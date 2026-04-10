@@ -1,0 +1,14 @@
+<p>participant-form works!</p>
+<div class="container">
+  <h2>Inscrever Participante</h2>
+
+  <form (ngSubmit)="addParticipant()">
+    <input [(ngModel)]="participant.name" name="name" placeholder="Nome" class="form-control" required>
+
+    <input [(ngModel)]="participant.email" name="email" placeholder="Email" class="form-control" required>
+
+    <input [(ngModel)]="participant.phone" name="phone" placeholder="Telefone" class="form-control">
+
+    <button type="submit" class="btn btn-success mt-2">Inscrever</button>
+  </form>
+</div>
