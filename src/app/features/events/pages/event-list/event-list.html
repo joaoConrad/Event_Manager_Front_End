@@ -8,7 +8,24 @@
     <button>Novo evento</button>
   </div>
 
-  <div class="empty-state">
-    <p>Nenhum evento carregado ainda.</p>
-  </div>
+  @if (events.length > 0) {
+    <div class="event-list">
+      @for (event of events; track event.id) {
+        <article class="event-card">
+          <h2>{{ event.title }}</h2>
+          <p>{{ event.description }}</p>
+          <ul>
+            <li><strong>Data:</strong> {{ event.date }}</li>
+            <li><strong>Horário:</strong> {{ event.time }}</li>
+            <li><strong>Local:</strong> {{ event.location }}</li>
+            <li><strong>Máx. participantes:</strong> {{ event.maxParticipants }}</li>
+          </ul>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <p>Nenhum evento carregado ainda.</p>
+    </div>
+  }
 </section>
