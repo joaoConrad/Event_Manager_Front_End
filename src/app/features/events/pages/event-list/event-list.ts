@@ -4,6 +4,8 @@ import { Component } from '@angular/core';
   selector: 'app-event-list',
   imports: [],
   templateUrl: './event-list.html',
-  styleUrl: './event-list.css',
+  styleUrl: './event-list.css'
 })
-export class EventList {}
+export class EventList {
+
+}
