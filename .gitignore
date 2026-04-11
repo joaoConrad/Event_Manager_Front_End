@@ -1,0 +1,89 @@
+# =========================================================
+# Angular / Build output
+# =========================================================
+/dist/
+/tmp/
+/out-tsc/
+/bazel-out/
+/.angular/
+/.angular/cache/
+/coverage/
+/build/
+
+# =========================================================
+# Node / Package managers
+# =========================================================
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================================================
+# Environment / local config (NÃO versionar segredos)
+# =========================================================
+.env
+.env.local
+.env.*.local
+
+# =========================================================
+# Logs / temp files
+# =========================================================
+*.log
+*.tmp
+*.temp
+/connect.lock
+/libpeerconnection.log
+testem.log
+
+# =========================================================
+# IDEs and editors
+# =========================================================
+
+# VS Code (mantém configs úteis compartilháveis)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains (IntelliJ, WebStorm, etc)
+.idea/
+*.iml
+
+# Eclipse / antigos
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# Sublime
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+
+# Histórico/local lixo de editor
+.history/
+
+# =========================================================
+# Angular / Sass / typings
+# =========================================================
+.sass-cache/
+/typings/
+
+# =========================================================
+# Test tools / artifacts
+# =========================================================
+__screenshots__/
+playwright-report/
+test-results/
+
+# =========================================================
+# Sistema operacional
+# =========================================================
+.DS_Store
+Thumbs.db
