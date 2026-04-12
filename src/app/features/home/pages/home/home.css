@@ -52,3 +52,20 @@
 .green { background: #dcfce7; }
 .purple { background: #ede9fe; }
 .yellow { background: #fef3c7; }
+
+.events {
+  margin-top: 2rem;
+}
+
+.event-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.event-card {
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  background: white;
+}
