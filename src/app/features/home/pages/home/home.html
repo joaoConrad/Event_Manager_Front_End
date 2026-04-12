@@ -1,82 +1,91 @@
-<section class="home">
+<section class="home-container">
 
-  <!-- HERO -->
-  <div class="hero">
-    <h1>Gerencie eventos de forma simples</h1>
-    <p>Crie, acompanhe e organize eventos e participantes em um só lugar.</p>
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Gerencie eventos de forma simples</h1>
+        <p>Crie, acompanhe e organize eventos e participantes em um só lugar.</p>
 
-    <div class="actions">
-      <button class="primary">Ver eventos</button>
-      <button class="secondary">Criar evento</button>
-    </div>
-  </div>
-
-  <div class="stats">
-  <div class="card blue">
-    <p>Total de eventos</p>
-    <h2>28</h2>
-  </div>
-
-  <div class="card green">
-    <p>Próximos eventos</p>
-    <h2>11</h2>
-  </div>
-
-  <div class="card purple">
-    <p>Participantes inscritos</p>
-    <h2>450</h2>
-  </div>
-
-  <div class="card yellow">
-    <p>Eventos esgotados</p>
-    <h2>4</h2>
-  </div>
-</div>
-
-<div class="events">
-  <h2>Próximos Eventos</h2>
-
-  <div class="event-list">
-    <div class="event-card">
-      <h3>Semana Acadêmica de TI</h3>
-      <p>15 Mai, 09:00</p>
-      <p>Auditório Prédio 5</p>
+        <div class="actions">
+            <a routerLink="/events" class="btn primary">Ver eventos</a>
+            <a routerLink="/events/new" class="btn secondary">Criar evento</a>
+        </div>
     </div>
 
-    <div class="event-card">
-      <h3>Workshop Java Web</h3>
-      <p>22 Jun, 14:00</p>
-      <p>Laboratório 203</p>
-    </div>
+    <!-- STATS -->
+    <section class="section">
+        <h2 class="section-title">Resumo rápido do sistema</h2>
 
-    <div class="event-card">
-      <h3>Palestra Inovação Digital</h3>
-      <p>10 Jul, 19:00</p>
-      <p>Anfiteatro Central</p>
-    </div>
-  </div>
-</div>
+        <div class="stats">
+            <div class="card blue">
+                <p>Total de eventos</p>
+                <h2>28</h2>
+            </div>
 
-<div class="features">
-  <h2>O que o sistema oferece</h2>
+            <div class="card green">
+                <p>Próximos eventos</p>
+                <h2>11</h2>
+            </div>
 
-  <div class="feature-grid">
-    <div>➕ Criar eventos</div>
-    <div>✏️ Editar eventos</div>
-    <div>🗑️ Excluir eventos</div>
-    <div>👤 Inscrever participantes</div>
-    <div>👁️ Visualizar participantes</div>
-  </div>
-</div>
+            <div class="card purple">
+                <p>Participantes inscritos</p>
+                <h2>450</h2>
+            </div>
 
-<div class="cta">
-  <h2>Pronto para organizar seu próximo evento?</h2>
-  <button>Cadastrar evento</button>
-</div>
+            <div class="card yellow">
+                <p>Eventos esgotados</p>
+                <h2>4</h2>
+            </div>
+        </div>
+    </section>
 
-<footer>
-  <p>EventManager - Sistema de Gerenciamento de Eventos</p>
-  <p>Desenvolvido por Bruno H., Pedro C., João C. e Murilo C.</p>
-</footer>
+    <!-- EVENTS -->
+    <section class="section">
+        <h2 class="section-title">Próximos eventos</h2>
+
+        <div class="event-list">
+            <div class="event-card">
+                <h3>Semana Acadêmica de TI</h3>
+                <p>15 Mai, 09:00</p>
+                <p>Auditório Prédio 5</p>
+            </div>
+
+            <div class="event-card">
+                <h3>Workshop Java Web</h3>
+                <p>22 Jun, 14:00</p>
+                <p>Laboratório 203</p>
+            </div>
+
+            <div class="event-card">
+                <h3>Palestra Inovação Digital</h3>
+                <p>10 Jul, 19:00</p>
+                <p>Anfiteatro Central</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section">
+        <h2 class="section-title">O que o sistema oferece</h2>
+
+        <div class="feature-grid">
+            <div class="feature-card">➕ Criar eventos</div>
+            <div class="feature-card">✏️ Editar eventos</div>
+            <div class="feature-card">🗑️ Excluir eventos</div>
+            <div class="feature-card">👤 Inscrever participantes</div>
+            <div class="feature-card">👁️ Visualizar participantes</div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <h2>Pronto para organizar seu próximo evento?</h2>
+        <a routerLink="/events/new" class="btn primary">Cadastrar evento</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>EventManager - Sistema de Gerenciamento de Eventos</p>
+        <p>Desenvolvido por Bruno, Pedro C., João e Murilo</p>
+    </footer>
 
 </section>
