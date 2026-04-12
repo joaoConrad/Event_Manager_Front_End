@@ -1,0 +1,36 @@
+.home {
+  padding: 2rem;
+}
+
+.hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, #dfe9f3, #ffffff);
+  border-radius: 16px;
+}
+
+.hero h1 {
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.actions button {
+  margin: 0 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.primary {
+  background: #5b6cff;
+  color: white;
+}
+
+.secondary {
+  background: #e0e7ff;
+}
