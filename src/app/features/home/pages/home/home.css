@@ -69,3 +69,13 @@
   border: 1px solid #ddd;
   background: white;
 }
+
+.features {
+  margin-top: 2rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+}
