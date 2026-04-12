@@ -1,1 +1,19 @@
-<router-outlet></router-outlet>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-icon"></span>
+    <span class="brand-name">EventManager</span>
+  </div>
+
+  <nav class="nav">
+    <a routerLink="/home" routerLinkActive="active">Home</a>
+    <a routerLink="/events" routerLinkActive="active">Eventos</a>
+  </nav>
+
+  <div class="topbar-action">
+    <a class="view-events-btn" routerLink="/events">Ver eventos</a>
+  </div>
+</header>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>

@@ -1,0 +1,67 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #1f2937;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+}
+
+.brand-icon {
+  font-size: 1.2rem;
+}
+
+.brand-name {
+  font-size: 1rem;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav a,
+.view-events-btn {
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
+}
+
+.nav a:hover,
+.view-events-btn:hover {
+  color: #4f46e5;
+}
+
+.nav a.active {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.view-events-btn {
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: #6d5dfc;
+  color: #ffffff;
+}
+
+.main-content {
+  padding: 2rem;
+}
