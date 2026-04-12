@@ -34,3 +34,21 @@
 .secondary {
   background: #e0e7ff;
 }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.card {
+  padding: 1rem;
+  border-radius: 12px;
+  color: #333;
+}
+
+.blue { background: #dbeafe; }
+.green { background: #dcfce7; }
+.purple { background: #ede9fe; }
+.yellow { background: #fef3c7; }
