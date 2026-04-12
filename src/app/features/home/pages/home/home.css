@@ -79,3 +79,18 @@
   grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
 }
+
+.cta {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #dbeafe;
+  text-align: center;
+  border-radius: 12px;
+}
+
+footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #555;
+}
