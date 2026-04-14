@@ -58,3 +58,64 @@ input:focus, textarea:focus {
   outline: none;
   border-color: #4f46e5;
 }
+
+.event-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  transition: 0.25s ease;
+  cursor: pointer;
+}
+
+.event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+/* TÍTULO */
+.event-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* DESCRIÇÃO */
+.event-description {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+/* DATA */
+.event-date {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 1rem;
+}
+
+/* AÇÕES */
+.event-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* BOTÕES */
+.btn-edit {
+  background: #22c55e;
+  color: white;
+}
+
+.btn-edit:hover {
+  background: #16a34a;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+}
