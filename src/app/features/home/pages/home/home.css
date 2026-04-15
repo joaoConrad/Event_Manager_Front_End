@@ -7,7 +7,6 @@
   padding: 2rem 1rem;
 }
 
-/* HERO */
 .hero {
   text-align: center;
   padding: 3.5rem 2rem;
@@ -26,7 +25,6 @@
   opacity: 0.9;
 }
 
-/* BOTÕES */
 .actions {
   margin-top: 1.5rem;
 }
@@ -60,7 +58,6 @@
   background: rgba(255,255,255,0.35);
 }
 
-/* SECTIONS */
 .section {
   background: white;
   padding: 1.8rem;
@@ -79,7 +76,6 @@
   font-weight: 600;
 }
 
-/* STATS */
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -102,7 +98,6 @@
 .purple { background: linear-gradient(135deg, #ddd6fe, #ede9fe); }
 .yellow { background: linear-gradient(135deg, #fde68a, #fef3c7); }
 
-/* EVENTS */
 .event-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -123,7 +118,6 @@
   box-shadow: 0 14px 28px rgba(0,0,0,0.12);
 }
 
-/* FEATURES */
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -143,7 +137,6 @@
   transform: translateY(-4px);
 }
 
-/* CTA */
 .cta {
   text-align: center;
   padding: 2.5rem;
@@ -155,7 +148,6 @@
   margin-bottom: 1rem;
 }
 
-/* FOOTER */
 footer {
   text-align: center;
   font-size: 0.9rem;
@@ -163,7 +155,6 @@ footer {
   padding: 1rem;
 }
 
-/* RESPONSIVO */
 @media (max-width: 900px) {
   .stats {
     grid-template-columns: repeat(2, 1fr);

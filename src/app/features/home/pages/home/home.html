@@ -43,23 +43,28 @@
         <h2 class="section-title">Próximos eventos</h2>
 
         <div class="event-list">
-            <div class="event-card">
-                <h3>Semana Acadêmica de TI</h3>
-                <p>15 Mai, 09:00</p>
-                <p>Auditório Prédio 5</p>
+
+            <div class="event-card" *ngFor="let event of events">
+
+                <div class="event-title">
+                    {{ event.title }}
+                </div>
+
+                <div class="event-description">
+                    {{ event.description }}
+                </div>
+
+                <div class="event-date">
+                    📅 {{ event.date }}
+                </div>
+
+                <div class="event-actions">
+                    <button class="btn-edit">Editar</button>
+                    <button class="btn-delete">Excluir</button>
+                </div>
+
             </div>
 
-            <div class="event-card">
-                <h3>Workshop Java Web</h3>
-                <p>22 Jun, 14:00</p>
-                <p>Laboratório 203</p>
-            </div>
-
-            <div class="event-card">
-                <h3>Palestra Inovação Digital</h3>
-                <p>10 Jul, 19:00</p>
-                <p>Anfiteatro Central</p>
-            </div>
         </div>
     </section>
 
