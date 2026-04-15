@@ -1,4 +1,33 @@
 <section>
-  <h1>Criar Evento</h1>
-  <p>Formulário em construção...</p>
+<body>
+    <div class="container">
+        <h2>Formulário de Criação de Evento</h2>
+
+        <form action="#" method="post">
+            
+            <label for="name">Nome do Evento:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="description">Breve Descrição:</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+
+            <label for="date">Data:</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="horario">Horário:</label>
+            <input type="time" id="horario" name="horario" required>
+
+            <label for="local">Local:</label>
+            <input type="text" id="local" name="local" required>
+
+            <label for="max_participants">Número Máximo de Participantes:</label>
+            <input type="number" id="max_participants" name="max_participantes" min="1" required>
+
+            <div class="button-group">
+                <input type="submit" value="Criar Evento">
+                <input type="reset" value="Limpar">
+            </div>
+        </form>
+    </div>
+</body>
 </section>
