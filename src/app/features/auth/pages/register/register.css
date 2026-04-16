@@ -1,0 +1,51 @@
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+}
+
+.auth-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 320px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.auth-card h1 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+}
+
+input {
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 0.3rem;
+}
+
+button {
+  margin-top: 1.2rem;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: none;
+  background: #6d5dfc;
+  color: white;
+  cursor: pointer;
+}
+
+.auth-footer {
+  margin-top: 1rem;
+  text-align: center;
+}
