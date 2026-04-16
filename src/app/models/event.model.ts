@@ -6,4 +6,5 @@ export interface EventModel {
   time: string;
   location: string;
   maxParticipants: number;
+  registeredParticipants: number;
 }
