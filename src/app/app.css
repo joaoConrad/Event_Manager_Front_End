@@ -6,6 +6,10 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* =========================
+   TOPBAR / NAVBAR
+========================= */
+
 .topbar {
   display: flex;
   align-items: center;
@@ -16,6 +20,7 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
+/* LOGO */
 .brand {
   display: flex;
   align-items: center;
@@ -31,36 +36,22 @@
   font-size: 1rem;
 }
 
+/* NAV CENTRAL */
 .nav {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-left: 2rem;
 }
 
-.nav a,
-.view-events-btn {
+.nav a {
   text-decoration: none;
   color: #374151;
   font-size: 0.95rem;
   transition: 0.2s ease;
 }
 
-.nav a:hover,
-.view-events-btn:hover {
-  color: #4f46e5;
-}
-
-.nav a,
-.view-user-acts-btn {
-  font-size: 1rem;
-  padding: 0.1rem 0.1rem;
-  text-decoration: none;
-  color: #374151;
-}
-
-.nav a:hover,
-.view-user-acts-btn:hover {
-  transition: 0.3s ease;
+.nav a:hover {
   color: #4f46e5;
 }
 
@@ -69,12 +60,48 @@
   font-weight: 600;
 }
 
+.actions-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* BOTÃO PRINCIPAL */
 .view-events-btn {
   padding: 0.6rem 1rem;
   border-radius: 999px;
   background: #6d5dfc;
   color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: 0.2s ease;
 }
+
+.view-events-btn:hover {
+  background: #5a4cf0;
+}
+
+/* LOGIN / CADASTRO */
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.view-user-acts-btn {
+  text-decoration: none;
+  color: #374151;
+  font-size: 0.9rem;
+  transition: 0.2s ease;
+}
+
+.view-user-acts-btn:hover {
+  color: #4f46e5;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
 
 .main-content {
   padding: 2rem;
