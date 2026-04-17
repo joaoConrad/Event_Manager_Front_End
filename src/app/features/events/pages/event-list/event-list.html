@@ -5,35 +5,37 @@
   </header>
 
   <div class="actions">
-    <a routerLink="/events/new" class="new-event-btn">Novo evento</a>
+    @if (authService.isAdmin()) {
+    <a routerLink="/events/new" class="btn secondary">Criar evento</a>
+    }
   </div>
 
   @if (events.length > 0) {
-    <div class="event-list">
-      @for (event of events; track event.id) {
-        <article class="event-card">
-          <h2>{{ event.title }}</h2>
-          <p class="event-description">{{ event.description }}</p>
+  <div class="event-list">
+    @for (event of events; track event.id) {
+    <article class="event-card">
+      <h2>{{ event.title }}</h2>
+      <p class="event-description">{{ event.description }}</p>
 
-          <ul>
-            <li><strong>Data:</strong> {{ event.date }}</li>
-            <li><strong>Horário:</strong> {{ event.time }}</li>
-            <li><strong>Local:</strong> {{ event.location }}</li>
-            <li><strong>Máx. participantes:</strong> {{ event.maxParticipants }}</li>
-            <li><strong>Inscritos:</strong> {{ event.registeredParticipants }}</li>
-            <li>
-              <strong>Vagas disponíveis:</strong>
-              {{ getAvailableSpots(event) }}
-            </li>
-          </ul>
+      <ul>
+        <li><strong>Data:</strong> {{ event.date }}</li>
+        <li><strong>Horário:</strong> {{ event.time }}</li>
+        <li><strong>Local:</strong> {{ event.location }}</li>
+        <li><strong>Máx. participantes:</strong> {{ event.maxParticipants }}</li>
+        <li><strong>Inscritos:</strong> {{ event.registeredParticipants }}</li>
+        <li>
+          <strong>Vagas disponíveis:</strong>
+          {{ getAvailableSpots(event) }}
+        </li>
+      </ul>
 
-          <button class="join-btn">Entrar no evento</button>
-        </article>
-      }
-    </div>
+      <button class="join-btn">Entrar no evento</button>
+    </article>
+    }
+  </div>
   } @else {
-    <div class="empty-state">
-      <p>Nenhum evento com vagas disponíveis no momento.</p>
-    </div>
+  <div class="empty-state">
+    <p>Nenhum evento com vagas disponíveis no momento.</p>
+  </div>
   }
 </section>

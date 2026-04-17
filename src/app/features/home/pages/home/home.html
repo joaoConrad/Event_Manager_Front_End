@@ -7,7 +7,9 @@
 
         <div class="actions">
             <a routerLink="/events" class="btn primary">Ver eventos</a>
+            @if (authService.isAdmin()) {
             <a routerLink="/events/new" class="btn secondary">Criar evento</a>
+            }
         </div>
     </div>
 
