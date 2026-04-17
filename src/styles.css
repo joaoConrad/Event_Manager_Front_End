@@ -59,36 +59,3 @@ input:focus, textarea:focus {
   border-color: #4f46e5;
 }
 
-/* GARANTE ALTURA TOTAL */
-html, body {
-  height: 100%;
-  margin: 0;
-}
-
-/* FUNDO COM IMAGEM */
-body {
-  background: url('https://images.unsplash.com/photo-1492724441997-5dc865305da7') no-repeat center center fixed;
-  background-size: cover;
-}
-
-/* CAMADA ESCURA */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(6px);
-  z-index: -1;
-}
-
-/* 🔴 ISSO AQUI É O QUE VAI RESOLVER */
-app-root,
-router-outlet + *,
-app-root > * {
-  background: transparent !important;
-}
-
-/* REMOVE FUNDO DE QUALQUER WRAPPER */
-div, main, section {
-  background-color: transparent !important;
-}

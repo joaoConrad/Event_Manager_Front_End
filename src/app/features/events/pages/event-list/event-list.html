@@ -1,39 +1,62 @@
 <section class="page">
+
+  <!-- HEADER -->
   <header class="page-header">
     <h1>Eventos com vagas disponíveis</h1>
     <p>Veja os eventos que ainda aceitam inscrições.</p>
   </header>
 
+  <!-- BOTÃO -->
   <div class="actions">
-    <a routerLink="/events/new" class="new-event-btn">Novo evento</a>
+    <a routerLink="/events/new" class="new-event-btn">+ Novo evento</a>
   </div>
 
+  <!-- LISTA -->
   @if (events.length > 0) {
     <div class="event-list">
+
       @for (event of events; track event.id) {
         <article class="event-card">
+
+          <!-- TITULO -->
           <h2>{{ event.title }}</h2>
-          <p class="event-description">{{ event.description }}</p>
 
-          <ul>
-            <li><strong>Data:</strong> {{ event.date }}</li>
-            <li><strong>Horário:</strong> {{ event.time }}</li>
-            <li><strong>Local:</strong> {{ event.location }}</li>
-            <li><strong>Máx. participantes:</strong> {{ event.maxParticipants }}</li>
-            <li><strong>Inscritos:</strong> {{ event.registeredParticipants }}</li>
-            <li>
-              <strong>Vagas disponíveis:</strong>
+          <!-- DESCRIÇÃO -->
+          <p class="event-description">
+            {{ event.description }}
+          </p>
+
+          <!-- INFO EM GRID (NOVO) -->
+          <div class="event-info">
+            <span><strong>📅 Data:</strong> {{ event.date }}</span>
+            <span><strong>⏰ Horário:</strong> {{ event.time }}</span>
+            <span><strong>📍 Local:</strong> {{ event.location }}</span>
+            <span><strong>👥 Máx:</strong> {{ event.maxParticipants }}</span>
+            <span><strong>✅ Inscritos:</strong> {{ event.registeredParticipants }}</span>
+
+            <span class="available">
+              <strong>🔥 Vagas:</strong>
               {{ getAvailableSpots(event) }}
-            </li>
-          </ul>
+            </span>
+          </div>
 
-          <button class="join-btn">Entrar no evento</button>
+          <!-- BOTÃO -->
+          <button class="join-btn">
+            Entrar no evento
+          </button>
+
         </article>
       }
+
     </div>
+
   } @else {
+
+    <!-- VAZIO -->
     <div class="empty-state">
       <p>Nenhum evento com vagas disponíveis no momento.</p>
     </div>
+
   }
+
 </section>
