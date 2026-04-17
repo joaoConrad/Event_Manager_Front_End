@@ -1,86 +1,146 @@
+/* CONTAINER PRINCIPAL */
 .page {
-  max-width: 960px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* HEADER COM IMAGEM */
 .page-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* IMAGEM DE FUNDO (festa.jpeg) */
+.page-header::before {
+  content: "";
+  display: block;
+  height: 220px;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.55),
+      rgba(0, 0, 0, 0.55)
+    ),
+    url("festa.jpeg") center/cover no-repeat;
+}
+
+/* TEXTO SOBRE A IMAGEM */
+.page-header-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2rem;
+  color: #fff;
 }
 
 .page-header h1 {
   margin: 0 0 0.5rem;
+  font-size: 2rem;
+  font-weight: 600;
 }
 
 .page-header p {
   margin: 0;
-  color: #555;
+  color: #ddd;
+  font-size: 1rem;
 }
 
+/* BOTÃO NOVO EVENTO */
 .actions {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .new-event-btn {
   display: inline-block;
-  padding: 0.75rem 1rem;
-  border: 0;
-  border-radius: 8px;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  background-color: #6d5dfc;
+  background-color: #2c2c2c;
   color: #fff;
   text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
+.new-event-btn:hover {
+  background-color: #000;
+  transform: translateY(-1px);
+}
+
+/* ESTADO VAZIO */
 .empty-state {
   padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  background: #f7f7f7;
+  text-align: center;
+  color: #666;
 }
 
+/* LISTA DE EVENTOS */
 .event-list {
   display: grid;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
+/* CARD DE EVENTO */
 .event-card {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 1.4rem;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
+.event-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* TITULO EVENTO */
 .event-card h2 {
   margin-top: 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  color: #222;
 }
 
+/* DESCRIÇÃO */
 .event-description {
   margin-top: 0;
-  color: #444;
+  margin-bottom: 1rem;
+  color: #555;
+  line-height: 1.4;
 }
 
+/* LISTA */
 .event-card ul {
   padding-left: 1.2rem;
   margin-bottom: 1rem;
 }
 
 .event-card li {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
+  color: #444;
 }
 
+/* BOTÃO PARTICIPAR */
 .join-btn {
-  padding: 0.75rem 1rem;
-  border: 0;
-  border-radius: 8px;
+  padding: 0.7rem 1.1rem;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-  background-color: #6d5dfc;
+  background-color: #2c2c2c;
   color: #fff;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.join-btn:hover,
-.new-event-btn:hover {
-  opacity: 0.92;
+.join-btn:hover {
+  background-color: #000;
+  transform: translateY(-1px);
 }
