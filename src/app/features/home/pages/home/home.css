@@ -93,10 +93,14 @@
   transform: scale(1.03);
 }
 
-.blue { background: linear-gradient(135deg, #bfdbfe, #dbeafe); }
-.green { background: linear-gradient(135deg, #bbf7d0, #dcfce7); }
-.purple { background: linear-gradient(135deg, #ddd6fe, #ede9fe); }
-.yellow { background: linear-gradient(135deg, #fde68a, #fef3c7); }
+
+
+/* 🔴 NOVO VERMELHO PROFISSIONAL */
+.red {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: white;
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+}
 
 .event-list {
   display: grid;
