@@ -15,29 +15,46 @@
   @if (events.length > 0) {
     <div class="event-list">
 
-      @for (event of events; track event.id) {
+      @for (event of events; track event.id; let i = $index) {
         <article class="event-card">
 
-          <!-- TITULO -->
-          <h2>{{ event.title }}</h2>
+          <div class="event-content">
 
-          <!-- DESCRIÇÃO -->
-          <p class="event-description">
-            {{ event.description }}
-          </p>
+            <!-- ESQUERDA -->
+            <div class="event-left">
+              <h2>{{ event.title }}</h2>
 
-          <!-- INFO EM GRID (NOVO) -->
-          <div class="event-info">
-            <span><strong>📅 Data:</strong> {{ event.date }}</span>
-            <span><strong>⏰ Horário:</strong> {{ event.time }}</span>
-            <span><strong>📍 Local:</strong> {{ event.location }}</span>
-            <span><strong>👥 Máx:</strong> {{ event.maxParticipants }}</span>
-            <span><strong>✅ Inscritos:</strong> {{ event.registeredParticipants }}</span>
+              <p class="event-description">
+                {{ event.description }}
+              </p>
 
-            <span class="available">
-              <strong>🔥 Vagas:</strong>
-              {{ getAvailableSpots(event) }}
-            </span>
+              <div class="event-info">
+                <span><strong>📅 Data:</strong> {{ event.date }}</span>
+                <span><strong>⏰ Horário:</strong> {{ event.time }}</span>
+                <span><strong>📍 Local:</strong> {{ event.location }}</span>
+                <span><strong>👥 Máx:</strong> {{ event.maxParticipants }}</span>
+                <span><strong>✅ Inscritos:</strong> {{ event.registeredParticipants }}</span>
+
+                <span class="available">
+                  <strong>🔥 Vagas:</strong>
+                  {{ getAvailableSpots(event) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- DIREITA (IMAGENS DIFERENTES) -->
+            <div class="event-image">
+              <img 
+                [src]="
+                  i === 0 
+                  ? 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30'
+                  : i === 1 
+                  ? 'https://images.unsplash.com/photo-1506157786151-b8491531f063'
+                  : 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819'
+                " 
+                alt="Evento">
+            </div>
+
           </div>
 
           <!-- BOTÃO -->
@@ -52,7 +69,6 @@
 
   } @else {
 
-    <!-- VAZIO -->
     <div class="empty-state">
       <p>Nenhum evento com vagas disponíveis no momento.</p>
     </div>

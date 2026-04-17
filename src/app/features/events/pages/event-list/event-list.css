@@ -11,7 +11,7 @@ body {
   padding: 2rem;
 }
 
-/* HEADER CLEAN */
+/* HEADER */
 .page-header {
   margin-bottom: 2rem;
 }
@@ -27,7 +27,7 @@ body {
   color: #64748b;
 }
 
-/* BOTÃO NOVO */
+/* BOTÃO */
 .actions {
   margin-bottom: 2rem;
 }
@@ -66,6 +66,18 @@ body {
   box-shadow: 0 10px 25px rgba(0,0,0,0.06);
 }
 
+/* LAYOUT INTERNO */
+.event-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* ESQUERDA */
+.event-left {
+  flex: 2;
+}
+
 /* TITULO */
 .event-card h2 {
   margin: 0;
@@ -79,7 +91,7 @@ body {
   color: #475569;
 }
 
-/* GRID INFO (melhor que lista feia) */
+/* INFO */
 .event-info {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -92,10 +104,27 @@ body {
   color: #334155;
 }
 
-/* DESTACAR VAGAS */
+/* VAGAS */
 .available {
   color: #16a34a;
   font-weight: 600;
+}
+
+/* IMAGEM DIREITA */
+.event-image {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-image img {
+  width: 100%;
+  max-width: 180px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
 /* BOTÃO */
@@ -120,4 +149,16 @@ body {
   text-align: center;
   padding: 2rem;
   color: #64748b;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .event-content {
+    flex-direction: column;
+  }
+
+  .event-image img {
+    max-width: 100%;
+    height: 160px;
+  }
 }
