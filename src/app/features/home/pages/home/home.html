@@ -1,38 +1,42 @@
 <section class="home-container">
 
-    <!-- HERO -->
-    <div class="hero">
-        <h1>Gerencie eventos de forma simples</h1>
-        <p>Crie, acompanhe e organize eventos e participantes em um só lugar.</p>
+    <!-- HERO / BANNER -->
+    <header class="hero">
+        <div class="hero-overlay"></div>
 
-        <div class="actions">
-            <a routerLink="/events" class="btn primary">Ver eventos</a>
-            <a routerLink="/events/new" class="btn secondary">Criar evento</a>
+        <div class="hero-content">
+            <h1>Gerencie eventos com eficiência</h1>
+            <p>Crie, organize e acompanhe seus eventos e participantes em um único sistema moderno.</p>
+
+            <div class="actions">
+                <a routerLink="/events" class="btn primary">Ver eventos</a>
+                <a routerLink="/events/new" class="btn secondary">Criar evento</a>
+            </div>
         </div>
-    </div>
+    </header>
 
     <!-- STATS -->
-    <section class="section">
-        <h2 class="section-title">Resumo rápido do sistema</h2>
+    <section class="section stats-section">
+        <h2 class="section-title">Visão geral</h2>
 
         <div class="stats">
-            <div class="card blue">
-                <p>Total de eventos</p>
+            <div class="card">
+                <span>Total de eventos</span>
                 <h2>28</h2>
             </div>
 
-            <div class="card green">
-                <p>Próximos eventos</p>
+            <div class="card">
+                <span>Próximos eventos</span>
                 <h2>11</h2>
             </div>
 
-            <div class="card purple">
-                <p>Participantes inscritos</p>
+            <div class="card">
+                <span>Participantes inscritos</span>
                 <h2>450</h2>
             </div>
 
-            <div class="card yellow">
-                <p>Eventos esgotados</p>
+            <div class="card">
+                <span>Eventos esgotados</span>
                 <h2>4</h2>
             </div>
         </div>
@@ -40,57 +44,82 @@
 
     <!-- EVENTS -->
     <section class="section">
-        <h2 class="section-title">Próximos eventos</h2>
+        <div class="section-header">
+            <h2 class="section-title">Próximos eventos</h2>
+            <a routerLink="/events" class="link">Ver todos</a>
+        </div>
 
         <div class="event-list">
 
-            <div class="event-card" *ngFor="let event of events">
+            <article class="event-card" *ngFor="let event of events">
 
-                <div class="event-title">
-                    {{ event.title }}
+                <div class="event-header">
+                    <h3 class="event-title">{{ event.title }}</h3>
+                    <span class="event-date">📅 {{ event.date }}</span>
                 </div>
 
-                <div class="event-description">
+                <p class="event-description">
                     {{ event.description }}
-                </div>
-
-                <div class="event-date">
-                    📅 {{ event.date }}
-                </div>
+                </p>
 
                 <div class="event-actions">
-                    <button class="btn-edit">Editar</button>
-                    <button class="btn-delete">Excluir</button>
+                    <button class="btn-outline">Editar</button>
+                    <button class="btn-danger">Excluir</button>
                 </div>
 
-            </div>
+            </article>
 
         </div>
     </section>
 
     <!-- FEATURES -->
-    <section class="section">
-        <h2 class="section-title">O que o sistema oferece</h2>
+    <section class="section features-section">
+        <h2 class="section-title">Funcionalidades</h2>
 
         <div class="feature-grid">
-            <div class="feature-card">➕ Criar eventos</div>
-            <div class="feature-card">✏️ Editar eventos</div>
-            <div class="feature-card">🗑️ Excluir eventos</div>
-            <div class="feature-card">👤 Inscrever participantes</div>
-            <div class="feature-card">👁️ Visualizar participantes</div>
+            <div class="feature-card">
+                <span>➕</span>
+                <p>Criar eventos</p>
+            </div>
+
+            <div class="feature-card">
+                <span>✏️</span>
+                <p>Editar eventos</p>
+            </div>
+
+            <div class="feature-card">
+                <span>🗑️</span>
+                <p>Excluir eventos</p>
+            </div>
+
+            <div class="feature-card">
+                <span>👤</span>
+                <p>Gerenciar participantes</p>
+            </div>
+
+            <div class="feature-card">
+                <span>📊</span>
+                <p>Acompanhar métricas</p>
+            </div>
         </div>
     </section>
 
     <!-- CTA -->
     <section class="cta">
-        <h2>Pronto para organizar seu próximo evento?</h2>
-        <a routerLink="/events/new" class="btn primary">Cadastrar evento</a>
+        <div class="cta-content">
+            <h2>Organize seu próximo evento agora</h2>
+            <p>Tenha controle total dos seus eventos de forma simples e profissional.</p>
+            <a routerLink="/events/new" class="btn primary">Cadastrar evento</a>
+        </div>
     </section>
 
     <!-- FOOTER -->
-    <footer>
-        <p>EventManager - Sistema de Gerenciamento de Eventos</p>
-        <p>Desenvolvido por Bruno, Pedro C., João e Murilo</p>
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="logo">EventManager</p>
+            <p>Sistema de gerenciamento de eventos</p>
+            <p class="credits">Desenvolvido por Bruno, Pedro C., João e Murilo</p>
+        </div>
     </footer>
 
 </section>
