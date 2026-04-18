@@ -4,22 +4,17 @@
     <header class="hero">
         <div class="hero-overlay"></div>
 
-<<<<<<< HEAD
-        <div class="actions">
-            <a routerLink="/events" class="btn primary">Ver eventos</a>
-            @if (authService.isAdmin()) {
-            <a routerLink="/events/new" class="btn secondary">Criar evento</a>
-            }
-=======
         <div class="hero-content">
             <h1>Gerencie eventos com eficiência</h1>
             <p>Crie, organize e acompanhe seus eventos e participantes em um único sistema moderno.</p>
 
             <div class="actions">
                 <a routerLink="/events" class="btn primary">Ver eventos</a>
-                <a routerLink="/events/new" class="btn secondary">Criar evento</a>
+
+                @if (authService.isAdmin()) {
+                    <a routerLink="/events/new" class="btn secondary">Criar evento</a>
+                }
             </div>
->>>>>>> origin/main
         </div>
     </header>
 
@@ -58,7 +53,6 @@
         </div>
 
         <div class="event-list">
-
             <article class="event-card" *ngFor="let event of events">
 
                 <div class="event-header">
@@ -70,13 +64,14 @@
                     {{ event.description }}
                 </p>
 
-                <div class="event-actions">
-                    <button class="btn-outline">Editar</button>
-                    <button class="btn-danger">Excluir</button>
-                </div>
+                @if (authService.isAdmin()) {
+                    <div class="event-actions">
+                        <button class="btn-outline">Editar</button>
+                        <button class="btn-danger">Excluir</button>
+                    </div>
+                }
 
             </article>
-
         </div>
     </section>
 
@@ -117,7 +112,10 @@
         <div class="cta-content">
             <h2>Organize seu próximo evento agora</h2>
             <p>Tenha controle total dos seus eventos de forma simples e profissional.</p>
-            <a routerLink="/events/new" class="btn primary">Cadastrar evento</a>
+
+            @if (authService.isAdmin()) {
+                <a routerLink="/events/new" class="btn primary">Cadastrar evento</a>
+            }
         </div>
     </section>
 
