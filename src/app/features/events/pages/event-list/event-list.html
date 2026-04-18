@@ -1,16 +1,25 @@
 <section class="page">
+
+  <!-- HEADER -->
   <header class="page-header">
     <h1>Eventos com vagas disponíveis</h1>
     <p>Veja os eventos que ainda aceitam inscrições.</p>
   </header>
 
+  <!-- BOTÃO -->
   <div class="actions">
+<<<<<<< HEAD
     @if (authService.isAdmin()) {
     <a routerLink="/events/new" class="btn secondary">Criar evento</a>
     }
+=======
+    <a routerLink="/events/new" class="new-event-btn">+ Novo evento</a>
+>>>>>>> origin/main
   </div>
 
+  <!-- LISTA -->
   @if (events.length > 0) {
+<<<<<<< HEAD
   <div class="event-list">
     @for (event of events; track event.id) {
     <article class="event-card">
@@ -37,5 +46,68 @@
   <div class="empty-state">
     <p>Nenhum evento com vagas disponíveis no momento.</p>
   </div>
+=======
+    <div class="event-list">
+
+      @for (event of events; track event.id; let i = $index) {
+        <article class="event-card">
+
+          <div class="event-content">
+
+            <!-- ESQUERDA -->
+            <div class="event-left">
+              <h2>{{ event.title }}</h2>
+
+              <p class="event-description">
+                {{ event.description }}
+              </p>
+
+              <div class="event-info">
+                <span><strong>📅 Data:</strong> {{ event.date }}</span>
+                <span><strong>⏰ Horário:</strong> {{ event.time }}</span>
+                <span><strong>📍 Local:</strong> {{ event.location }}</span>
+                <span><strong>👥 Máx:</strong> {{ event.maxParticipants }}</span>
+                <span><strong>✅ Inscritos:</strong> {{ event.registeredParticipants }}</span>
+
+                <span class="available">
+                  <strong>🔥 Vagas:</strong>
+                  {{ getAvailableSpots(event) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- DIREITA (IMAGENS DIFERENTES) -->
+            <div class="event-image">
+              <img 
+                [src]="
+                  i === 0 
+                  ? 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30'
+                  : i === 1 
+                  ? 'https://images.unsplash.com/photo-1506157786151-b8491531f063'
+                  : 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819'
+                " 
+                alt="Evento">
+            </div>
+
+          </div>
+
+          <!-- BOTÃO -->
+          <button class="join-btn">
+            Entrar no evento
+          </button>
+
+        </article>
+      }
+
+    </div>
+
+  } @else {
+
+    <div class="empty-state">
+      <p>Nenhum evento com vagas disponíveis no momento.</p>
+    </div>
+
+>>>>>>> origin/main
   }
+
 </section>
