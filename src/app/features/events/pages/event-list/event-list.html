@@ -8,45 +8,13 @@
 
   <!-- BOTÃO -->
   <div class="actions">
-<<<<<<< HEAD
     @if (authService.isAdmin()) {
-    <a routerLink="/events/new" class="btn secondary">Criar evento</a>
+      <a routerLink="/events/new" class="new-event-btn">+ Novo evento</a>
     }
-=======
-    <a routerLink="/events/new" class="new-event-btn">+ Novo evento</a>
->>>>>>> origin/main
   </div>
 
   <!-- LISTA -->
   @if (events.length > 0) {
-<<<<<<< HEAD
-  <div class="event-list">
-    @for (event of events; track event.id) {
-    <article class="event-card">
-      <h2>{{ event.title }}</h2>
-      <p class="event-description">{{ event.description }}</p>
-
-      <ul>
-        <li><strong>Data:</strong> {{ event.date }}</li>
-        <li><strong>Horário:</strong> {{ event.time }}</li>
-        <li><strong>Local:</strong> {{ event.location }}</li>
-        <li><strong>Máx. participantes:</strong> {{ event.maxParticipants }}</li>
-        <li><strong>Inscritos:</strong> {{ event.registeredParticipants }}</li>
-        <li>
-          <strong>Vagas disponíveis:</strong>
-          {{ getAvailableSpots(event) }}
-        </li>
-      </ul>
-
-      <button class="join-btn">Entrar no evento</button>
-    </article>
-    }
-  </div>
-  } @else {
-  <div class="empty-state">
-    <p>Nenhum evento com vagas disponíveis no momento.</p>
-  </div>
-=======
     <div class="event-list">
 
       @for (event of events; track event.id; let i = $index) {
@@ -76,22 +44,21 @@
               </div>
             </div>
 
-            <!-- DIREITA (IMAGENS DIFERENTES) -->
+            <!-- DIREITA -->
             <div class="event-image">
-              <img 
+              <img
                 [src]="
                   i === 0 
                   ? 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30'
                   : i === 1 
                   ? 'https://images.unsplash.com/photo-1506157786151-b8491531f063'
                   : 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819'
-                " 
+                "
                 alt="Evento">
             </div>
 
           </div>
 
-          <!-- BOTÃO -->
           <button class="join-btn">
             Entrar no evento
           </button>
@@ -107,7 +74,6 @@
       <p>Nenhum evento com vagas disponíveis no momento.</p>
     </div>
 
->>>>>>> origin/main
   }
 
 </section>
