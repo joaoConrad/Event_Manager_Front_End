@@ -4,6 +4,7 @@ import { EventList } from './features/events/pages/event-list/event-list';
 import { EventCreate } from './features/events/pages/event-create/event-create';
 import { Login } from './features/auth/pages/login/login';
 import { Register } from './features/auth/pages/register/register';
+import { adminGuard } from './core/guards/admin-guard';
 
 
 export const routes: Routes = [
@@ -12,5 +13,6 @@ export const routes: Routes = [
     { path: 'events', component: EventList },
     { path: 'events/new', component: EventCreate },
     { path: 'login', component: Login },
-    { path: 'register', component: Register }
+    { path: 'register', component: Register },
+    { path: 'events/new', component: EventCreate, canActivate: [adminGuard] }
 ];
