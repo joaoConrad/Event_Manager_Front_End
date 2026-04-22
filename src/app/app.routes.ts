@@ -6,13 +6,13 @@ import { Login } from './features/auth/pages/login/login';
 import { Register } from './features/auth/pages/register/register';
 import { adminGuard } from './core/guards/admin-guard';
 
-
 export const routes: Routes = [
-    { path: '', redirectTo: 'home', pathMatch: 'full' },
-    { path: 'home', component: Home },
-    { path: 'events', component: EventList },
-    { path: 'events/new', component: EventCreate },
-    { path: 'login', component: Login },
-    { path: 'register', component: Register },
-    { path: 'events/new', component: EventCreate, canActivate: [adminGuard] }
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: 'home', component: Home },
+  { path: 'events', component: EventList },
+  { path: 'events/new', component: EventCreate, canActivate: [adminGuard] },
+  { path: 'events/edit/:id', component: EventCreate, canActivate: [adminGuard] },
+  { path: 'login', component: Login },
+  { path: 'register', component: Register },
+  { path: '**', redirectTo: 'home' }
 ];

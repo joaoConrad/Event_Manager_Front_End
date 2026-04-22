@@ -1,108 +1,107 @@
-:host {
-  display: block;
-  min-height: 100vh;
-  background: #f5f7fb;
-  color: #1f2937;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* =========================
-   TOPBAR / NAVBAR
-========================= */
-
 .topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 2rem;
-  background: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid #e5e7eb;
 }
 
-/* LOGO */
+.topbar-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-weight: 700;
-}
-
-.brand-icon {
-  font-size: 1.2rem;
-}
-
-.brand-name {
-  font-size: 1rem;
-}
-
-/* NAV CENTRAL */
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-left: 2rem;
-}
-
-.nav a {
   text-decoration: none;
-  color: #374151;
-  font-size: 0.95rem;
-  transition: 0.2s ease;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #111827;
 }
 
-.nav a:hover {
-  color: #4f46e5;
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.nav a.active {
-  color: #4f46e5;
+.topbar-nav a {
+  text-decoration: none;
+  color: #4b5563;
   font-weight: 600;
 }
 
-.actions-right {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
+.topbar-nav a:hover {
+  color: #111827;
 }
 
-/* BOTÃO PRINCIPAL */
-.view-events-btn {
-  padding: 0.6rem 1rem;
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-badge {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 0.55rem 0.8rem;
   border-radius: 999px;
-  background: #6d5dfc;
-  color: #ffffff;
+  color: #111827;
+  font-weight: 600;
+}
+
+.user-badge small {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.nav-btn {
+  border: none;
   text-decoration: none;
-  font-size: 0.9rem;
-  transition: 0.2s ease;
-}
-
-.view-events-btn:hover {
-  background: #5a4cf0;
-}
-
-/* LOGIN / CADASTRO */
-.user-actions {
-  display: flex;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
 }
 
-.view-user-acts-btn {
-  text-decoration: none;
-  color: #374151;
-  font-size: 0.9rem;
-  transition: 0.2s ease;
+.nav-btn.ghost {
+  background: #eef2ff;
+  color: #1d4ed8;
 }
 
-.view-user-acts-btn:hover {
-  color: #4f46e5;
+.nav-btn.primary {
+  background: #2563eb;
+  color: #fff;
 }
 
-/* =========================
-   MAIN CONTENT
-========================= */
+.nav-btn.danger {
+  background: #dc2626;
+  color: #fff;
+}
 
-.main-content {
-  padding: 2rem;
+.app-main {
+  min-height: calc(100vh - 72px);
+}
+
+@media (max-width: 860px) {
+  .topbar-container {
+    flex-wrap: wrap;
+  }
+
+  .topbar-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .topbar-actions {
+    margin-left: auto;
+  }
 }

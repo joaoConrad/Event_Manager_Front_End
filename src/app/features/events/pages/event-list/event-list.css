@@ -1,164 +1,175 @@
-body {
-  margin: 0;
-  background: #f5f7fb;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-}
-
-/* CONTAINER */
-.page {
-  max-width: 1100px;
+.events-page {
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1rem 3rem;
 }
 
-/* HEADER */
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #2563eb;
+}
+
 .page-header {
-  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
 }
 
 .page-header h1 {
-  margin: 0;
+  margin: 0 0 0.4rem;
   font-size: 2rem;
-  color: #1e293b;
+  color: #111827;
 }
 
 .page-header p {
-  margin-top: 0.4rem;
-  color: #64748b;
+  margin: 0;
+  color: #5b6472;
 }
 
-/* BOTÃO */
-.actions {
-  margin-bottom: 2rem;
-}
-
-.new-event-btn {
-  padding: 0.7rem 1.2rem;
-  border-radius: 8px;
-  background: #2563eb;
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  transition: 0.2s;
-}
-
-.new-event-btn:hover {
-  background: #1d4ed8;
-}
-
-/* LISTA */
-.event-list {
+.events-grid {
   display: grid;
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
 }
 
-/* CARD */
+.event-card,
+.empty-state {
+  background: #fff;
+  border: 1px solid #e8edf3;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
 .event-card {
-  background: white;
-  border-radius: 14px;
-  padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  transition: 0.2s;
+  padding: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .event-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
 }
 
-/* LAYOUT INTERNO */
-.event-content {
+.card-header {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  font-size: 0.92rem;
 }
 
-/* ESQUERDA */
-.event-left {
-  flex: 2;
+.card-date {
+  color: #2563eb;
+  font-weight: 700;
 }
 
-/* TITULO */
-.event-card h2 {
-  margin: 0;
-  font-size: 1.4rem;
-  color: #0f172a;
-}
-
-/* DESCRIÇÃO */
-.event-description {
-  margin: 0.5rem 0 1.2rem;
-  color: #475569;
-}
-
-/* INFO */
-.event-info {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem 1.5rem;
-  margin-bottom: 1.2rem;
-}
-
-.event-info span {
-  font-size: 0.95rem;
-  color: #334155;
-}
-
-/* VAGAS */
-.available {
-  color: #16a34a;
+.card-time {
+  color: #6b7280;
   font-weight: 600;
 }
 
-/* IMAGEM DIREITA */
-.event-image {
-  flex: 1;
+.event-card h2 {
+  margin: 0 0 0.7rem;
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+.card-description {
+  margin: 0 0 1rem;
+  color: #5b6472;
+  line-height: 1.65;
+  min-height: 72px;
+}
+
+.card-meta {
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.spots {
+  color: #047857;
+  font-weight: 700;
+}
+
+.card-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-actions .btn {
+  flex: 1;
+}
+
+.btn {
+  border: none;
+  text-decoration: none;
+  padding: 0.82rem 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.event-image img {
+.full {
   width: 100%;
-  max-width: 180px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
 
-/* BOTÃO */
-.join-btn {
-  width: 100%;
-  padding: 0.8rem;
-  border-radius: 10px;
-  border: none;
-  background: #0f172a;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.2s;
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
 }
 
-.join-btn:hover {
-  background: #020617;
+.btn-secondary {
+  background: #f5f7fb;
+  color: #111827;
+  border: 1px solid #dbe3ee;
 }
 
-/* EMPTY */
+.btn-success {
+  background: #059669;
+  color: #fff;
+}
+
+.btn-warning {
+  background: #d97706;
+  color: #fff;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+}
+
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #64748b;
 }
 
-/* RESPONSIVO */
-@media (max-width: 768px) {
-  .event-content {
-    flex-direction: column;
+.empty-state p {
+  margin: 0;
+  color: #6b7280;
+}
+
+@media (max-width: 900px) {
+  .events-grid {
+    grid-template-columns: 1fr;
   }
 
-  .event-image img {
-    max-width: 100%;
-    height: 160px;
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

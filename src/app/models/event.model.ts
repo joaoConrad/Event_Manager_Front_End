@@ -1,10 +1,10 @@
 export interface EventModel {
-  id: number;
+  id?: number;
   title: string;
   description: string;
   date: string;
   time: string;
   location: string;
   maxParticipants: number;
-  registeredParticipants: number;
+  registeredParticipants?: number;
 }

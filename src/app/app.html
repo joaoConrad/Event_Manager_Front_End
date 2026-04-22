@@ -1,23 +1,32 @@
 <header class="topbar">
-  <div class="brand">
-    <span class="brand-icon"></span>
-    <span class="brand-name">EventManager</span>
-  </div>
+  <div class="topbar-container">
+    <a routerLink="/home" class="brand">Event Manager</a>
 
-  <nav class="nav">
-    <a routerLink="/home" routerLinkActive="active">Home</a>
-    <a routerLink="/events" routerLinkActive="active">Eventos</a>
-  </nav>
+    <nav class="topbar-nav">
+      <a routerLink="/home">Home</a>
+      <a routerLink="/events">Eventos</a>
 
-  <div class="actions-right">
-    <div class="user-actions">
-      <a class="view-user-acts-btn" routerLink="/login">Login</a>
-      <span>/</span>
-      <a class="view-user-acts-btn" routerLink="/register">Cadastro</a>
+      @if (authService.isLoggedIn() && authService.isAdmin()) {
+        <a routerLink="/events/new">Novo evento</a>
+      }
+    </nav>
+
+    <div class="topbar-actions">
+      @if (!authService.isLoggedIn()) {
+        <a routerLink="/login" class="nav-btn ghost">Entrar</a>
+        <a routerLink="/register" class="nav-btn primary">Cadastrar</a>
+      } @else {
+        <span class="user-badge">
+          {{ authService.getUser()?.name }}
+          <small>({{ authService.getUser()?.role }})</small>
+        </span>
+
+        <button class="nav-btn danger" (click)="logout()">Sair</button>
+      }
     </div>
   </div>
 </header>
 
-<main class="main-content">
+<main class="app-main">
   <router-outlet></router-outlet>
 </main>

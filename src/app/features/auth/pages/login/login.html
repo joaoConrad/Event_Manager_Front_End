@@ -2,15 +2,19 @@
   <div class="auth-card">
     <h1>Login</h1>
 
-    <form>
+    <form (ngSubmit)="submit()">
       <label>Email</label>
-      <input type="email" placeholder="Digite seu email" />
+      <input type="email" [(ngModel)]="email" name="email" placeholder="Digite seu email" required />
 
       <label>Senha</label>
-      <input type="password" placeholder="Digite sua senha" />
+      <input type="password" [(ngModel)]="password" name="password" placeholder="Digite sua senha" required />
 
       <button type="submit">Entrar</button>
     </form>
+
+    @if (errorMessage) {
+      <p class="auth-footer">{{ errorMessage }}</p>
+    }
 
     <p class="auth-footer">
       Não tem conta?

@@ -1,52 +1,91 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 export type UserRole = 'admin' | 'user';
 
 export interface AuthUser {
+  id: number;
   name: string;
   email: string;
   role: UserRole;
+}
+
+interface AuthResponse {
+  message?: string;
+  data?: {
+    user: AuthUser;
+    token: string;
+  };
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUser: AuthUser | null = {
-    name: 'Bruno',
-    email: 'bruno@email.com',
-    role: 'admin'
-  };
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = 'http://localhost:3000/api/auth';
+
+  private readonly userStorageKey = 'eventmanager_user';
+  private readonly tokenStorageKey = 'eventmanager_token';
 
   getUser(): AuthUser | null {
-    return this.currentUser;
+    const data = localStorage.getItem(this.userStorageKey);
+    return data ? JSON.parse(data) : null;
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenStorageKey);
   }
 
   isLoggedIn(): boolean {
-    return this.currentUser !== null;
+    return !!this.getToken();
   }
 
   isAdmin(): boolean {
-    return this.currentUser?.role === 'admin';
+    return this.getUser()?.role === 'admin';
   }
 
-  loginAsAdmin(): void {
-    this.currentUser = {
-      name: 'Administrador',
-      email: 'admin@email.com',
-      role: 'admin'
-    };
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap((response) => {
+        const user = response?.data?.user;
+        const token = response?.data?.token;
+
+        if (user && token) {
+          localStorage.setItem(this.userStorageKey, JSON.stringify(user));
+          localStorage.setItem(this.tokenStorageKey, token);
+        }
+      })
+    );
   }
 
-  loginAsUser(): void {
-    this.currentUser = {
-      name: 'Usuário Comum',
-      email: 'user@email.com',
-      role: 'user'
-    };
+  register(name: string, email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, {
+      name,
+      email,
+      password
+    }).pipe(
+      tap((response) => {
+        const user = response?.data?.user;
+        const token = response?.data?.token;
+
+        if (user && token) {
+          localStorage.setItem(this.userStorageKey, JSON.stringify(user));
+          localStorage.setItem(this.tokenStorageKey, token);
+        }
+      })
+    );
+  }
+
+  getAuthHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      Authorization: `Bearer ${this.getToken() ?? ''}`
+    });
   }
 
   logout(): void {
-    this.currentUser = null;
+    localStorage.removeItem(this.userStorageKey);
+    localStorage.removeItem(this.tokenStorageKey);
   }
 }

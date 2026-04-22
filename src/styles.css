@@ -1,61 +1,53 @@
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
+html,
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f6f9;
-  color: #333;
+  margin: 0;
+  padding: 0;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  background: #f6f8fb;
+  color: #111827;
 }
 
-.page {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem;
+body {
+  min-height: 100vh;
 }
 
-h1, h2, h3 {
-  font-weight: 600;
-  color: #222;
+a,
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 button {
-  padding: 0.7rem 1.2rem;
-  border: none;
-  border-radius: 10px;
   cursor: pointer;
-  font-weight: 500;
-  transition: 0.2s;
 }
 
-button.primary {
-  background: #4f46e5;
-  color: white;
+img {
+  max-width: 100%;
+  display: block;
 }
 
-button.primary:hover {
-  background: #4338ca;
-  transform: translateY(-1px);
-}
-
-.card {
-  background: white;
-  border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-input, textarea {
+input,
+textarea,
+select {
   width: 100%;
-  padding: 0.6rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-top: 0.3rem;
+  border: 1px solid #d6deea;
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
+  background: #fff;
+  color: #111827;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
-  border-color: #4f46e5;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.14);
 }
-
