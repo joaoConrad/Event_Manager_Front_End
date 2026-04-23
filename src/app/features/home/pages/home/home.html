@@ -1,103 +1,86 @@
 <section class="home-page">
-
-  <!-- HERO -->
   <section class="hero">
-    <div class="hero-text">
+    <div class="hero-content">
       <span class="eyebrow">Event Manager</span>
 
       <h1>
-        Descubra eventos  <br />
-        incríveis perto de você
+        Descubra eventos incríveis com uma experiência mais elegante.
       </h1>
 
       <p>
-        Encontre, participe e gerencie eventos de forma simples, rápida e inteligente.
+        Explore eventos em destaque, acompanhe vagas disponíveis e participe de forma simples, rápida e organizada.
       </p>
 
       <div class="hero-actions">
-        <a routerLink="/events" class="btn btn-primary">
-           Explorar eventos
-        </a>
+        <a routerLink="/events" class="btn btn-primary">Explorar eventos</a>
 
         @if (!authService.isLoggedIn()) {
-          <a routerLink="/register" class="btn btn-secondary">
-             Criar conta
-          </a>
+          <a routerLink="/register" class="btn btn-secondary">Criar conta</a>
         }
       </div>
     </div>
+
+    <div class="hero-side-card">
+      <span class="hero-side-label">Destaque</span>
+      <strong>{{ events.length }}</strong>
+      <p>eventos disponíveis em evidência para você explorar agora.</p>
+    </div>
   </section>
 
-  <!-- EVENTS -->
-  <section class="events-section">
-
+  <section class="highlights-section">
     <div class="section-header">
       <div>
         <span class="eyebrow">Destaques</span>
         <h2>Próximos eventos</h2>
+        <p>Uma seleção dos eventos mais relevantes disponíveis no momento.</p>
       </div>
 
-      <a routerLink="/events" class="section-link">
-        Ver todos →
-      </a>
+      <div class="carousel-controls">
+        <button type="button" class="carousel-btn" (click)="scrollCarousel('left')">←</button>
+        <button type="button" class="carousel-btn" (click)="scrollCarousel('right')">→</button>
+      </div>
     </div>
 
     @if (loading) {
       <div class="empty-state">
-        <p>⏳ Carregando eventos...</p>
+        <p>Carregando eventos...</p>
       </div>
-    }
+    } @else if (events.length > 0) {
+      <div class="carousel-wrap">
+        <div class="events-carousel" #carousel>
+          @for (event of events; track event.id) {
+            <article class="event-slide">
+              <div class="event-slide-top">
+                <span class="event-chip">Evento</span>
+                <span class="event-time">{{ event.time }}</span>
+              </div>
 
-    @else if (events.length > 0) {
+              <div class="event-date-box">
+                <span class="event-date-label">Data</span>
+                <strong>{{ event.date }}</strong>
+              </div>
 
-      <div class="event-grid">
+              <div class="event-slide-body">
+                <h3>{{ event.title }}</h3>
+                <p>{{ event.description }}</p>
+              </div>
 
-        @for (event of events; track event.id) {
-          <article class="event-card">
+              <div class="event-slide-meta">
+                <span>📍 {{ event.location }}</span>
+                <span>👥 {{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }} inscritos</span>
+              </div>
 
-            <!-- DATA -->
-            <div class="event-top">
-              <span class="event-date">📅 {{ event.date }}</span>
-              <span class="event-time">⏰ {{ event.time }}</span>
-            </div>
-
-            <!-- TITULO -->
-            <h3>{{ event.title }}</h3>
-
-            <!-- DESC -->
-            <p class="event-description">
-              {{ event.description }}
-            </p>
-
-            <!-- INFO -->
-            <div class="event-meta">
-              <span>📍 {{ event.location }}</span>
-
-              <span>
-                👥 {{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}
-              </span>
-            </div>
-
-            <!-- FOOTER -->
-            <div class="event-footer">
-              <a routerLink="/events" class="event-link">
-                Ver detalhes →
-              </a>
-            </div>
-
-          </article>
-        }
-
+              <div class="event-slide-footer">
+                <a routerLink="/events" class="event-link">Ver detalhes</a>
+              </div>
+            </article>
+          }
+        </div>
       </div>
-
     } @else {
-
       <div class="empty-state">
-        <p> Nenhum evento disponível no momento.</p>
+        <p>Nenhum evento disponível no momento.</p>
       </div>
-
     }
-
   </section>
-
 </section>

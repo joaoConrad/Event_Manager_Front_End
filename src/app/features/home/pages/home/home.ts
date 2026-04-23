@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event';
 import { AuthService } from '../../../../core/services/auth';
@@ -14,6 +14,8 @@ export class Home implements OnInit, AfterViewInit {
   events: EventModel[] = [];
   loading = true;
   private loadedOnce = false;
+
+  @ViewChild('carousel', { static: false }) carouselRef?: ElementRef<HTMLDivElement>;
 
   constructor(
     private readonly eventService: EventService,
@@ -37,7 +39,7 @@ export class Home implements OnInit, AfterViewInit {
 
     this.eventService.getAll().subscribe({
       next: (res) => {
-        this.events = Array.isArray(res) ? res.slice(0, 3) : [];
+        this.events = Array.isArray(res) ? res.slice(0, 8) : [];
         this.loading = false;
         this.loadedOnce = true;
         this.cdr.detectChanges();
@@ -48,6 +50,18 @@ export class Home implements OnInit, AfterViewInit {
         this.loading = false;
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  scrollCarousel(direction: 'left' | 'right'): void {
+    const container = this.carouselRef?.nativeElement;
+    if (!container) return;
+
+    const amount = Math.round(container.clientWidth * 0.85);
+
+    container.scrollBy({
+      left: direction === 'left' ? -amount : amount,
+      behavior: 'smooth'
     });
   }
 }
