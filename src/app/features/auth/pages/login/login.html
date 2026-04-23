@@ -1,6 +1,7 @@
 <section class="auth-container">
   <div class="auth-card">
-    <h1>Login</h1>
+    <h1>Entrar</h1>
+    <p class="subtitle">Acesse sua conta para gerenciar eventos</p>
 
     <form (ngSubmit)="submit()">
       <label>Email</label>
@@ -13,7 +14,7 @@
     </form>
 
     @if (errorMessage) {
-      <p class="auth-footer">{{ errorMessage }}</p>
+      <div class="auth-error">{{ errorMessage }}</div>
     }
 
     <p class="auth-footer">
