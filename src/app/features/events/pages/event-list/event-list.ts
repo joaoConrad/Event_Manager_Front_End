@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event';
 import { ParticipantService } from '../../../../core/services/participant';
@@ -13,23 +13,32 @@ type EventWithRegistered = EventModel & { registeredParticipants?: number };
   templateUrl: './event-list.html',
   styleUrl: './event-list.css'
 })
-export class EventList implements OnInit {
+export class EventList implements OnInit, AfterViewInit {
   events: EventWithRegistered[] = [];
   joinedEventIds = new Set<number>();
   loading = true;
+  private loadedOnce = false;
 
   constructor(
     private readonly eventService: EventService,
     private readonly participantService: ParticipantService,
-    public authService: AuthService
+    public authService: AuthService,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadEvents();
   }
 
+  ngAfterViewInit(): void {
+    if (!this.loadedOnce) {
+      this.loadEvents();
+    }
+  }
+
   loadEvents(): void {
     this.loading = true;
+    this.cdr.detectChanges();
 
     this.eventService.getAll().subscribe({
       next: (res) => {
@@ -41,6 +50,8 @@ export class EventList implements OnInit {
           : [];
 
         this.loading = false;
+        this.loadedOnce = true;
+        this.cdr.detectChanges();
         this.loadJoinedState();
       },
       error: (err) => {
@@ -48,6 +59,7 @@ export class EventList implements OnInit {
         this.events = [];
         this.joinedEventIds.clear();
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -56,11 +68,15 @@ export class EventList implements OnInit {
     this.joinedEventIds.clear();
 
     if (!this.authService.isLoggedIn() || this.authService.isAdmin()) {
+      this.cdr.detectChanges();
       return;
     }
 
     const currentUser = this.authService.getUser();
-    if (!currentUser?.email) return;
+    if (!currentUser?.email) {
+      this.cdr.detectChanges();
+      return;
+    }
 
     this.events.forEach((event) => {
       if (!event.id) return;
@@ -69,6 +85,7 @@ export class EventList implements OnInit {
         next: (participants) => {
           const joined = participants.some((p) => p.email === currentUser.email);
           if (joined) this.joinedEventIds.add(event.id!);
+          this.cdr.detectChanges();
         },
         error: () => {}
       });
