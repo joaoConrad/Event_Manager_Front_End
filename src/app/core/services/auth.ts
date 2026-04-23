@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+
 
 export type UserRole = 'admin' | 'user';
 
@@ -24,8 +26,7 @@ interface AuthResponse {
 })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3000/api/auth';
-
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
   private readonly userStorageKey = 'eventmanager_user';
   private readonly tokenStorageKey = 'eventmanager_token';
 

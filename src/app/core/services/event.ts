@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { EventModel } from '../../models/event.model';
 import { AuthService } from './auth';
+import { environment } from '../../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +12,7 @@ import { AuthService } from './auth';
 export class EventService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly apiUrl = 'http://localhost:3000/api/events';
+  private readonly apiUrl = `${environment.apiUrl}/events`;
 
   getAll(): Observable<EventModel[]> {
     return this.http.get<EventModel[]>(this.apiUrl);
