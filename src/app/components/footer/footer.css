@@ -11,7 +11,7 @@
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start; /* 🔥 melhora alinhamento */
+  align-items: flex-start;
   gap: 3rem;
   flex-wrap: wrap;
 }
@@ -32,9 +32,11 @@
   line-height: 1.5;
 }
 
-/* GITHUB MELHORADO */
+/* GITHUB */
 .github-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: 1rem;
   padding: 0.5rem 0.9rem;
   background: rgba(37, 99, 235, 0.15);
@@ -52,6 +54,12 @@
   transform: translateY(-2px);
 }
 
+/* ÍCONE */
+.github-icon {
+  width: 18px;
+  height: 18px;
+}
+
 /* LINKS */
 .footer-links {
   display: flex;
@@ -64,7 +72,6 @@
   gap: 0.5rem;
 }
 
-/* TITULO */
 .footer-column span {
   font-size: 0.75rem;
   font-weight: 700;
@@ -74,7 +81,6 @@
   margin-bottom: 0.4rem;
 }
 
-/* LINKS CLIQUE */
 .footer-column a {
   text-decoration: none;
   color: #e5e7eb;
@@ -84,10 +90,9 @@
 
 .footer-column a:hover {
   color: #ffffff;
-  transform: translateX(3px); /* 🔥 micro interação */
+  transform: translateX(3px);
 }
 
-/* AUTORES */
 .footer-column p {
   margin: 0;
   font-size: 0.9rem;
