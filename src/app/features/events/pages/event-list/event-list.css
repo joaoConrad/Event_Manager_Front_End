@@ -163,6 +163,128 @@
   color: #6b7280;
 }
 
+.feedback-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.feedback-banner span {
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.feedback-banner.success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.feedback-banner.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.feedback-banner.info {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.feedback-close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  border: 1px solid #e8edf3;
+  border-radius: 22px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  padding: 1.4rem;
+  animation: modalFadeUp 0.18s ease;
+}
+
+.modal-header {
+  margin-bottom: 1.2rem;
+}
+
+.modal-tag {
+  display: inline-block;
+  margin-bottom: 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #dc2626;
+}
+
+.modal-header h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.35rem;
+  color: #111827;
+}
+
+.modal-header p {
+  margin: 0;
+  color: #5b6472;
+  line-height: 1.65;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.modal-actions .btn {
+  min-width: 140px;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@keyframes modalFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (max-width: 900px) {
   .events-grid {
     grid-template-columns: 1fr;

@@ -11,6 +11,13 @@
     }
   </div>
 
+  @if (feedbackMessage) {
+    <div class="feedback-banner" [class.success]="feedbackType === 'success'" [class.error]="feedbackType === 'error'" [class.info]="feedbackType === 'info'">
+      <span>{{ feedbackMessage }}</span>
+      <button type="button" class="feedback-close" (click)="clearFeedback()">×</button>
+    </div>
+  }
+
   @if (loading) {
     <div class="empty-state">
       <p>Carregando eventos...</p>
@@ -37,7 +44,7 @@
             @if (authService.isAdmin()) {
               <div class="card-actions admin-actions">
                 <a class="btn btn-secondary" [routerLink]="['/events/edit', event.id]">Editar</a>
-                <button class="btn btn-danger" (click)="deleteEvent(event.id)">Excluir</button>
+                <button class="btn btn-danger" (click)="openDeleteModal(event)">Excluir</button>
               </div>
             } @else if (authService.isLoggedIn()) {
               <div class="card-actions">
@@ -63,6 +70,30 @@
   } @else {
     <div class="empty-state">
       <p>Nenhum evento disponível no momento.</p>
+    </div>
+  }
+
+  @if (showDeleteModal && eventToDelete) {
+    <div class="modal-backdrop" (click)="closeDeleteModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <span class="modal-tag">Confirmação</span>
+          <h3>Excluir evento</h3>
+          <p>
+            Tem certeza que deseja excluir o evento
+            <strong>{{ eventToDelete.title }}</strong>?
+          </p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="deleting">
+            Cancelar
+          </button>
+          <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+            {{ deleting ? 'Excluindo...' : 'Excluir evento' }}
+          </button>
+        </div>
+      </div>
     </div>
   }
 </section>

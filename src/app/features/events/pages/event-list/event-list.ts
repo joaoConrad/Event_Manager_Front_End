@@ -6,6 +6,7 @@ import { EventModel } from '../../../../models/event.model';
 import { AuthService } from '../../../../core/services/auth';
 
 type EventWithRegistered = EventModel & { registeredParticipants?: number };
+type FeedbackType = 'success' | 'error' | 'info';
 
 @Component({
   selector: 'app-event-list',
@@ -18,6 +19,14 @@ export class EventList implements OnInit, AfterViewInit {
   joinedEventIds = new Set<number>();
   loading = true;
   private loadedOnce = false;
+
+  feedbackMessage = '';
+  feedbackType: FeedbackType = 'info';
+  private feedbackTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  showDeleteModal = false;
+  eventToDelete: EventWithRegistered | null = null;
+  deleting = false;
 
   constructor(
     private readonly eventService: EventService,
@@ -34,6 +43,73 @@ export class EventList implements OnInit, AfterViewInit {
     if (!this.loadedOnce) {
       this.loadEvents();
     }
+  }
+
+  showFeedback(message: string, type: FeedbackType): void {
+    this.feedbackMessage = message;
+    this.feedbackType = type;
+
+    if (this.feedbackTimeout) {
+      clearTimeout(this.feedbackTimeout);
+    }
+
+    this.feedbackTimeout = setTimeout(() => {
+      this.feedbackMessage = '';
+      this.cdr.detectChanges();
+    }, 3500);
+
+    this.cdr.detectChanges();
+  }
+
+  clearFeedback(): void {
+    this.feedbackMessage = '';
+
+    if (this.feedbackTimeout) {
+      clearTimeout(this.feedbackTimeout);
+      this.feedbackTimeout = null;
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  openDeleteModal(event: EventWithRegistered): void {
+    this.eventToDelete = event;
+    this.showDeleteModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeDeleteModal(): void {
+    if (this.deleting) return;
+
+    this.showDeleteModal = false;
+    this.eventToDelete = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete(): void {
+    if (!this.eventToDelete?.id) return;
+
+    this.deleting = true;
+    this.cdr.detectChanges();
+
+    this.eventService.delete(this.eventToDelete.id).subscribe({
+      next: () => {
+        this.deleting = false;
+        this.showDeleteModal = false;
+        this.showFeedback('Evento excluído com sucesso.', 'success');
+        this.eventToDelete = null;
+        this.loadEvents();
+      },
+      error: (err) => {
+        console.error('Erro ao excluir evento', err);
+        this.deleting = false;
+        this.showFeedback(
+          err?.error?.message || 'Não foi possível excluir o evento.',
+          'error'
+        );
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   loadEvents(): void {
@@ -59,7 +135,7 @@ export class EventList implements OnInit, AfterViewInit {
         this.events = [];
         this.joinedEventIds.clear();
         this.loading = false;
-        this.cdr.detectChanges();
+        this.showFeedback('Não foi possível carregar os eventos.', 'error');
       }
     });
   }
@@ -104,18 +180,21 @@ export class EventList implements OnInit, AfterViewInit {
     if (!id) return;
 
     if (!this.authService.isLoggedIn()) {
-      alert('Você precisa estar logado para se inscrever.');
+      this.showFeedback('Você precisa estar logado para se inscrever.', 'info');
       return;
     }
 
     this.participantService.subscribe(id).subscribe({
       next: () => {
-        alert('Inscrição realizada com sucesso!');
+        this.showFeedback('Inscrição realizada com sucesso.', 'success');
         this.loadEvents();
       },
       error: (err) => {
         console.error('Erro ao inscrever', err);
-        alert(err?.error?.message || 'Não foi possível concluir a inscrição.');
+        this.showFeedback(
+          err?.error?.message || 'Não foi possível concluir a inscrição.',
+          'error'
+        );
       }
     });
   }
@@ -125,25 +204,15 @@ export class EventList implements OnInit, AfterViewInit {
 
     this.participantService.cancelMySubscription(id).subscribe({
       next: () => {
-        alert('Inscrição cancelada com sucesso!');
+        this.showFeedback('Inscrição cancelada com sucesso.', 'success');
         this.loadEvents();
       },
       error: (err) => {
         console.error('Erro ao cancelar', err);
-        alert(err?.error?.message || 'Não foi possível cancelar a inscrição.');
-      }
-    });
-  }
-
-  deleteEvent(id?: number): void {
-    if (!id) return;
-    if (!confirm('Deseja excluir este evento?')) return;
-
-    this.eventService.delete(id).subscribe({
-      next: () => this.loadEvents(),
-      error: (err) => {
-        console.error('Erro ao excluir evento', err);
-        alert(err?.error?.message || 'Não foi possível excluir o evento.');
+        this.showFeedback(
+          err?.error?.message || 'Não foi possível cancelar a inscrição.',
+          'error'
+        );
       }
     });
   }
