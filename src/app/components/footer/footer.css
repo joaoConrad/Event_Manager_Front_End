@@ -1,76 +1,68 @@
-/* FOOTER */
 .app-footer {
-  margin-top: 3rem;
-  background: #111827;
+  margin-top: 4rem;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
   color: #fff;
-  padding: 2rem 1rem 1rem;
+  padding: 3rem 1rem 1.5rem;
 }
 
-/* CONTAINER */
-.footer-content {
+.footer-container {
   max-width: 1120px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 3rem;
   flex-wrap: wrap;
 }
 
-/* ESQUERDA */
-.footer-left {
-  max-width: 280px;
+.footer-brand {
+  max-width: 320px;
 }
 
-.footer-left strong {
-  font-size: 1.2rem;
+.footer-brand h2 {
+  margin: 0;
+  font-size: 1.5rem;
 }
 
-.footer-left p {
-  margin-top: 0.5rem;
-  color: #9ca3af;
-  font-size: 0.95rem;
-  line-height: 1.5;
+.footer-brand p {
+  margin-top: 0.8rem;
+  color: #cbd5e1;
 }
 
-/* LINKS */
-.footer-right {
+/* 🔥 ISSO AQUI CORRIGE OS LINKS GRUDADOS */
+.footer-links {
   display: flex;
-  gap: 2rem;
+  gap: 3rem;
 }
 
-.footer-right a {
-  display: block;
+.footer-column {
+  display: flex;
+  flex-direction: column; /* ESSENCIAL */
+  gap: 0.5rem;
+}
+
+.footer-column span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.footer-column a {
+  display: block; /* 🔥 ISSO RESOLVE */
   text-decoration: none;
-  color: #e5e7eb;
-  font-size: 0.95rem;
-  margin-bottom: 0.4rem;
+  color: #e2e8f0;
   transition: 0.2s;
 }
 
-.footer-right a:hover {
+.footer-column a:hover {
   color: #fff;
+  transform: translateX(3px);
 }
 
-/* LINHA DE BAIXO */
 .footer-bottom {
   max-width: 1120px;
-  margin: 1.5rem auto 0;
+  margin: 2rem auto 0;
   padding-top: 1rem;
-  border-top: 1px solid #374151;
+  border-top: 1px solid rgba(255,255,255,0.1);
   text-align: center;
-  font-size: 0.85rem;
-  color: #9ca3af;
-}
-
-/* RESPONSIVO */
-@media (max-width: 768px) {
-  .footer-content {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .footer-right {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+  color: #94a3b8;
 }
