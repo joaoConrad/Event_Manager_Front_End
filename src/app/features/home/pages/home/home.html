@@ -51,7 +51,11 @@
           @for (event of events; track event.id) {
             <article class="event-slide">
               <div class="event-slide-top">
-                <span class="event-chip">Evento</span>
+                @if ((event.registeredParticipants ?? 0) >= event.maxParticipants) {
+                  <span class="event-chip sold-out">Esgotado</span>
+                } @else {
+                  <span class="event-chip">Evento</span>
+                }
                 <span class="event-time">{{ event.time }}</span>
               </div>
 
@@ -71,7 +75,11 @@
               </div>
 
               <div class="event-slide-footer">
-                <a routerLink="/events" class="event-link">Ver detalhes</a>
+                @if ((event.registeredParticipants ?? 0) >= event.maxParticipants) {
+                  <span class="event-link sold-out-text">Sem vagas disponíveis</span>
+                } @else {
+                  <a routerLink="/events" class="event-link">Ver detalhes</a>
+                }
               </div>
             </article>
           }
