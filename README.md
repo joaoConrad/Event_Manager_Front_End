@@ -1,91 +1,91 @@
-# 🎉 Event Manager
+# Event Manager
 
-Sistema web para gerenciamento de eventos, permitindo criar, visualizar e participar de eventos de forma simples e moderna.
-
----
-
-## 🚀 Funcionalidades
-
-- 📅 Listagem de eventos  
-- ➕ Criação de eventos (admin)  
-- ✏️ Edição e exclusão de eventos (admin)  
-- 👥 Inscrição em eventos  
-- ❌ Cancelamento de inscrição  
-- 🔐 Autenticação de usuários  
-- 👑 Controle de acesso por perfil (admin / usuário)  
-- 📊 Visualização de vagas disponíveis  
-- 🔎 Página de detalhes do evento  
+Sistema web para gerenciamento de eventos — permite que usuários encontrem, participem e acompanhem eventos de forma simples e intuitiva.
 
 ---
 
-## 🖥️ Tecnologias utilizadas
+## Visão Geral
 
-- Angular  
-- TypeScript  
-- HTML5  
-- CSS3  
-- Angular Router  
+Aplicação frontend desenvolvida em Angular, com foco em experiência do usuário, controle de acesso por perfis e regras de negócio reais.
 
 ---
 
-## 📂 Estrutura do projeto
+## Funcionalidades
 
+### Usuário
+- Cadastro e login
+- Listagem e visualização de eventos
+- Inscrição e cancelamento de inscrição em eventos
+- Visualização de eventos esgotados
+
+### Administrador
+- Criação, edição e exclusão de eventos
+- Validação de datas (eventos no passado são bloqueados)
 
 ---
-```bash
+
+## Regras de Negócio
+
+- Um usuário não pode se inscrever duas vezes no mesmo evento
+- Eventos possuem limite de participantes
+- Eventos esgotados não permitem novas inscrições
+- Não é permitido criar eventos com data/horário no passado
+- O cancelamento de inscrição libera a vaga automaticamente
+
+---
+
+## Tecnologias
+
+Angular · TypeScript · HTML5 · CSS3
+
+---
+
+## Estrutura do Projeto
+
+```
 src/
- ├── app/
- │   ├── features/
- │   │   ├── events_pages/
- │   │   ├── auth_pages/
- │   ├── components/
- │   │   └── footer/
- │   ├── models/
- │   ├── app.routes.ts
- │   ├── app.ts
+└── app/
+    ├── core/
+    │   ├── services/
+    │   └── guards/
+    ├── features/
+    │   ├── auth/
+    │   ├── events/
+    │   └── home/
+    ├── components/
+    │   └── footer/
+    ├── models/
+    ├── app.routes.ts
+    └── app.config.ts
+```
 
+---
 
- ---
+## Como Rodar
 
-
-⚙️ Como rodar o projeto
-1. Clonar o repositório
+```bash
 git clone https://github.com/joaoConrad/Event_Manager_Front_End.git
-
----
-
-2. Entrar na pasta
 cd Event_Manager_Front_End
-
----
-
-3. Instalar dependências
 npm install
-
----
-
-4. Rodar o projeto
 ng serve
+```
+
+Acesse em: `http://localhost:4200`
 
 ---
 
-5. Acessar no navegador
-http://localhost:4200
+## Contexto Acadêmico
+
+Projeto desenvolvido para a disciplina de Programação Web, com aplicação prática de Angular, consumo de API REST e regras de negócio reais.
 
 ---
 
-👥 Autores
-Pedro C.
-Bruno H.
-Murilo C.
-João C.
+## Autores
+
+Bruno H. · Pedro C. · Murilo C. · João C.
 
 ---
 
-📌 Observações
+## Repositório
 
-Este projeto foi desenvolvido para fins acadêmicos, com foco em prática de desenvolvimento frontend utilizando Angular.
-
-🔗 Repositório
-
-https://github.com/joaoConrad/Event_Manager_Front_End.git
+[github.com/joaoConrad/Event_Manager_Front_End](https://github.com/joaoConrad/Event_Manager_Front_End)
