@@ -11,8 +11,14 @@
     </div>
 
     @if (errorMessage) {
-      <div class="form-error">
+      <div class="form-feedback error">
         {{ errorMessage }}
+      </div>
+    }
+
+    @if (successMessage) {
+      <div class="form-feedback success">
+        {{ successMessage }}
       </div>
     }
 
@@ -34,12 +40,21 @@
       <div class="form-grid">
         <div class="form-group">
           <label for="date">Data</label>
-          <input id="date" name="date" [(ngModel)]="event.date" type="date" />
+          <input
+            id="date"
+            name="date"
+            [(ngModel)]="event.date"
+            type="date"
+            [min]="minDate" />
         </div>
 
         <div class="form-group">
           <label for="time">Horário</label>
-          <input id="time" name="time" [(ngModel)]="event.time" type="time" />
+          <input
+            id="time"
+            name="time"
+            [(ngModel)]="event.time"
+            type="time" />
         </div>
       </div>
 
@@ -56,6 +71,10 @@
           [(ngModel)]="event.maxParticipants"
           type="number"
           min="1" />
+      </div>
+
+      <div class="form-note">
+        A data não pode ser anterior à data atual. Caso a data seja hoje, o horário também deve ser futuro.
       </div>
 
       <div class="form-actions">

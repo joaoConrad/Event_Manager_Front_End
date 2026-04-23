@@ -37,14 +37,24 @@
   color: #6b7280;
 }
 
-.form-error {
+.form-feedback {
   margin-bottom: 1rem;
-  padding: 0.9rem 1rem;
+  padding: 0.95rem 1rem;
   border-radius: 12px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #b91c1c;
+  border: 1px solid transparent;
   font-weight: 600;
+}
+
+.form-feedback.error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.form-feedback.success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
 }
 
 .event-form {
@@ -72,6 +82,16 @@
 
 textarea {
   resize: vertical;
+}
+
+.form-note {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .form-actions {
