@@ -43,22 +43,45 @@ src/
  │   ├── models/
  │   ├── app.routes.ts
  │   ├── app.ts
+
+
+ ---
+
+
 ⚙️ Como rodar o projeto
 1. Clonar o repositório
 git clone https://github.com/joaoConrad/Event_Manager_Front_End.git
+
+---
+
 2. Entrar na pasta
 cd Event_Manager_Front_End
+
+---
+
 3. Instalar dependências
 npm install
+
+---
+
 4. Rodar o projeto
 ng serve
+
+---
+
 5. Acessar no navegador
 http://localhost:4200
+
+---
+
 👥 Autores
 Pedro C.
 Bruno H.
 Murilo C.
 João C.
+
+---
+
 📌 Observações
 
 Este projeto foi desenvolvido para fins acadêmicos, com foco em prática de desenvolvimento frontend utilizando Angular.
