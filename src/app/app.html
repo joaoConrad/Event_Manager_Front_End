@@ -1,27 +1,35 @@
 <header class="topbar">
   <div class="topbar-container">
-    <a routerLink="/home" class="brand">Event Manager</a>
+    <a routerLink="/home" class="brand" aria-label="Ir para a home">
+      <img src="logo-horizontal.png" alt="Event Manager" class="brand-logo" />
+    </a>
 
     <nav class="topbar-nav">
-      <a routerLink="/home">Home</a>
-      <a routerLink="/events">Eventos</a>
+      <a routerLink="/home" routerLinkActive="active-link">Home</a>
+      <a routerLink="/events" routerLinkActive="active-link">Eventos</a>
 
       @if (authService.isLoggedIn() && authService.isAdmin()) {
-        <a routerLink="/events/new">Novo evento</a>
+        <a routerLink="/events/new" routerLinkActive="active-link">Novo evento</a>
       }
     </nav>
 
     <div class="topbar-actions">
       @if (!authService.isLoggedIn()) {
-        <a routerLink="/login" class="nav-btn ghost">Entrar</a>
-        <a routerLink="/register" class="nav-btn primary">Cadastrar</a>
+        <a routerLink="/login" class="nav-btn nav-btn-ghost">Entrar</a>
+        <a routerLink="/register" class="nav-btn nav-btn-primary">Cadastrar</a>
       } @else {
-        <span class="user-badge">
-          {{ authService.getUser()?.name }}
-          <small>({{ authService.getUser()?.role }})</small>
-        </span>
+        <div class="user-badge">
+          <div class="user-avatar">
+            {{ authService.getUser()?.name?.charAt(0) }}
+          </div>
 
-        <button class="nav-btn danger" (click)="logout()">Sair</button>
+          <div class="user-info">
+            <span class="user-name">{{ authService.getUser()?.name }}</span>
+            <small class="user-role">{{ authService.getUser()?.role }}</small>
+          </div>
+        </div>
+
+        <button class="nav-btn nav-btn-outline" (click)="logout()">Sair</button>
       }
     </div>
   </div>
