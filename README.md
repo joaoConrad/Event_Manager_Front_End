@@ -1,59 +1,75 @@
-# EventManagerFrontEnd
+# 🎉 Event Manager
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+Sistema web para gerenciamento de eventos, permitindo criar, visualizar e participar de eventos de forma simples e moderna.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Funcionalidades
+
+- 📅 Listagem de eventos
+- ➕ Criação de eventos (admin)
+- ✏️ Edição e exclusão de eventos (admin)
+- 👥 Inscrição em eventos
+- ❌ Cancelamento de inscrição
+- 🔐 Autenticação de usuários
+- 👑 Controle de acesso por perfil (admin / usuário)
+- 📊 Visualização de vagas disponíveis
+- 🔎 Página de detalhes do evento
+
+---
+
+## 🖥️ Tecnologias utilizadas
+
+- Angular
+- TypeScript
+- HTML5
+- CSS3
+- Angular Router
+
+---
+
+## 📂 Estrutura do projeto
+
+
+src/
+├── app/
+│ ├── features/
+│ │ ├── events_pages/
+│ │ ├── auth_pages/
+│ ├── components/
+│ │ └── footer/
+│ ├── models/
+│ ├── app.routes.ts
+│ ├── app.ts
+
+
+---
+
+## ⚙️ Como rodar o projeto
+
+### 1. Clonar o repositório
 
 ```bash
+git clone https://github.com/joaoConrad/Event_Manager_Front_End.git
+2. Entrar na pasta
+cd Event_Manager_Front_End
+3. Instalar dependências
+npm install
+4. Rodar o projeto
 ng serve
-```
+5. Acessar no navegador
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+http://localhost:4200
 
-## Code scaffolding
+👥 Autores
+Pedro C.
+Bruno H.
+Murilo C.
+João C.
+📌 Observações
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Este projeto foi desenvolvido para fins acadêmicos, com foco em prática de desenvolvimento frontend utilizando Angular.
 
-```bash
-ng generate component component-name
-```
+🔗 Repositório
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+https://github.com/joaoConrad/Event_Manager_Front_End.git
