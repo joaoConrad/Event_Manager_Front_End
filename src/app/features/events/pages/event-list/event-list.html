@@ -1,13 +1,16 @@
 <section class="events-page">
+
   <div class="page-header">
     <div>
       <span class="eyebrow">Eventos</span>
-      <h1>Todos os eventos</h1>
-      <p>Escolha um evento e participe com poucos cliques.</p>
+      <h1>Explore todos os eventos disponíveis</h1>
+      <p>Escolha um evento, veja vagas em tempo real e participe com poucos cliques.</p>
     </div>
 
     @if (authService.isAdmin()) {
-      <a routerLink="/events/new" class="btn btn-primary">Novo evento</a>
+      <a routerLink="/events/new" class="btn btn-primary">
+        ➕ Novo evento
+      </a>
     }
   </div>
 
@@ -20,56 +23,90 @@
 
   @if (loading) {
     <div class="empty-state">
-      <p>Carregando eventos...</p>
+      <p>⏳ Carregando eventos...</p>
     </div>
-  } @else if (events.length > 0) {
+  }
+
+  @else if (events.length > 0) {
     <div class="events-grid">
       @for (event of events; track event.id) {
         @if (getAvailableSpots(event) > 0 || isJoined(event.id)) {
           <article class="event-card">
+
             <div class="card-header">
-              <span class="card-date">{{ event.date }}</span>
-              <span class="card-time">{{ event.time }}</span>
+              <span class="card-date">📅 {{ event.date }}</span>
+              <span class="card-time">⏰ {{ event.time }}</span>
             </div>
 
             <h2>{{ event.title }}</h2>
-            <p class="card-description">{{ event.description }}</p>
+
+            <p class="card-description">
+              {{ event.description }}
+            </p>
 
             <div class="card-meta">
               <span>📍 {{ event.location }}</span>
-              <span>👥 {{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }} inscritos</span>
-              <span class="spots">🔥 {{ getAvailableSpots(event) }} vagas restantes</span>
+              <span>
+                👥 {{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }} inscritos
+              </span>
+              <span class="spots">
+                🔥 {{ getAvailableSpots(event) }} vagas restantes
+              </span>
             </div>
 
             @if (authService.isAdmin()) {
               <div class="card-actions admin-actions">
-                <a class="btn btn-secondary" [routerLink]="['/events/edit', event.id]">Editar</a>
-                <button class="btn btn-danger" (click)="openDeleteModal(event)">Excluir</button>
+                <a
+                  class="btn btn-secondary"
+                  [routerLink]="['/events/edit', event.id]"
+                >
+                  ✏️ Editar
+                </a>
+
+                <button
+                  class="btn btn-danger"
+                  (click)="openDeleteModal(event)"
+                >
+                  🗑️ Excluir
+                </button>
               </div>
+
             } @else if (authService.isLoggedIn()) {
               <div class="card-actions">
                 @if (isJoined(event.id)) {
-                  <button class="btn btn-warning full" (click)="cancelSubscription(event.id)">
-                    Cancelar inscrição
+                  <button
+                    class="btn btn-warning full"
+                    (click)="cancelSubscription(event.id)"
+                  >
+                    ❌ Cancelar inscrição
                   </button>
                 } @else {
-                  <button class="btn btn-success full" (click)="joinEvent(event.id)">
-                    Participar
+                  <button
+                    class="btn btn-success full"
+                    (click)="joinEvent(event.id)"
+                  >
+                    ✅ Participar do evento
                   </button>
                 }
               </div>
+
             } @else {
               <div class="card-actions">
-                <a routerLink="/login" class="btn btn-primary full">Entrar para participar</a>
+                <a routerLink="/login" class="btn btn-primary full">
+                  🔐 Entrar para participar
+                </a>
               </div>
             }
+
           </article>
         }
       }
     </div>
-  } @else {
+  }
+
+  @else {
     <div class="empty-state">
-      <p>Nenhum evento disponível no momento.</p>
+      <p> Nenhum evento disponível no momento.</p>
     </div>
   }
 
