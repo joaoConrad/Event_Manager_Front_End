@@ -30,6 +30,8 @@ Sistema web para gerenciamento de eventos, permitindo criar, visualizar e partic
 
 ## 📂 Estrutura do projeto
 
+
+---
 ```bash
 src/
  ├── app/
