@@ -11,6 +11,33 @@
     }
   </div>
 
+  <!-- TOOLBAR -->
+  <div class="list-toolbar">
+    <div>
+      <span class="toolbar-label">Ordenar eventos</span>
+      <p>Escolha como deseja visualizar a lista.</p>
+    </div>
+
+    <div class="sort-actions">
+      <button
+        type="button"
+        class="sort-btn"
+        [class.active]="sortOrder === 'recent'"
+        (click)="setSortOrder('recent')">
+        Mais recentes
+      </button>
+
+      <button
+        type="button"
+        class="sort-btn"
+        [class.active]="sortOrder === 'oldest'"
+        (click)="setSortOrder('oldest')">
+        Mais antigos
+      </button>
+    </div>
+  </div>
+
+  <!-- FEEDBACK -->
   @if (feedbackMessage) {
     <div
       class="feedback-banner"
@@ -22,133 +49,183 @@
     </div>
   }
 
+  <!-- LOADING -->
   @if (loading) {
     <div class="empty-state">
       <p>Carregando eventos...</p>
     </div>
-  } @else if (events.length > 0) {
+  } @else {
 
-    <div class="events-grid">
-      @for (event of getAvailableEvents(); track event.id) {
-        <article class="event-card">
-          <div class="event-aside">
-            <span class="aside-label">Evento</span>
-            <strong class="aside-date">{{ event.date }}</strong>
-            <span class="aside-time">{{ event.time }}</span>
+    <!-- EVENTOS DISPONÍVEIS -->
+    @if (getAvailableEvents().length > 0) {
+      <div class="events-grid">
+        @for (event of getAvailableEvents(); track event.id) {
+          <article class="event-card">
 
-            <div class="aside-divider"></div>
+            <div class="event-aside">
+              <span class="aside-label">Evento</span>
+              <strong class="aside-date">{{ event.date }}</strong>
+              <span class="aside-time">{{ event.time }}</span>
 
-            <span class="aside-vacancies-label">Vagas</span>
-            <strong class="aside-vacancies">{{ getAvailableSpots(event) }}</strong>
-          </div>
+              <div class="aside-divider"></div>
 
-          <div class="event-content">
-            <div class="event-main">
-              <div class="event-head">
-                <h2>{{ event.title }}</h2>
-
-                @if (isSoldOut(event)) {
-                  <span class="status-badge sold-out">Esgotado</span>
-                } @else {
-                  <span class="status-badge open">Inscrições abertas</span>
-                }
-              </div>
-
-              <p class="card-description">{{ event.description }}</p>
-
-              <div class="event-meta">
-                <div class="meta-item">
-                  <span class="meta-label">Local</span>
-                  <span class="meta-value">{{ event.location }}</span>
-                </div>
-
-                <div class="meta-item">
-                  <span class="meta-label">Inscritos</span>
-                  <span class="meta-value">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span>
-                </div>
-
-                <div class="meta-item">
-                  <span class="meta-label">Disponibilidade</span>
-                  <span class="meta-value highlight">{{ getAvailableSpots(event) }} vagas restantes</span>
-                </div>
-              </div>
+              <span class="aside-vacancies-label">Vagas</span>
+              <strong class="aside-vacancies">
+                {{ isPastEvent(event) ? '—' : getAvailableSpots(event) }}
+              </strong>
             </div>
 
-            <div class="event-actions">
-              @if (authService.isAdmin()) {
-                <div class="card-actions admin-actions">
-                  <a class="btn btn-secondary" [routerLink]="['/events/edit', event.id]">Editar</a>
-                  <button class="btn btn-danger" (click)="openDeleteModal(event)">Excluir</button>
-                </div>
-              } @else if (authService.isLoggedIn()) {
-                @if (isJoined(event.id)) {
-                  <button class="btn btn-warning full" (click)="cancelSubscription(event.id)">
-                    Cancelar inscrição
-                  </button>
-                } @else {
-                  <button class="btn btn-success full" (click)="joinEvent(event.id)">
-                    Participar do evento
-                  </button>
-                }
-              } @else {
-                <a routerLink="/login" class="btn btn-primary full">Entrar para participar</a>
-              }
-            </div>
-          </div>
-        </article>
-      }
-    </div>
+            <div class="event-content">
+              <div class="event-main">
 
+                <!-- HEADER -->
+                <div class="event-head">
+                  <h2>{{ event.title }}</h2>
+
+                  @if (isPastEvent(event)) {
+                    <span class="status-badge closed">Encerrado</span>
+                  } @else if (isJoined(event.id)) {
+                    <span class="status-badge joined">Inscrito</span>
+                  } @else if (isSoldOut(event)) {
+                    <span class="status-badge sold-out">Esgotado</span>
+                  } @else {
+                    <span class="status-badge open">Inscrições abertas</span>
+                  }
+                </div>
+
+                <!-- DESC -->
+                <p class="card-description">{{ event.description }}</p>
+
+                <!-- META -->
+                <div class="event-meta">
+                  <div class="meta-item">
+                    <span class="meta-label">Local</span>
+                    <span class="meta-value">{{ event.location }}</span>
+                  </div>
+
+                  <div class="meta-item">
+                    <span class="meta-label">Inscritos</span>
+                    <span class="meta-value">
+                      {{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}
+                    </span>
+                  </div>
+
+                  <div class="meta-item">
+                    <span class="meta-label">Disponibilidade</span>
+
+                    @if (isPastEvent(event)) {
+                      <span class="meta-value danger">Evento encerrado</span>
+                    } @else if (isJoined(event.id)) {
+                      <span class="meta-value highlight">Você está inscrito</span>
+                    } @else if (isSoldOut(event)) {
+                      <span class="meta-value danger">Sem vagas</span>
+                    } @else {
+                      <span class="meta-value highlight">
+                        {{ getAvailableSpots(event) }} vagas restantes
+                      </span>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- ACTIONS -->
+              <div class="event-actions">
+
+                <button
+                  class="btn btn-secondary full"
+                  type="button"
+                  (click)="openDetailsModal(event)">
+                  Ver detalhes
+                </button>
+
+                @if (authService.isAdmin()) {
+                  <div class="card-actions admin-actions">
+                    <a class="btn btn-secondary" [routerLink]="['/events/edit', event.id]">
+                      Editar
+                    </a>
+
+                    <button class="btn btn-danger" (click)="openDeleteModal(event)">
+                      Excluir
+                    </button>
+                  </div>
+                }
+
+                @else if (authService.isLoggedIn()) {
+
+                  @if (isPastEvent(event)) {
+                    <button class="btn btn-disabled full" disabled>
+                      Evento encerrado
+                    </button>
+                  }
+
+                  @else if (isJoined(event.id)) {
+                    <button class="btn btn-warning full" (click)="cancelSubscription(event.id)">
+                      Cancelar inscrição
+                    </button>
+                  }
+
+                  @else if (isSoldOut(event)) {
+                    <button class="btn btn-disabled full" disabled>
+                      Evento esgotado
+                    </button>
+                  }
+
+                  @else {
+                    <button class="btn btn-success full" (click)="joinEvent(event.id)">
+                      Participar
+                    </button>
+                  }
+                }
+
+                @else {
+                  @if (isPastEvent(event)) {
+                    <button class="btn btn-disabled full" disabled>
+                      Evento encerrado
+                    </button>
+                  } @else if (isSoldOut(event)) {
+                    <button class="btn btn-disabled full" disabled>
+                      Evento esgotado
+                    </button>
+                  } @else {
+                    <a routerLink="/login" class="btn btn-primary full">
+                      Entrar para participar
+                    </a>
+                  }
+                }
+
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
+    <!-- ESGOTADOS (SEM INSCRIÇÃO) -->
     @if (getSoldOutEvents().length > 0) {
       <section class="sold-out-section">
         <div class="sold-out-header">
           <span class="eyebrow">Esgotados</span>
           <h2>Eventos sem vagas disponíveis</h2>
-          <p>Esses eventos continuam visíveis, mas não aceitam novas inscrições no momento.</p>
         </div>
 
         <div class="events-grid sold-out-grid">
           @for (event of getSoldOutEvents(); track event.id) {
             <article class="event-card sold-out-card">
-              <div class="event-aside">
-                <span class="aside-label">Evento</span>
-                <strong class="aside-date">{{ event.date }}</strong>
-                <span class="aside-time">{{ event.time }}</span>
-
-                <div class="aside-divider"></div>
-
-                <span class="aside-vacancies-label">Status</span>
-                <strong class="aside-vacancies">0</strong>
-              </div>
-
               <div class="event-content">
-                <div class="event-main">
-                  <div class="event-head">
-                    <h2>{{ event.title }}</h2>
-                    <span class="status-badge sold-out">Esgotado</span>
-                  </div>
-
-                  <p class="card-description">{{ event.description }}</p>
-
-                  <div class="event-meta">
-                    <div class="meta-item">
-                      <span class="meta-label">Local</span>
-                      <span class="meta-value">{{ event.location }}</span>
-                    </div>
-
-                    <div class="meta-item">
-                      <span class="meta-label">Inscritos</span>
-                      <span class="meta-value">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span>
-                    </div>
-
-                    <div class="meta-item">
-                      <span class="meta-label">Disponibilidade</span>
-                      <span class="meta-value danger">Sem vagas disponíveis</span>
-                    </div>
-                  </div>
+                <div class="event-head">
+                  <h2>{{ event.title }}</h2>
+                  <span class="status-badge sold-out">Esgotado</span>
                 </div>
 
+                <p class="card-description">{{ event.description }}</p>
+
                 <div class="event-actions">
+                  <button
+                    class="btn btn-secondary full"
+                    (click)="openDetailsModal(event)">
+                    Ver detalhes
+                  </button>
+
                   <button class="btn btn-disabled full" disabled>
                     Evento esgotado
                   </button>
@@ -160,33 +237,83 @@
       </section>
     }
 
-  } @else {
-    <div class="empty-state">
-      <p>Nenhum evento disponível no momento.</p>
-    </div>
+    <!-- ENCERRADOS (RESUMO) -->
+    @if (getPastEvents().length > 0) {
+      <section class="closed-summary">
+        <div>
+          <span class="eyebrow">Encerrados</span>
+          <h2>{{ getPastEvents().length }} evento(s) já realizados</h2>
+        </div>
+
+        <button class="btn btn-secondary" (click)="togglePastEvents()">
+          {{ showPastEvents ? 'Ocultar' : 'Ver' }}
+        </button>
+      </section>
+    }
   }
 
-  @if (showDeleteModal && eventToDelete) {
-    <div class="modal-backdrop" (click)="closeDeleteModal()">
-      <div class="modal-card" (click)="$event.stopPropagation()">
+  <!-- MODAL DETALHES -->
+  @if (showDetailsModal && selectedEvent) {
+    <div class="modal-backdrop" (click)="closeDetailsModal()">
+      <div class="modal-card details-modal" (click)="$event.stopPropagation()">
+
         <div class="modal-header">
-          <span class="modal-tag">Confirmação</span>
-          <h3>Excluir evento</h3>
-          <p>
-            Tem certeza que deseja excluir o evento
-            <strong>{{ eventToDelete.title }}</strong>?
-          </p>
+          <h3>{{ selectedEvent.title }}</h3>
+          <p>{{ selectedEvent.description }}</p>
         </div>
 
         <div class="modal-actions">
-          <button class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="deleting">
-            Cancelar
-          </button>
-          <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
-            {{ deleting ? 'Excluindo...' : 'Excluir evento' }}
-          </button>
+          <button class="btn btn-secondary" (click)="closeDetailsModal()">Fechar</button>
+
+          @if (!authService.isAdmin()) {
+
+            @if (isPastEvent(selectedEvent)) {
+              <button class="btn btn-disabled" disabled>Encerrado</button>
+            }
+
+            @else if (isJoined(selectedEvent.id)) {
+              <button class="btn btn-warning"
+                (click)="cancelSubscription(selectedEvent.id); closeDetailsModal()">
+                Cancelar inscrição
+              </button>
+            }
+
+            @else if (isSoldOut(selectedEvent)) {
+              <button class="btn btn-disabled" disabled>Esgotado</button>
+            }
+
+            @else if (authService.isLoggedIn()) {
+              <button class="btn btn-success"
+                (click)="joinEvent(selectedEvent.id); closeDetailsModal()">
+                Participar
+              </button>
+            }
+
+            @else {
+              <a routerLink="/login" class="btn btn-primary">
+                Entrar para participar
+              </a>
+            }
+          }
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- MODAL DELETE -->
+  @if (showDeleteModal && eventToDelete) {
+    <div class="modal-backdrop" (click)="closeDeleteModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h3>Excluir evento</h3>
+        <p>Deseja excluir {{ eventToDelete.title }}?</p>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
+          <button class="btn btn-danger" (click)="confirmDelete()">Excluir</button>
         </div>
       </div>
     </div>
   }
+
 </section>

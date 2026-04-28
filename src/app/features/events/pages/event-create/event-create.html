@@ -1,15 +1,32 @@
 <section class="event-form-page">
+
   <div class="event-form-card">
+
+    <!-- HEADER -->
     <div class="form-header">
-      <span class="form-kicker">Administração</span>
-      <h1>{{ isEditMode ? 'Editar evento' : 'Novo evento' }}</h1>
+      <span class="form-kicker">
+        {{ isEditMode ? 'Editar evento' : 'Novo evento' }}
+      </span>
+
+      <h1>
+        {{ isEditMode ? 'Atualize o evento' : 'Criar evento' }}
+      </h1>
+
       <p>
         {{ isEditMode
-          ? 'Atualize as informações do evento.'
-          : 'Preencha os dados para cadastrar um novo evento.' }}
+          ? 'Altere as informações abaixo.'
+          : 'Preencha os dados para cadastrar um evento.' }}
       </p>
     </div>
 
+    <!-- LOADING -->
+    @if (loadingEvent) {
+      <div class="form-feedback info">
+        Carregando dados do evento...
+      </div>
+    }
+
+    <!-- FEEDBACK -->
     @if (errorMessage) {
       <div class="form-feedback error">
         {{ errorMessage }}
@@ -22,67 +39,118 @@
       </div>
     }
 
+    <!-- FORM -->
     <form (ngSubmit)="submit()" class="event-form">
-      <div class="form-group">
-        <label for="title">Título</label>
-        <input id="title" name="title" [(ngModel)]="event.title" type="text" />
-      </div>
 
-      <div class="form-group">
-        <label for="description">Descrição</label>
-        <textarea
-          id="description"
-          name="description"
-          [(ngModel)]="event.description"
-          rows="4"></textarea>
-      </div>
-
+      <!-- GRID PRINCIPAL -->
       <div class="form-grid">
-        <div class="form-group">
-          <label for="date">Data</label>
+
+        <!-- TÍTULO -->
+        <div class="form-group full">
+          <label>Título</label>
           <input
-            id="date"
-            name="date"
-            [(ngModel)]="event.date"
+            type="text"
+            [(ngModel)]="event.title"
+            name="title"
+            placeholder="Ex: Workshop de Angular"
+            required
+            [disabled]="loadingEvent"
+          />
+        </div>
+
+        <!-- DESCRIÇÃO -->
+        <div class="form-group full">
+          <label>Descrição</label>
+          <textarea
+            [(ngModel)]="event.description"
+            name="description"
+            rows="4"
+            placeholder="Descreva o evento..."
+            required
+            [disabled]="loadingEvent">
+          </textarea>
+        </div>
+
+        <!-- DATA -->
+        <div class="form-group">
+          <label>Data</label>
+          <input
             type="date"
-            [min]="minDate" />
+            [(ngModel)]="event.date"
+            name="date"
+            [min]="minDate"
+            required
+            [disabled]="loadingEvent"
+          />
         </div>
 
+        <!-- HORA -->
         <div class="form-group">
-          <label for="time">Horário</label>
+          <label>Hora</label>
           <input
-            id="time"
-            name="time"
+            type="time"
             [(ngModel)]="event.time"
-            type="time" />
+            name="time"
+            required
+            [disabled]="loadingEvent"
+          />
         </div>
+
+        <!-- LOCAL -->
+        <div class="form-group">
+          <label>Local</label>
+          <input
+            type="text"
+            [(ngModel)]="event.location"
+            name="location"
+            placeholder="Ex: Auditório"
+            required
+            [disabled]="loadingEvent"
+          />
+        </div>
+
+        <!-- VAGAS -->
+        <div class="form-group">
+          <label>Vagas</label>
+          <input
+            type="number"
+            [(ngModel)]="event.maxParticipants"
+            name="maxParticipants"
+            min="1"
+            required
+            [disabled]="loadingEvent"
+          />
+        </div>
+
       </div>
 
-      <div class="form-group">
-        <label for="location">Local</label>
-        <input id="location" name="location" [(ngModel)]="event.location" type="text" />
-      </div>
-
-      <div class="form-group">
-        <label for="maxParticipants">Máximo de participantes</label>
-        <input
-          id="maxParticipants"
-          name="maxParticipants"
-          [(ngModel)]="event.maxParticipants"
-          type="number"
-          min="1" />
-      </div>
-
+      <!-- NOTA -->
       <div class="form-note">
-        A data não pode ser anterior à data atual. Caso a data seja hoje, o horário também deve ser futuro.
+        A data e horário não podem ser no passado.
       </div>
 
+      <!-- ACTIONS -->
       <div class="form-actions">
-        <a routerLink="/events" class="secondary-btn">Cancelar</a>
-        <button type="submit" class="primary-btn" [disabled]="loading">
-          {{ loading ? 'Salvando...' : (isEditMode ? 'Atualizar evento' : 'Criar evento') }}
+
+        <a routerLink="/events" class="secondary-btn">
+          Cancelar
+        </a>
+
+        <button
+          type="submit"
+          class="primary-btn"
+          [disabled]="loading || loadingEvent">
+
+          {{ loading
+            ? 'Salvando...'
+            : (isEditMode ? 'Atualizar evento' : 'Criar evento') }}
+
         </button>
+
       </div>
+
     </form>
+
   </div>
+
 </section>

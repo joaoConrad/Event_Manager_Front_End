@@ -18,6 +18,14 @@ export class EventList implements OnInit, AfterViewInit {
   events: EventWithRegistered[] = [];
   loading = true;
 
+  sortOrder: 'recent' | 'oldest' = 'recent';
+
+  showDetailsModal = false;
+  selectedEvent: EventWithRegistered | null = null;
+
+  showPastEvents = false;
+  manualJoinedEventIds = new Set<number>();
+
   private loadingStarted = false;
   private loadedOnce = false;
 
@@ -90,13 +98,80 @@ export class EventList implements OnInit, AfterViewInit {
     this.loadEventsOnce();
   }
 
+  setSortOrder(order: 'recent' | 'oldest'): void {
+    this.sortOrder = order;
+  }
+
+  getEventDateTime(event: EventWithRegistered): number {
+    return new Date(`${event.date}T${event.time}`).getTime();
+  }
+
+  isPastEvent(event: EventWithRegistered): boolean {
+    return this.getEventDateTime(event) < new Date().getTime();
+  }
+
+  sortEvents(events: EventWithRegistered[]): EventWithRegistered[] {
+    return [...events].sort((a, b) => {
+      const dateA = this.getEventDateTime(a);
+      const dateB = this.getEventDateTime(b);
+
+      return this.sortOrder === 'recent'
+        ? dateA - dateB
+        : dateB - dateA;
+    });
+  }
+
+  getAvailableEvents(): EventWithRegistered[] {
+  const filtered = this.events.filter((event) => {
+    if (this.isPastEvent(event)) return false;
+
+    if (this.authService.isAdmin()) return true;
+
+    return !this.isSoldOut(event) || this.isJoined(event.id);
+  });
+
+  return this.sortEvents(filtered);
+}
+
+  getSoldOutEvents(): EventWithRegistered[] {
+  if (this.authService.isAdmin()) return [];
+
+  const filtered = this.events.filter((event) => {
+    return !this.isPastEvent(event)
+      && this.isSoldOut(event)
+      && !this.isJoined(event.id);
+  });
+
+  return this.sortEvents(filtered);
+}
+
+  getPastEvents(): EventWithRegistered[] {
+    return this.sortEvents(
+      this.events.filter((event) => this.isPastEvent(event))
+    );
+  }
+
+  togglePastEvents(): void {
+    this.showPastEvents = !this.showPastEvents;
+  }
+
+  openDetailsModal(event: EventWithRegistered): void {
+    this.selectedEvent = event;
+    this.showDetailsModal = true;
+    this.cdr.detectChanges();
+  }
+
+  closeDetailsModal(): void {
+    this.showDetailsModal = false;
+    this.selectedEvent = null;
+    this.cdr.detectChanges();
+  }
+
   showFeedback(message: string, type: FeedbackType): void {
     this.feedbackMessage = message;
     this.feedbackType = type;
 
-    if (this.feedbackTimeout) {
-      clearTimeout(this.feedbackTimeout);
-    }
+    if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
 
     this.feedbackTimeout = setTimeout(() => {
       this.feedbackMessage = '';
@@ -158,33 +233,13 @@ export class EventList implements OnInit, AfterViewInit {
     });
   }
 
-  getAvailableEvents(): EventWithRegistered[] {
-    if (this.authService.isAdmin()) {
-      return this.events;
-    }
-
-    return this.events.filter((event) => {
-      return !this.isSoldOut(event) || this.isJoined(event.id);
-    });
-  }
-
-  getSoldOutEvents(): EventWithRegistered[] {
-    if (this.authService.isAdmin()) {
-      return [];
-    }
-
-    return this.events.filter((event) => {
-      return this.isSoldOut(event) && !this.isJoined(event.id);
-    });
-  }
-
   isJoined(eventId?: number): boolean {
-    if (!eventId) return false;
+  if (!eventId) return false;
 
-    const event = this.events.find((item) => item.id === eventId);
+  const event = this.events.find((item) => item.id === eventId);
 
-    return event?.isUserRegistered === true;
-  }
+  return event?.isUserRegistered === true || this.manualJoinedEventIds.has(eventId);
+}
 
   calculateAvailableSpots(event: EventWithRegistered): number {
     return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
@@ -215,7 +270,12 @@ export class EventList implements OnInit, AfterViewInit {
 
     const event = this.events.find((item) => item.id === id);
 
-    if (event && this.isSoldOut(event)) {
+    if (event && this.isPastEvent(event)) {
+      this.showFeedback('Este evento já foi encerrado.', 'info');
+      return;
+    }
+
+    if (event && this.isSoldOut(event) && !this.isJoined(id)) {
       this.showFeedback('Este evento está esgotado.', 'info');
       return;
     }
@@ -227,6 +287,7 @@ export class EventList implements OnInit, AfterViewInit {
 
     this.participantService.subscribe(id).subscribe({
       next: () => {
+        this.manualJoinedEventIds.add(id);
         this.showFeedback('Inscrição realizada com sucesso.', 'success');
         this.reloadEvents();
       },
@@ -245,6 +306,7 @@ export class EventList implements OnInit, AfterViewInit {
 
     this.participantService.cancelMySubscription(id).subscribe({
       next: () => {
+        this.manualJoinedEventIds.delete(id);
         this.showFeedback('Inscrição cancelada com sucesso.', 'success');
         this.reloadEvents();
       },

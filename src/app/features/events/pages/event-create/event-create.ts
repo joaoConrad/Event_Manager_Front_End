@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event';
@@ -22,16 +22,19 @@ export class EventCreate implements OnInit {
 
   isEditMode = false;
   eventId: number | null = null;
+
   errorMessage = '';
   successMessage = '';
   loading = false;
+  loadingEvent = false;
 
   minDate = '';
 
   constructor(
     private readonly eventService: EventService,
     private readonly router: Router,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -48,19 +51,14 @@ export class EventCreate implements OnInit {
 
   getTodayDateString(): string {
     const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return today.toISOString().split('T')[0];
   }
 
   isPastDateTime(date: string, time: string): boolean {
     if (!date || !time) return false;
 
     const selected = new Date(`${date}T${time}`);
-    const now = new Date();
-
-    return selected.getTime() < now.getTime();
+    return selected.getTime() < new Date().getTime();
   }
 
   clearMessages(): void {
@@ -69,21 +67,26 @@ export class EventCreate implements OnInit {
   }
 
   loadEvent(id: number): void {
+    this.loadingEvent = true;
+
     this.eventService.getById(id).subscribe({
-      next: (event) => {
+      next: (response: any) => {
+        const event = response?.data ?? response;
+
         this.event = {
-          id: event.id,
-          title: event.title,
-          description: event.description,
-          date: event.date,
-          time: event.time,
-          location: event.location,
-          maxParticipants: event.maxParticipants
+          ...event,
+          date: event.date?.split('T')[0] ?? event.date,
+          time: event.time?.slice(0, 5) ?? event.time
         };
+
+        this.loadingEvent = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Erro ao carregar evento', err);
-        this.errorMessage = err?.error?.message || 'Não foi possível carregar o evento.';
+        console.error(err);
+        this.loadingEvent = false;
+        this.errorMessage = 'Erro ao carregar evento.';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -104,38 +107,33 @@ export class EventCreate implements OnInit {
     }
 
     if (this.isPastDateTime(this.event.date, this.event.time)) {
-      this.errorMessage = 'Não é permitido criar ou editar eventos com data e hora no passado.';
+      this.errorMessage = 'Data/hora não pode ser no passado.';
       return;
     }
 
     this.loading = true;
 
-    if (this.isEditMode && this.eventId) {
-      this.eventService.update(this.eventId, this.event).subscribe({
-        next: () => {
-          this.loading = false;
-          this.successMessage = 'Evento atualizado com sucesso.';
-          setTimeout(() => this.router.navigate(['/events']), 900);
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorMessage =
-            err?.error?.message || 'Não foi possível atualizar o evento.';
-        }
-      });
-    } else {
-      this.eventService.create(this.event).subscribe({
-        next: () => {
-          this.loading = false;
-          this.successMessage = 'Evento criado com sucesso.';
-          setTimeout(() => this.router.navigate(['/events']), 900);
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorMessage =
-            err?.error?.message || 'Não foi possível criar o evento.';
-        }
-      });
-    }
+    const request = this.isEditMode
+      ? this.eventService.update(this.eventId!, this.event)
+      : this.eventService.create(this.event);
+
+    request.subscribe({
+      next: () => {
+        this.loading = false;
+        this.successMessage = this.isEditMode
+          ? 'Evento atualizado com sucesso.'
+          : 'Evento criado com sucesso.';
+
+        this.eventService.clearCache();
+
+        setTimeout(() => this.router.navigate(['/events']), 800);
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
+        this.errorMessage = err?.error?.message || 'Erro ao salvar.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

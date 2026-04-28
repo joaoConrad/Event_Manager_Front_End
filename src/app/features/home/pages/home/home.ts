@@ -47,7 +47,13 @@ export class Home implements OnInit, AfterViewInit {
 
     this.eventService.getAll().subscribe({
       next: (res) => {
-        this.events = Array.isArray(res) ? res.slice(0, 8) : [];
+        this.events = Array.isArray(res)
+          ? res
+              .filter((event) => !this.isPastEvent(event))
+              .sort((a, b) => this.getEventDateTime(a) - this.getEventDateTime(b))
+              .slice(0, 8)
+          : [];
+
         this.loading = false;
         this.loadedOnce = true;
         this.cdr.detectChanges();
@@ -72,6 +78,14 @@ export class Home implements OnInit, AfterViewInit {
       left: direction === 'left' ? -amount : amount,
       behavior: 'smooth'
     });
+  }
+
+  getEventDateTime(event: EventModel): number {
+    return new Date(`${event.date}T${event.time}`).getTime();
+  }
+
+  isPastEvent(event: EventModel): boolean {
+    return this.getEventDateTime(event) < new Date().getTime();
   }
 
   getAvailableSpots(event: EventModel): number {
