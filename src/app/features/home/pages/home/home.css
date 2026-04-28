@@ -325,6 +325,31 @@
   cursor: default;
 }
 
+.event-card,
+.event-slide,
+.meta-item,
+.card-description,
+.event-description,
+.event-slide-body p,
+.event-head h2,
+.event-card h2,
+.event-card h3,
+.event-slide-body h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.card-description,
+.event-description,
+.event-slide-body p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 @media (max-width: 1020px) {
   .hero {
     grid-template-columns: 1fr;

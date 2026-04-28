@@ -401,6 +401,80 @@
   cursor: not-allowed;
 }
 
+.event-card,
+.event-slide,
+.meta-item,
+.card-description,
+.event-description,
+.event-slide-body p,
+.event-head h2,
+.event-card h2,
+.event-card h3,
+.event-slide-body h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.card-description,
+.event-description,
+.event-slide-body p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.status-badge.sold-out {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.sold-out-section {
+  margin-top: 2rem;
+}
+
+.sold-out-header {
+  margin-bottom: 1rem;
+}
+
+.sold-out-header h2 {
+  margin: 0 0 0.35rem;
+  color: #111827;
+  font-size: 1.65rem;
+}
+
+.sold-out-header p {
+  margin: 0;
+  color: #667085;
+  line-height: 1.6;
+}
+
+.sold-out-card {
+  opacity: 0.88;
+}
+
+.sold-out-card .event-aside {
+  background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+}
+
+.meta-value.danger {
+  color: #b91c1c;
+}
+
+.btn-disabled {
+  background: #e5e7eb;
+  color: #6b7280;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-disabled:hover {
+  transform: none;
+}
+
 @keyframes modalFadeUp {
   from {
     opacity: 0;

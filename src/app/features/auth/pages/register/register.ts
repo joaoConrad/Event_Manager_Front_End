@@ -32,7 +32,7 @@ export class Register {
 
     this.loading = true;
 
-    this.authService.register(this.name, this.email, this.password).subscribe({
+    this.authService.register(this.name, this.email, this.password, this.phone).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/home']);

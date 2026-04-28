@@ -27,80 +27,139 @@
       <p>Carregando eventos...</p>
     </div>
   } @else if (events.length > 0) {
+
     <div class="events-grid">
-      @for (event of events; track event.id) {
-        @if (getAvailableSpots(event) > 0 || isJoined(event.id)) {
-          <article class="event-card">
-            <div class="event-aside">
-              <span class="aside-label">Evento</span>
-              <strong class="aside-date">{{ event.date }}</strong>
-              <span class="aside-time">{{ event.time }}</span>
+      @for (event of getAvailableEvents(); track event.id) {
+        <article class="event-card">
+          <div class="event-aside">
+            <span class="aside-label">Evento</span>
+            <strong class="aside-date">{{ event.date }}</strong>
+            <span class="aside-time">{{ event.time }}</span>
 
-              <div class="aside-divider"></div>
+            <div class="aside-divider"></div>
 
-              <span class="aside-vacancies-label">Vagas</span>
-              <strong class="aside-vacancies">{{ getAvailableSpots(event) }}</strong>
-            </div>
+            <span class="aside-vacancies-label">Vagas</span>
+            <strong class="aside-vacancies">{{ getAvailableSpots(event) }}</strong>
+          </div>
 
-            <div class="event-content">
-              <div class="event-main">
-                <div class="event-head">
-                  <h2>{{ event.title }}</h2>
+          <div class="event-content">
+            <div class="event-main">
+              <div class="event-head">
+                <h2>{{ event.title }}</h2>
 
-                  @if (getAvailableSpots(event) > 0) {
-                    <span class="status-badge open">Inscrições abertas</span>
-                  } @else if (isJoined(event.id)) {
-                    <span class="status-badge joined">Inscrito</span>
-                  }
-                </div>
-
-                <p class="card-description">
-                  {{ event.description }}
-                </p>
-
-                <div class="event-meta">
-                  <div class="meta-item">
-                    <span class="meta-label">Local</span>
-                    <span class="meta-value">{{ event.location }}</span>
-                  </div>
-
-                  <div class="meta-item">
-                    <span class="meta-label">Inscritos</span>
-                    <span class="meta-value">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span>
-                  </div>
-
-                  <div class="meta-item">
-                    <span class="meta-label">Disponibilidade</span>
-                    <span class="meta-value highlight">{{ getAvailableSpots(event) }} vagas restantes</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="event-actions">
-                @if (authService.isAdmin()) {
-                  <div class="card-actions admin-actions">
-                    <a class="btn btn-secondary" [routerLink]="['/events/edit', event.id]">Editar</a>
-                    <button class="btn btn-danger" (click)="openDeleteModal(event)">Excluir</button>
-                  </div>
-                } @else if (authService.isLoggedIn()) {
-                  @if (isJoined(event.id)) {
-                    <button class="btn btn-warning full" (click)="cancelSubscription(event.id)">
-                      Cancelar inscrição
-                    </button>
-                  } @else {
-                    <button class="btn btn-success full" (click)="joinEvent(event.id)">
-                      Participar do evento
-                    </button>
-                  }
+                @if (isSoldOut(event)) {
+                  <span class="status-badge sold-out">Esgotado</span>
                 } @else {
-                  <a routerLink="/login" class="btn btn-primary full">Entrar para participar</a>
+                  <span class="status-badge open">Inscrições abertas</span>
                 }
               </div>
+
+              <p class="card-description">{{ event.description }}</p>
+
+              <div class="event-meta">
+                <div class="meta-item">
+                  <span class="meta-label">Local</span>
+                  <span class="meta-value">{{ event.location }}</span>
+                </div>
+
+                <div class="meta-item">
+                  <span class="meta-label">Inscritos</span>
+                  <span class="meta-value">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span>
+                </div>
+
+                <div class="meta-item">
+                  <span class="meta-label">Disponibilidade</span>
+                  <span class="meta-value highlight">{{ getAvailableSpots(event) }} vagas restantes</span>
+                </div>
+              </div>
             </div>
-          </article>
-        }
+
+            <div class="event-actions">
+              @if (authService.isAdmin()) {
+                <div class="card-actions admin-actions">
+                  <a class="btn btn-secondary" [routerLink]="['/events/edit', event.id]">Editar</a>
+                  <button class="btn btn-danger" (click)="openDeleteModal(event)">Excluir</button>
+                </div>
+              } @else if (authService.isLoggedIn()) {
+                @if (isJoined(event.id)) {
+                  <button class="btn btn-warning full" (click)="cancelSubscription(event.id)">
+                    Cancelar inscrição
+                  </button>
+                } @else {
+                  <button class="btn btn-success full" (click)="joinEvent(event.id)">
+                    Participar do evento
+                  </button>
+                }
+              } @else {
+                <a routerLink="/login" class="btn btn-primary full">Entrar para participar</a>
+              }
+            </div>
+          </div>
+        </article>
       }
     </div>
+
+    @if (getSoldOutEvents().length > 0) {
+      <section class="sold-out-section">
+        <div class="sold-out-header">
+          <span class="eyebrow">Esgotados</span>
+          <h2>Eventos sem vagas disponíveis</h2>
+          <p>Esses eventos continuam visíveis, mas não aceitam novas inscrições no momento.</p>
+        </div>
+
+        <div class="events-grid sold-out-grid">
+          @for (event of getSoldOutEvents(); track event.id) {
+            <article class="event-card sold-out-card">
+              <div class="event-aside">
+                <span class="aside-label">Evento</span>
+                <strong class="aside-date">{{ event.date }}</strong>
+                <span class="aside-time">{{ event.time }}</span>
+
+                <div class="aside-divider"></div>
+
+                <span class="aside-vacancies-label">Status</span>
+                <strong class="aside-vacancies">0</strong>
+              </div>
+
+              <div class="event-content">
+                <div class="event-main">
+                  <div class="event-head">
+                    <h2>{{ event.title }}</h2>
+                    <span class="status-badge sold-out">Esgotado</span>
+                  </div>
+
+                  <p class="card-description">{{ event.description }}</p>
+
+                  <div class="event-meta">
+                    <div class="meta-item">
+                      <span class="meta-label">Local</span>
+                      <span class="meta-value">{{ event.location }}</span>
+                    </div>
+
+                    <div class="meta-item">
+                      <span class="meta-label">Inscritos</span>
+                      <span class="meta-value">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span>
+                    </div>
+
+                    <div class="meta-item">
+                      <span class="meta-label">Disponibilidade</span>
+                      <span class="meta-value danger">Sem vagas disponíveis</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="event-actions">
+                  <button class="btn btn-disabled full" disabled>
+                    Evento esgotado
+                  </button>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
   } @else {
     <div class="empty-state">
       <p>Nenhum evento disponível no momento.</p>

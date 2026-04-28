@@ -1,10 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay, tap } from 'rxjs';
 import { EventModel } from '../../models/event.model';
 import { AuthService } from './auth';
-import { environment } from '../../../environments/environment';
-
 
 @Injectable({
   providedIn: 'root'
@@ -12,31 +10,54 @@ import { environment } from '../../../environments/environment';
 export class EventService {
   private readonly http = inject(HttpClient);
   private readonly authService = inject(AuthService);
-  private readonly apiUrl = `${environment.apiUrl}/events`;
 
-  getAll(): Observable<EventModel[]> {
-    return this.http.get<EventModel[]>(this.apiUrl);
+  private readonly apiUrl = 'http://localhost:3000/api/events';
+
+  private eventsCache$?: Observable<EventModel[]>;
+
+  getAll(forceRefresh = false): Observable<EventModel[]> {
+    if (!this.eventsCache$ || forceRefresh) {
+      this.eventsCache$ = this.http.get<EventModel[]>(this.apiUrl, {
+        headers: this.authService.getAuthHeaders()
+      }).pipe(
+        shareReplay(1)
+      );
+    }
+
+    return this.eventsCache$;
+  }
+
+  clearCache(): void {
+    this.eventsCache$ = undefined;
   }
 
   getById(id: number): Observable<EventModel> {
-    return this.http.get<EventModel>(`${this.apiUrl}/${id}`);
+    return this.http.get<EventModel>(`${this.apiUrl}/${id}`, {
+      headers: this.authService.getAuthHeaders()
+    });
   }
 
   create(event: EventModel): Observable<EventModel> {
     return this.http.post<EventModel>(this.apiUrl, event, {
       headers: this.authService.getAuthHeaders()
-    });
+    }).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   update(id: number, event: Partial<EventModel>): Observable<EventModel> {
     return this.http.put<EventModel>(`${this.apiUrl}/${id}`, event, {
       headers: this.authService.getAuthHeaders()
-    });
+    }).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, {
       headers: this.authService.getAuthHeaders()
-    });
+    }).pipe(
+      tap(() => this.clearCache())
+    );
   }
 }

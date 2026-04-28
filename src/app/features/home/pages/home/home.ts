@@ -13,9 +13,12 @@ import { EventModel } from '../../../../models/event.model';
 export class Home implements OnInit, AfterViewInit {
   events: EventModel[] = [];
   loading = true;
+
+  private loadingStarted = false;
   private loadedOnce = false;
 
-  @ViewChild('carousel', { static: false }) carouselRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('carousel', { static: false })
+  carouselRef?: ElementRef<HTMLDivElement>;
 
   constructor(
     private readonly eventService: EventService,
@@ -24,13 +27,18 @@ export class Home implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadEvents();
+    this.loadEventsOnce();
   }
 
   ngAfterViewInit(): void {
-    if (!this.loadedOnce) {
-      this.loadEvents();
-    }
+    this.loadEventsOnce();
+  }
+
+  loadEventsOnce(): void {
+    if (this.loadingStarted || this.loadedOnce) return;
+
+    this.loadingStarted = true;
+    this.loadEvents();
   }
 
   loadEvents(): void {
@@ -48,6 +56,7 @@ export class Home implements OnInit, AfterViewInit {
         console.error('Erro ao carregar eventos da home', err);
         this.events = [];
         this.loading = false;
+        this.loadingStarted = false;
         this.cdr.detectChanges();
       }
     });
@@ -63,5 +72,21 @@ export class Home implements OnInit, AfterViewInit {
       left: direction === 'left' ? -amount : amount,
       behavior: 'smooth'
     });
+  }
+
+  getAvailableSpots(event: EventModel): number {
+    if (typeof event.availableSpots === 'number') {
+      return event.availableSpots;
+    }
+
+    return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
+  }
+
+  isSoldOut(event: EventModel): boolean {
+    if (typeof event.isSoldOut === 'boolean') {
+      return event.isSoldOut;
+    }
+
+    return this.getAvailableSpots(event) <= 0;
   }
 }

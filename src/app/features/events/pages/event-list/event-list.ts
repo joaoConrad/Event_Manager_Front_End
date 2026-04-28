@@ -16,8 +16,9 @@ type FeedbackType = 'success' | 'error' | 'info';
 })
 export class EventList implements OnInit, AfterViewInit {
   events: EventWithRegistered[] = [];
-  joinedEventIds = new Set<number>();
   loading = true;
+
+  private loadingStarted = false;
   private loadedOnce = false;
 
   feedbackMessage = '';
@@ -36,13 +37,57 @@ export class EventList implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadEvents();
+    this.loadEventsOnce();
   }
 
   ngAfterViewInit(): void {
-    if (!this.loadedOnce) {
-      this.loadEvents();
-    }
+    this.loadEventsOnce();
+  }
+
+  loadEventsOnce(): void {
+    if (this.loadingStarted || this.loadedOnce) return;
+
+    this.loadingStarted = true;
+    this.loadEvents();
+  }
+
+  loadEvents(): void {
+    this.loading = true;
+    this.cdr.detectChanges();
+
+    this.eventService.getAll(true).subscribe({
+      next: (res) => {
+        this.events = Array.isArray(res)
+          ? res.map((event) => ({
+              ...event,
+              registeredParticipants: event.registeredParticipants ?? 0,
+              availableSpots: event.availableSpots ?? this.calculateAvailableSpots(event),
+              isSoldOut: event.isSoldOut ?? this.calculateIsSoldOut(event),
+              isUserRegistered: event.isUserRegistered ?? false
+            }))
+          : [];
+
+        this.loading = false;
+        this.loadedOnce = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao carregar eventos', err);
+        this.events = [];
+        this.loading = false;
+        this.loadingStarted = false;
+        this.cdr.detectChanges();
+
+        this.showFeedback('Não foi possível carregar os eventos.', 'error');
+      }
+    });
+  }
+
+  reloadEvents(): void {
+    this.eventService.clearCache();
+    this.loadingStarted = false;
+    this.loadedOnce = false;
+    this.loadEventsOnce();
   }
 
   showFeedback(message: string, type: FeedbackType): void {
@@ -96,9 +141,10 @@ export class EventList implements OnInit, AfterViewInit {
       next: () => {
         this.deleting = false;
         this.showDeleteModal = false;
-        this.showFeedback('Evento excluído com sucesso.', 'success');
         this.eventToDelete = null;
-        this.loadEvents();
+
+        this.showFeedback('Evento excluído com sucesso.', 'success');
+        this.reloadEvents();
       },
       error: (err) => {
         console.error('Erro ao excluir evento', err);
@@ -112,72 +158,67 @@ export class EventList implements OnInit, AfterViewInit {
     });
   }
 
-  loadEvents(): void {
-    this.loading = true;
-    this.cdr.detectChanges();
+  getAvailableEvents(): EventWithRegistered[] {
+    if (this.authService.isAdmin()) {
+      return this.events;
+    }
 
-    this.eventService.getAll().subscribe({
-      next: (res) => {
-        this.events = Array.isArray(res)
-          ? res.map((event) => ({
-              ...event,
-              registeredParticipants: event.registeredParticipants ?? 0
-            }))
-          : [];
-
-        this.loading = false;
-        this.loadedOnce = true;
-        this.cdr.detectChanges();
-        this.loadJoinedState();
-      },
-      error: (err) => {
-        console.error('Erro ao carregar eventos', err);
-        this.events = [];
-        this.joinedEventIds.clear();
-        this.loading = false;
-        this.showFeedback('Não foi possível carregar os eventos.', 'error');
-      }
+    return this.events.filter((event) => {
+      return !this.isSoldOut(event) || this.isJoined(event.id);
     });
   }
 
-  loadJoinedState(): void {
-    this.joinedEventIds.clear();
-
-    if (!this.authService.isLoggedIn() || this.authService.isAdmin()) {
-      this.cdr.detectChanges();
-      return;
+  getSoldOutEvents(): EventWithRegistered[] {
+    if (this.authService.isAdmin()) {
+      return [];
     }
 
-    const currentUser = this.authService.getUser();
-    if (!currentUser?.email) {
-      this.cdr.detectChanges();
-      return;
-    }
-
-    this.events.forEach((event) => {
-      if (!event.id) return;
-
-      this.participantService.listByEvent(event.id).subscribe({
-        next: (participants) => {
-          const joined = participants.some((p) => p.email === currentUser.email);
-          if (joined) this.joinedEventIds.add(event.id!);
-          this.cdr.detectChanges();
-        },
-        error: () => {}
-      });
+    return this.events.filter((event) => {
+      return this.isSoldOut(event) && !this.isJoined(event.id);
     });
   }
 
   isJoined(eventId?: number): boolean {
-    return !!eventId && this.joinedEventIds.has(eventId);
+    if (!eventId) return false;
+
+    const event = this.events.find((item) => item.id === eventId);
+
+    return event?.isUserRegistered === true;
+  }
+
+  calculateAvailableSpots(event: EventWithRegistered): number {
+    return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
+  }
+
+  calculateIsSoldOut(event: EventWithRegistered): boolean {
+    return this.calculateAvailableSpots(event) <= 0;
   }
 
   getAvailableSpots(event: EventWithRegistered): number {
-    return event.maxParticipants - (event.registeredParticipants ?? 0);
+    if (typeof event.availableSpots === 'number') {
+      return event.availableSpots;
+    }
+
+    return this.calculateAvailableSpots(event);
+  }
+
+  isSoldOut(event: EventWithRegistered): boolean {
+    if (typeof event.isSoldOut === 'boolean') {
+      return event.isSoldOut;
+    }
+
+    return this.calculateIsSoldOut(event);
   }
 
   joinEvent(id?: number): void {
     if (!id) return;
+
+    const event = this.events.find((item) => item.id === id);
+
+    if (event && this.isSoldOut(event)) {
+      this.showFeedback('Este evento está esgotado.', 'info');
+      return;
+    }
 
     if (!this.authService.isLoggedIn()) {
       this.showFeedback('Você precisa estar logado para se inscrever.', 'info');
@@ -187,7 +228,7 @@ export class EventList implements OnInit, AfterViewInit {
     this.participantService.subscribe(id).subscribe({
       next: () => {
         this.showFeedback('Inscrição realizada com sucesso.', 'success');
-        this.loadEvents();
+        this.reloadEvents();
       },
       error: (err) => {
         console.error('Erro ao inscrever', err);
@@ -205,7 +246,7 @@ export class EventList implements OnInit, AfterViewInit {
     this.participantService.cancelMySubscription(id).subscribe({
       next: () => {
         this.showFeedback('Inscrição cancelada com sucesso.', 'success');
-        this.loadEvents();
+        this.reloadEvents();
       },
       error: (err) => {
         console.error('Erro ao cancelar', err);
