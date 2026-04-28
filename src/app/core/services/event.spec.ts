@@ -1,16 +1,119 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 
-import { Event } from './event';
+import { EventService } from './event';
+import { AuthService } from './auth';
+import { EventModel } from '../../models/event.model';
 
-describe('Event', () => {
-  let service: Event;
+describe('EventService', () => {
+  let service: EventService;
+  let httpMock: HttpTestingController;
+
+  const apiUrl = 'http://localhost:3000/api/events';
+
+  const authServiceMock = {
+    getAuthHeaders: () => ({
+      Authorization: 'Bearer fake-token'
+    })
+  };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Event);
+    TestBed.configureTestingModule({
+      providers: [
+        EventService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: authServiceMock }
+      ]
+    });
+
+    service = TestBed.inject(EventService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  afterEach(() => {
+    httpMock.verify();
+    service.clearCache();
+  });
+
+  it('deve buscar eventos na API', () => {
+    const mockEvents: EventModel[] = [
+      {
+        id: 1,
+        title: 'Evento Teste',
+        description: 'Descrição do evento',
+        date: '2026-05-10',
+        time: '19:00',
+        location: 'URI',
+        maxParticipants: 10,
+        registeredParticipants: 2,
+        availableSpots: 8,
+        isSoldOut: false,
+        isUserRegistered: false
+      }
+    ];
+
+    service.getAll(true).subscribe((events) => {
+      expect(events.length).toBe(1);
+      expect(events[0].title).toBe('Evento Teste');
+      expect(events[0].availableSpots).toBe(8);
+      expect(events[0].isSoldOut).toBeFalsy();
+    });
+
+    const req = httpMock.expectOne(apiUrl);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer fake-token');
+
+    req.flush(mockEvents);
+  });
+
+  it('deve cachear eventos usando shareReplay', () => {
+    service.getAll().subscribe();
+    service.getAll().subscribe();
+
+    const req = httpMock.expectOne(apiUrl);
+    expect(req.request.method).toBe('GET');
+
+    req.flush([]);
+  });
+
+  it('deve criar evento e limpar cache', () => {
+    const newEvent: EventModel = {
+      title: 'Novo Evento',
+      description: 'Teste',
+      date: '2026-05-12',
+      time: '20:00',
+      location: 'Auditório',
+      maxParticipants: 30
+    };
+
+    service.create(newEvent).subscribe((event) => {
+      expect(event.title).toBe('Novo Evento');
+    });
+
+    const req = httpMock.expectOne(apiUrl);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body.title).toBe('Novo Evento');
+
+    req.flush({
+      ...newEvent,
+      id: 1,
+      registeredParticipants: 0,
+      availableSpots: 30,
+      isSoldOut: false,
+      isUserRegistered: false
+    });
+  });
+
+  it('deve excluir evento', () => {
+    service.delete(1).subscribe((res) => {
+      expect(res).toBeTruthy();
+    });
+
+    const req = httpMock.expectOne(`${apiUrl}/1`);
+    expect(req.request.method).toBe('DELETE');
+
+    req.flush({});
   });
 });
