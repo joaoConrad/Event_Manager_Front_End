@@ -37,6 +37,37 @@
     </div>
   </div>
 
+    
+
+<!-- FILTRO AVANÇADO -->
+<div class="filtro-avancado">
+  <h3>Filtro Avançado</h3>
+
+  <input type="date" [(ngModel)]="filtroData" />
+
+  <input
+    type="text"
+    placeholder="Categoria"
+    [(ngModel)]="filtroCategoria" />
+
+  <select [(ngModel)]="filtroStatus">
+    <option value="">Todos</option>
+    <option value="ativo">Ativo</option>
+    <option value="cancelado">Cancelado</option>
+  </select>
+
+  <button (click)="aplicarFiltro()">Filtrar</button>
+  <button (click)="limparFiltro()">Limpar</button>
+</div>
+
+@if (getAvailableEvents().length === 0 && !loading) {
+  <div class="empty-state">
+    <p>Nenhum evento encontrado com esse filtro.</p>
+  </div>
+}
+  
+
+  
   <!-- FEEDBACK -->
   @if (feedbackMessage) {
     <div

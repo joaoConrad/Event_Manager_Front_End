@@ -1,5 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../../core/services/event';
 import { ParticipantService } from '../../../../core/services/participant';
 import { EventModel } from '../../../../models/event.model';
@@ -10,11 +11,20 @@ type FeedbackType = 'success' | 'error' | 'info';
 
 @Component({
   selector: 'app-event-list',
-  imports: [RouterLink],
+  standalone: true,
+  imports: [RouterLink, FormsModule],
   templateUrl: './event-list.html',
   styleUrl: './event-list.css'
 })
 export class EventList implements OnInit, AfterViewInit {
+
+  // =====================
+  // 🔎 FILTROS
+  // =====================
+  filtroData: string = '';
+  filtroCategoria: string = '';
+  filtroStatus: string = '';
+
   events: EventWithRegistered[] = [];
   loading = true;
 
@@ -77,6 +87,7 @@ export class EventList implements OnInit, AfterViewInit {
 
         this.loading = false;
         this.loadedOnce = true;
+
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -121,34 +132,85 @@ export class EventList implements OnInit, AfterViewInit {
     });
   }
 
+  // =====================
+  // 🔥 FILTRO APLICADO AQUI
+  // =====================
+  aplicarFiltroBase(events: EventWithRegistered[]): EventWithRegistered[] {
+    return events.filter((event) => {
+
+      const matchData = this.filtroData
+        ? event.date === this.filtroData
+        : true;
+
+      const matchCategoria = this.filtroCategoria
+        ? (event.title || '')
+            .toLowerCase()
+            .includes(this.filtroCategoria.toLowerCase())
+        : true;
+
+      const matchStatus = this.filtroStatus
+        ? this.getStatus(event) === this.filtroStatus
+        : true;
+
+      return matchData && matchCategoria && matchStatus;
+    });
+  }
+
+  getStatus(event: EventWithRegistered): string {
+    if (this.isPastEvent(event)) return 'cancelado';
+    if (this.isSoldOut(event)) return 'cancelado';
+    return 'ativo';
+  }
+
+  // =====================
+  // LISTAS COM FILTRO
+  // =====================
   getAvailableEvents(): EventWithRegistered[] {
-  const filtered = this.events.filter((event) => {
-    if (this.isPastEvent(event)) return false;
+    let filtered = this.events.filter((event) => {
+      if (this.isPastEvent(event)) return false;
 
-    if (this.authService.isAdmin()) return true;
+      if (this.authService.isAdmin()) return true;
 
-    return !this.isSoldOut(event) || this.isJoined(event.id);
-  });
+      return !this.isSoldOut(event) || this.isJoined(event.id);
+    });
 
-  return this.sortEvents(filtered);
-}
+    filtered = this.aplicarFiltroBase(filtered);
+
+    return this.sortEvents(filtered);
+  }
 
   getSoldOutEvents(): EventWithRegistered[] {
-  if (this.authService.isAdmin()) return [];
+    if (this.authService.isAdmin()) return [];
 
-  const filtered = this.events.filter((event) => {
-    return !this.isPastEvent(event)
-      && this.isSoldOut(event)
-      && !this.isJoined(event.id);
-  });
+    let filtered = this.events.filter((event) => {
+      return !this.isPastEvent(event)
+        && this.isSoldOut(event)
+        && !this.isJoined(event.id);
+    });
 
-  return this.sortEvents(filtered);
-}
+    filtered = this.aplicarFiltroBase(filtered);
+
+    return this.sortEvents(filtered);
+  }
 
   getPastEvents(): EventWithRegistered[] {
-    return this.sortEvents(
-      this.events.filter((event) => this.isPastEvent(event))
-    );
+    let filtered = this.events.filter((event) => this.isPastEvent(event));
+
+    filtered = this.aplicarFiltroBase(filtered);
+
+    return this.sortEvents(filtered);
+  }
+
+  aplicarFiltro() {
+    // só força atualização da tela
+    this.cdr.detectChanges();
+  }
+
+  limparFiltro() {
+    this.filtroData = '';
+    this.filtroCategoria = '';
+    this.filtroStatus = '';
+    this.cdr.detectChanges();
   }
 
   togglePastEvents(): void {
@@ -234,12 +296,12 @@ export class EventList implements OnInit, AfterViewInit {
   }
 
   isJoined(eventId?: number): boolean {
-  if (!eventId) return false;
+    if (!eventId) return false;
 
-  const event = this.events.find((item) => item.id === eventId);
+    const event = this.events.find((item) => item.id === eventId);
 
-  return event?.isUserRegistered === true || this.manualJoinedEventIds.has(eventId);
-}
+    return event?.isUserRegistered === true || this.manualJoinedEventIds.has(eventId);
+  }
 
   calculateAvailableSpots(event: EventWithRegistered): number {
     return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
