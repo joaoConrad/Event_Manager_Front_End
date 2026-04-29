@@ -151,7 +151,7 @@
 
 .status-badge.joined {
   background: #eff6ff;
-  color: #1d4ed8;
+  color: #2563eb;
   border: 1px solid #bfdbfe;
 }
 
@@ -193,7 +193,7 @@
 }
 
 .meta-value.highlight {
-  color: #1d4ed8;
+  color: #2563eb;
 }
 
 .event-actions {
@@ -237,7 +237,7 @@
 }
 
 .btn-primary:hover {
-  background: #1d4ed8;
+  background: #2563eb;
 }
 
 .btn-secondary {
@@ -524,7 +524,7 @@
 
 .sort-btn.active {
   background: #2563eb;
-  border-color: #2563eb;
+  border-color:#2563eb;
   color: #ffffff;
   box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
 }
@@ -755,7 +755,7 @@
 
 .filtro-avancado input:focus,
 .filtro-avancado select:focus {
-  border-color: #4f46e5;
+  border-color: #2563eb;
   outline: none;
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
 }
@@ -771,7 +771,7 @@
 }
 
 .filtro-avancado button:first-of-type {
-  background-color: #4f46e5;
+  background-color: #2563eb;
   color: white;
 }
 
