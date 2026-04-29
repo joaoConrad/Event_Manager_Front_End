@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, shareReplay, tap } from 'rxjs';
+import { Observable, shareReplay, tap, map, forkJoin } from 'rxjs';
 import { EventModel } from '../../models/event.model';
 import { AuthService } from './auth';
 
@@ -12,6 +12,7 @@ export class EventService {
   private readonly authService = inject(AuthService);
 
   private readonly apiUrl = 'http://localhost:3000/api/events';
+  private readonly participantUrl = 'http://localhost:3000/api/participants';
 
   private eventsCache$?: Observable<EventModel[]>;
 
@@ -25,6 +26,23 @@ export class EventService {
     }
 
     return this.eventsCache$;
+  }
+
+  // ✅ NOVO: junta eventos + participantes e conta
+  getEventsWithCount(): Observable<any[]> {
+    return forkJoin({
+      events: this.getAll(),
+      participants: this.http.get<any[]>(this.participantUrl, {
+        headers: this.authService.getAuthHeaders()
+      })
+    }).pipe(
+      map(({ events, participants }) =>
+        events.map(event => ({
+          ...event,
+          totalParticipants: participants.filter(p => p.eventId === event.id).length
+        }))
+      )
+    );
   }
 
   clearCache(): void {

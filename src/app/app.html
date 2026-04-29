@@ -10,6 +10,9 @@
 
       @if (authService.isLoggedIn() && authService.isAdmin()) {
         <a routerLink="/events/new" routerLinkActive="active-link">Novo evento</a>
+
+        <!-- 🔥 DASHBOARD (SÓ ADMIN) -->
+        <a routerLink="/admin/dashboard" routerLinkActive="active-link">Dashboard</a>
       }
     </nav>
 

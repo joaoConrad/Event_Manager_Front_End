@@ -1,1 +1,6 @@
-<p>dashboard works!</p>
+<h2>Dashboard Admin</h2>
+
+<div *ngFor="let event of events">
+  <h3>{{ event.name }}</h3>
+  <p>Total de inscritos: {{ event.totalParticipants }}</p>
+</div>
