@@ -1,6 +1,19 @@
-<h2>Dashboard Admin</h2>
+<h2 class="dashboard-title">Dashboard Admin</h2>
 
-<div *ngFor="let event of events">
-  <h3>{{ event.name }}</h3>
-  <p>Total de inscritos: {{ event.totalParticipants }}</p>
+<p class="total-geral">
+  Total geral de inscritos: {{ getTotalGeral() }}
+</p>
+
+<div class="dashboard-container">
+
+  <div class="dashboard-card" *ngFor="let event of events">
+    <h3 class="event-name">{{ event.name }}</h3>
+    
+    <div class="event-count">
+      {{ event.totalParticipants }}
+    </div>
+
+    <p class="event-label">inscritos</p>
+  </div>
+
 </div>

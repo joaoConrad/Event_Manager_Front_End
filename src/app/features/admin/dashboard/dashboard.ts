@@ -6,7 +6,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './dashboard.html'
+  templateUrl: './dashboard.html',
+  styleUrls: ['./dashboard.css']
 })
 export class Dashboard implements OnInit {
 
@@ -18,5 +19,9 @@ export class Dashboard implements OnInit {
     this.eventService.getEventsWithCount().subscribe(data => {
       this.events = data;
     });
+  }
+
+  getTotalGeral(): number {
+    return this.events.reduce((total, event) => total + event.totalParticipants, 0);
   }
 }
