@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { EventService } from '../../../../core/services/event';
+import { EventService, PaginationMeta } from '../../../../core/services/event';
 import { ParticipantService } from '../../../../core/services/participant';
 import { EventModel } from '../../../../models/event.model';
 import { AuthService } from '../../../../core/services/auth';
@@ -26,6 +26,11 @@ export class EventList implements OnInit {
   loading = true;
   sortOrder: 'recent' | 'oldest' = 'recent';
 
+  // ── Paginação ──────────────────────────────────────────
+  currentPage = 1;
+  readonly pageSize = 10;
+  pagination: PaginationMeta | null = null;
+
   showPastEvents = false;
   manualJoinedEventIds = new Set<number>();
 
@@ -36,21 +41,10 @@ export class EventList implements OnInit {
   showDeleteModal = false;
   eventToDelete: EventWithRegistered | null = null;
   deleting = false;
+
   showHistoryModal = false;
   historyEventId: number | null = null;
   historyEventName = '';
-
-  openHistoryModal(event: EventWithRegistered): void {
-    this.historyEventId = event.id ?? null;
-    this.historyEventName = event.title;
-    this.showHistoryModal = true;
-  }
-
-  closeHistoryModal(): void {
-    this.showHistoryModal = false;
-    this.historyEventId = null;
-    this.historyEventName = '';
-  }
 
   constructor(
     private readonly eventService: EventService,
@@ -63,23 +57,24 @@ export class EventList implements OnInit {
     this.loadEvents();
   }
 
+  // ── Carregamento ───────────────────────────────────────
+
   loadEvents(): void {
     this.loading = true;
 
-    this.eventService.getAll(true).subscribe({
-      next: (res) => {
-        this.events = Array.isArray(res)
-          ? res.map((event) => ({
-              ...event,
-              // fix: normaliza date/time que podem vir como ISO do banco
-              date: event.date?.split('T')[0] ?? event.date,
-              time: event.time?.slice(0, 5) ?? event.time,
-              registeredParticipants: event.registeredParticipants ?? 0,
-              availableSpots: event.availableSpots ?? this.calcSpots(event),
-              isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
-              isUserRegistered: event.isUserRegistered ?? false,
-            }))
-          : [];
+    this.eventService.getPage(this.currentPage, this.pageSize).subscribe({
+      next: ({ events, meta }) => {
+        this.events = events.map((event) => ({
+          ...event,
+          date: event.date?.split('T')[0] ?? event.date,
+          time: event.time?.slice(0, 5) ?? event.time,
+          registeredParticipants: event.registeredParticipants ?? 0,
+          availableSpots: event.availableSpots ?? this.calcSpots(event),
+          isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
+          isUserRegistered: event.isUserRegistered ?? false,
+        }));
+
+        this.pagination = meta;
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -96,6 +91,47 @@ export class EventList implements OnInit {
     this.loadEvents();
   }
 
+  // ── Paginação ──────────────────────────────────────────
+
+  goToPage(page: number): void {
+    if (page < 1 || (this.pagination && page > this.pagination.totalPages)) return;
+    if (page === this.currentPage) return;
+    this.currentPage = page;
+    this.manualJoinedEventIds.clear(); // limpa inscrições locais ao trocar de página
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.loadEvents();
+  }
+
+  prevPage(): void { this.goToPage(this.currentPage - 1); }
+  nextPage(): void { this.goToPage(this.currentPage + 1); }
+
+  // gera array de números de página para o template
+  getPageNumbers(): number[] {
+    if (!this.pagination) return [];
+    const total = this.pagination.totalPages;
+    const current = this.currentPage;
+
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    // janela deslizante: sempre mostra 1, ..., atual-1, atual, atual+1, ..., total
+    const pages: number[] = [1];
+
+    if (current > 3) pages.push(-1); // -1 = reticências
+
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+      pages.push(i);
+    }
+
+    if (current < total - 2) pages.push(-1);
+
+    pages.push(total);
+    return pages;
+  }
+
+  // ── Ordenação ──────────────────────────────────────────
+
   setSortOrder(order: 'recent' | 'oldest'): void {
     this.sortOrder = order;
   }
@@ -107,13 +143,13 @@ export class EventList implements OnInit {
     });
   }
 
+  // ── Filtros (client-side sobre a página atual) ─────────
+
   private applyFilters(events: EventWithRegistered[]): EventWithRegistered[] {
     return events.filter((event) => {
-      const matchData = this.filtroData ? event.date === this.filtroData : true;
-      const matchTitulo = this.filtroCategoria
-        ? event.title.toLowerCase().includes(this.filtroCategoria.toLowerCase())
-        : true;
-      const matchStatus = this.filtroStatus ? this.getStatus(event) === this.filtroStatus : true;
+      const matchData    = this.filtroData      ? event.date === this.filtroData : true;
+      const matchTitulo  = this.filtroCategoria ? event.title.toLowerCase().includes(this.filtroCategoria.toLowerCase()) : true;
+      const matchStatus  = this.filtroStatus    ? this.getStatus(event) === this.filtroStatus : true;
       return matchData && matchTitulo && matchStatus;
     });
   }
@@ -139,9 +175,7 @@ export class EventList implements OnInit {
     return this.sortEvents(this.applyFilters(this.events.filter((e) => this.isPastEvent(e))));
   }
 
-  aplicarFiltro(): void {
-    this.cdr.detectChanges();
-  }
+  aplicarFiltro(): void { this.cdr.detectChanges(); }
 
   limparFiltro(): void {
     this.filtroData = '';
@@ -155,11 +189,10 @@ export class EventList implements OnInit {
     return 'ativo';
   }
 
-  togglePastEvents(): void {
-    this.showPastEvents = !this.showPastEvents;
-  }
+  togglePastEvents(): void { this.showPastEvents = !this.showPastEvents; }
 
-  // date e time já normalizados no loadEvents, mas protege por garantia
+  // ── Helpers de data/estado ─────────────────────────────
+
   getDateTime(event: EventWithRegistered): number {
     const date = event.date?.split('T')[0] ?? event.date;
     const time = event.time?.slice(0, 5) ?? event.time;
@@ -174,9 +207,7 @@ export class EventList implements OnInit {
     return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
   }
 
-  calcSoldOut(event: EventWithRegistered): boolean {
-    return this.calcSpots(event) <= 0;
-  }
+  calcSoldOut(event: EventWithRegistered): boolean { return this.calcSpots(event) <= 0; }
 
   getAvailableSpots(event: EventWithRegistered): number {
     return typeof event.availableSpots === 'number' ? event.availableSpots : this.calcSpots(event);
@@ -192,21 +223,14 @@ export class EventList implements OnInit {
     return event?.isUserRegistered === true || this.manualJoinedEventIds.has(eventId);
   }
 
+  // ── Ações ──────────────────────────────────────────────
+
   joinEvent(id?: number): void {
     if (!id) return;
     const event = this.events.find((e) => e.id === id);
-    if (event && this.isPastEvent(event)) {
-      this.showFeedback('Este evento já foi encerrado.', 'info');
-      return;
-    }
-    if (event && this.isSoldOut(event)) {
-      this.showFeedback('Este evento está esgotado.', 'info');
-      return;
-    }
-    if (!this.authService.isLoggedIn()) {
-      this.showFeedback('Você precisa estar logado para se inscrever.', 'info');
-      return;
-    }
+    if (event && this.isPastEvent(event)) { this.showFeedback('Este evento já foi encerrado.', 'info'); return; }
+    if (event && this.isSoldOut(event))   { this.showFeedback('Este evento está esgotado.', 'info'); return; }
+    if (!this.authService.isLoggedIn())   { this.showFeedback('Você precisa estar logado para se inscrever.', 'info'); return; }
 
     this.participantService.subscribe(id).subscribe({
       next: () => {
@@ -214,8 +238,7 @@ export class EventList implements OnInit {
         this.showFeedback('Inscrição realizada com sucesso.', 'success');
         this.reloadEvents();
       },
-      error: (err) =>
-        this.showFeedback(err?.error?.message || 'Não foi possível concluir a inscrição.', 'error'),
+      error: (err) => this.showFeedback(err?.error?.message || 'Não foi possível concluir a inscrição.', 'error'),
     });
   }
 
@@ -227,9 +250,22 @@ export class EventList implements OnInit {
         this.showFeedback('Inscrição cancelada com sucesso.', 'success');
         this.reloadEvents();
       },
-      error: (err) =>
-        this.showFeedback(err?.error?.message || 'Não foi possível cancelar a inscrição.', 'error'),
+      error: (err) => this.showFeedback(err?.error?.message || 'Não foi possível cancelar a inscrição.', 'error'),
     });
+  }
+
+  // ── Modais ─────────────────────────────────────────────
+
+  openHistoryModal(event: EventWithRegistered): void {
+    this.historyEventId = event.id ?? null;
+    this.historyEventName = event.title;
+    this.showHistoryModal = true;
+  }
+
+  closeHistoryModal(): void {
+    this.showHistoryModal = false;
+    this.historyEventId = null;
+    this.historyEventName = '';
   }
 
   openDeleteModal(event: EventWithRegistered): void {
@@ -263,6 +299,8 @@ export class EventList implements OnInit {
     });
   }
 
+  // ── Feedback ───────────────────────────────────────────
+
   showFeedback(message: string, type: FeedbackType): void {
     this.feedbackMessage = message;
     this.feedbackType = type;
@@ -276,10 +314,7 @@ export class EventList implements OnInit {
 
   clearFeedback(): void {
     this.feedbackMessage = '';
-    if (this.feedbackTimeout) {
-      clearTimeout(this.feedbackTimeout);
-      this.feedbackTimeout = null;
-    }
+    if (this.feedbackTimeout) { clearTimeout(this.feedbackTimeout); this.feedbackTimeout = null; }
     this.cdr.detectChanges();
   }
 }

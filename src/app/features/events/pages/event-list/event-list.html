@@ -305,6 +305,49 @@
     }
   }
 
+  <!-- PAGINAÇÃO -->
+  @if (pagination && pagination.totalPages > 1) {
+    <div class="pagination-bar">
+
+      <span class="pagination-info">
+        Página {{ currentPage }} de {{ pagination.totalPages }}
+        <span class="pagination-total">({{ pagination.totalItems }} eventos)</span>
+      </span>
+
+      <div class="pagination-controls">
+
+        <button
+          class="page-btn page-btn--nav"
+          [disabled]="!pagination.hasPreviousPage"
+          (click)="prevPage()">
+          ←
+        </button>
+
+        @for (page of getPageNumbers(); track page) {
+          @if (page === -1) {
+            <span class="page-dots">…</span>
+          } @else {
+            <button
+              class="page-btn"
+              [class.active]="page === currentPage"
+              (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          }
+        }
+
+        <button
+          class="page-btn page-btn--nav"
+          [disabled]="!pagination.hasNextPage"
+          (click)="nextPage()">
+          →
+        </button>
+
+      </div>
+    </div>
+  }
+
+
   <!-- MODAL DELETE -->
   @if (showDeleteModal && eventToDelete) {
     <div class="modal-backdrop" (click)="closeDeleteModal()">

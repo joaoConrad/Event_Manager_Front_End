@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-
 export type UserRole = 'admin' | 'user';
 
 export interface AuthUser {
@@ -17,7 +16,16 @@ interface AuthResponse {
   message?: string;
   data?: {
     user: AuthUser;
-    token: string;
+    accessToken: string;   // era 'token', agora é 'accessToken'
+    refreshToken: string;  // novo campo do back
+  };
+}
+
+interface RefreshResponse {
+  message?: string;
+  data?: {
+    accessToken: string;
+    refreshToken: string;
   };
 }
 
@@ -27,8 +35,12 @@ interface AuthResponse {
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/auth`;
-  private readonly userStorageKey = 'eventmanager_user';
-  private readonly tokenStorageKey = 'eventmanager_token';
+
+  private readonly userStorageKey         = 'eventmanager_user';
+  private readonly accessTokenStorageKey  = 'eventmanager_token';        // chave mantida pra não quebrar código existente
+  private readonly refreshTokenStorageKey = 'eventmanager_refresh_token';
+
+  // ── Leitura ────────────────────────────────────────────
 
   getUser(): AuthUser | null {
     const data = localStorage.getItem(this.userStorageKey);
@@ -36,7 +48,11 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenStorageKey);
+    return localStorage.getItem(this.accessTokenStorageKey);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.refreshTokenStorageKey);
   }
 
   isLoggedIn(): boolean {
@@ -47,15 +63,25 @@ export class AuthService {
     return this.getUser()?.role === 'admin';
   }
 
+  // ── Salvar tokens (usado pelo interceptor também) ──────
+
+  saveTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem(this.accessTokenStorageKey, accessToken);
+    localStorage.setItem(this.refreshTokenStorageKey, refreshToken);
+  }
+
+  // ── Auth ───────────────────────────────────────────────
+
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
       tap((response) => {
-        const user = response?.data?.user;
-        const token = response?.data?.token;
+        const user         = response?.data?.user;
+        const accessToken  = response?.data?.accessToken;
+        const refreshToken = response?.data?.refreshToken;
 
-        if (user && token) {
+        if (user && accessToken && refreshToken) {
           localStorage.setItem(this.userStorageKey, JSON.stringify(user));
-          localStorage.setItem(this.tokenStorageKey, token);
+          this.saveTokens(accessToken, refreshToken);
         }
       })
     );
@@ -69,25 +95,56 @@ export class AuthService {
       password
     }).pipe(
       tap((response) => {
-        const user = response?.data?.user;
-        const token = response?.data?.token;
+        const user         = response?.data?.user;
+        const accessToken  = response?.data?.accessToken;
+        const refreshToken = response?.data?.refreshToken;
 
-        if (user && token) {
+        if (user && accessToken && refreshToken) {
           localStorage.setItem(this.userStorageKey, JSON.stringify(user));
-          localStorage.setItem(this.tokenStorageKey, token);
+          this.saveTokens(accessToken, refreshToken);
         }
       })
     );
   }
 
+  // ── Refresh token ──────────────────────────────────────
+  // Chamado automaticamente pelo AuthInterceptor quando recebe TOKEN_EXPIRED
+
+  refreshAccessToken(): Observable<RefreshResponse> {
+    const refreshToken = this.getRefreshToken();
+    return this.http.post<RefreshResponse>(`${this.apiUrl}/refresh`, { refreshToken }).pipe(
+      tap((response) => {
+        const accessToken  = response?.data?.accessToken;
+        const newRefresh   = response?.data?.refreshToken;
+        if (accessToken && newRefresh) {
+          this.saveTokens(accessToken, newRefresh);
+        }
+      })
+    );
+  }
+
+  // ── Logout ─────────────────────────────────────────────
+
+  logout(): void {
+    const refreshToken = this.getRefreshToken();
+
+    // avisa o back pra invalidar o refresh token no banco
+    if (refreshToken) {
+      this.http.post(`${this.apiUrl}/logout`, { refreshToken }).subscribe({
+        error: () => {} // silencia erro — o logout local acontece de qualquer forma
+      });
+    }
+
+    localStorage.removeItem(this.userStorageKey);
+    localStorage.removeItem(this.accessTokenStorageKey);
+    localStorage.removeItem(this.refreshTokenStorageKey);
+  }
+
+  // ── Headers ────────────────────────────────────────────
+
   getAuthHeaders(): HttpHeaders {
     return new HttpHeaders({
       Authorization: `Bearer ${this.getToken() ?? ''}`
     });
-  }
-
-  logout(): void {
-    localStorage.removeItem(this.userStorageKey);
-    localStorage.removeItem(this.tokenStorageKey);
   }
 }
