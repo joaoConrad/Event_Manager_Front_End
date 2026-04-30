@@ -1,0 +1,251 @@
+<section class="detail-page">
+
+  <!-- VOLTAR -->
+  <a routerLink="/events" class="back-link">
+    ← Voltar para eventos
+  </a>
+
+  <!-- LOADING -->
+  @if (loading) {
+    <div class="detail-skeleton">
+      <p>Carregando evento...</p>
+    </div>
+  }
+
+  <!-- NOT FOUND -->
+  @else if (notFound || !event) {
+    <div class="detail-not-found">
+      <span class="eyebrow">Ops</span>
+      <h1>Evento não encontrado</h1>
+      <p>O evento que você está buscando não existe ou foi removido.</p>
+      <a routerLink="/events" class="btn btn-primary">Ver todos os eventos</a>
+    </div>
+  }
+
+  <!-- CONTEÚDO -->
+  @else {
+    <!-- FEEDBACK -->
+    @if (feedbackMessage) {
+      <div
+        class="feedback-banner"
+        [class.success]="feedbackType === 'success'"
+        [class.error]="feedbackType === 'error'"
+        [class.info]="feedbackType === 'info'">
+        {{ feedbackMessage }}
+      </div>
+    }
+
+    <div class="detail-layout">
+
+      <!-- COLUNA PRINCIPAL -->
+      <div class="detail-main">
+
+        <!-- HERO -->
+        <div class="detail-hero">
+          <div class="detail-hero-top">
+            <span class="eyebrow">Evento</span>
+
+            @if (isPastEvent()) {
+              <span class="status-badge closed">Encerrado</span>
+            } @else if (isJoined()) {
+              <span class="status-badge joined">Você está inscrito</span>
+            } @else if (isSoldOut()) {
+              <span class="status-badge sold-out">Esgotado</span>
+            } @else {
+              <span class="status-badge open">Inscrições abertas</span>
+            }
+          </div>
+
+          <h1>{{ event.title }}</h1>
+        </div>
+
+        <!-- DESCRIÇÃO -->
+        <div class="detail-section">
+          <span class="section-label">Sobre o evento</span>
+          <p class="detail-description">{{ event.description }}</p>
+        </div>
+
+        <!-- INFORMAÇÕES -->
+        <div class="detail-section">
+          <span class="section-label">Informações</span>
+
+          <div class="detail-info-grid">
+            <div class="info-item">
+              <span class="info-label">📅 Data</span>
+              <span class="info-value">{{ event.date }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">🕐 Horário</span>
+              <span class="info-value">{{ event.time }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">📍 Local</span>
+              <span class="info-value">{{ event.location }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">👥 Capacidade</span>
+              <span class="info-value">
+                {{ event.registeredParticipants ?? 0 }} / {{ event.maxParticipants }} inscritos
+              </span>
+            </div>
+
+            @if (!isPastEvent()) {
+              <div class="info-item" [class.highlight-item]="!isSoldOut()" [class.danger-item]="isSoldOut()">
+                <span class="info-label">🎟️ Vagas restantes</span>
+                <span class="info-value">
+                  {{ isSoldOut() ? 'Sem vagas' : getAvailableSpots() + ' vagas' }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- LISTA DE PARTICIPANTES (somente admin) -->
+        @if (authService.isAdmin()) {
+          <div class="detail-section">
+            <span class="section-label">
+              Participantes inscritos
+              @if (!loadingParticipants) {
+                <span class="participant-count">({{ participants.length }})</span>
+              }
+            </span>
+
+            @if (loadingParticipants) {
+              <p class="muted">Carregando participantes...</p>
+            } @else if (participants.length === 0) {
+              <p class="muted">Nenhum participante inscrito ainda.</p>
+            } @else {
+              <div class="participants-table-wrap">
+                <table class="participants-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nome</th>
+                      <th>Email</th>
+                      <th>Telefone</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (p of participants; track p.id; let i = $index) {
+                      <tr>
+                        <td class="td-index">{{ i + 1 }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.email }}</td>
+                        <td>{{ p.phone ?? '—' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+
+      <!-- SIDEBAR DE AÇÃO -->
+      <aside class="detail-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-date-block">
+            <span class="sidebar-date-label">Data do evento</span>
+            <strong class="sidebar-date">{{ event.date }}</strong>
+            <span class="sidebar-time">{{ event.time }}</span>
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <div class="sidebar-spots">
+            <span class="sidebar-spots-label">Vagas</span>
+            @if (isPastEvent()) {
+              <strong class="sidebar-spots-value muted-value">—</strong>
+            } @else {
+              <strong
+                class="sidebar-spots-value"
+                [class.danger-value]="isSoldOut()"
+                [class.ok-value]="!isSoldOut()">
+                {{ isSoldOut() ? '0' : getAvailableSpots() }}
+              </strong>
+              <span class="sidebar-spots-of">de {{ event.maxParticipants }}</span>
+            }
+          </div>
+
+          <div class="sidebar-divider"></div>
+
+          <!-- AÇÕES DO ADMIN -->
+          @if (authService.isAdmin()) {
+            <a
+              [routerLink]="['/events/edit', event.id]"
+              class="btn btn-secondary full">
+              Editar evento
+            </a>
+
+            <button
+              class="btn btn-danger full"
+              style="margin-top: 0.6rem"
+              (click)="openDeleteModal()">
+              Excluir evento
+            </button>
+          }
+
+          <!-- AÇÕES DO USUÁRIO LOGADO -->
+          @else if (authService.isLoggedIn()) {
+            @if (isPastEvent()) {
+              <button class="btn btn-disabled full" disabled>Evento encerrado</button>
+            } @else if (isJoined()) {
+              <button
+                class="btn btn-warning full"
+                [disabled]="actionLoading"
+                (click)="cancelSubscription()">
+                {{ actionLoading ? 'Aguarde...' : 'Cancelar inscrição' }}
+              </button>
+            } @else if (isSoldOut()) {
+              <button class="btn btn-disabled full" disabled>Evento esgotado</button>
+            } @else {
+              <button
+                class="btn btn-success full"
+                [disabled]="actionLoading"
+                (click)="joinEvent()">
+                {{ actionLoading ? 'Aguarde...' : 'Participar' }}
+              </button>
+            }
+          }
+
+          <!-- NÃO LOGADO -->
+          @else {
+            @if (isPastEvent()) {
+              <button class="btn btn-disabled full" disabled>Evento encerrado</button>
+            } @else if (isSoldOut()) {
+              <button class="btn btn-disabled full" disabled>Evento esgotado</button>
+            } @else {
+              <a routerLink="/login" class="btn btn-primary full">
+                Entrar para participar
+              </a>
+            }
+          }
+        </div>
+      </aside>
+
+    </div>
+  }
+
+  <!-- MODAL DELETE -->
+  @if (showDeleteModal && event) {
+    <div class="modal-backdrop" (click)="closeDeleteModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <h3>Excluir evento</h3>
+        <p>Deseja excluir <strong>{{ event.title }}</strong>? Essa ação não pode ser desfeita.</p>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="deleting">Cancelar</button>
+          <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+            {{ deleting ? 'Excluindo...' : 'Excluir' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</section>

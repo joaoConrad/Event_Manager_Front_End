@@ -1,25 +1,183 @@
-<h2 class="dashboard-title">Dashboard Admin</h2>
+<section class="dash-page">
 
-<p class="total-geral">
-  Total geral de inscritos: {{ getTotalGeral() }}
-</p>
-
-<!-- 🔥 GRÁFICO -->
-<div class="chart-container">
-  <canvas id="chart"></canvas>
-</div>
-
-<!-- 🔥 CARDS -->
-<div class="dashboard-container">
-
-  <div class="dashboard-card" *ngFor="let event of events">
-    <h3 class="event-name">{{ event.name }}</h3>
-    
-    <div class="event-count">
-      {{ event.totalParticipants }}
+  <div class="dash-header">
+    <div>
+      <span class="eyebrow">Administração</span>
+      <h1>Dashboard</h1>
+      <p>Visão geral dos eventos e inscrições.</p>
     </div>
-
-    <p class="event-label">inscritos</p>
+    <a routerLink="/events/new" class="btn btn-primary">+ Novo evento</a>
   </div>
 
-</div>
+  <!-- LOADING -->
+  @if (loading) {
+    <div class="dash-loading">
+      <div class="skeleton-grid">
+        @for (i of [1,2,3,4]; track i) {
+          <div class="skeleton-card"></div>
+        }
+      </div>
+    </div>
+  } @else {
+
+    <!-- ── CARDS DE MÉTRICAS ── -->
+    <div class="metrics-grid">
+
+      <div class="metric-card">
+        <div class="metric-icon blue">📅</div>
+        <div class="metric-body">
+          <span class="metric-label">Total de eventos</span>
+          <strong class="metric-value">{{ stats.totalEvents }}</strong>
+          <!-- TODO back: endpoint /stats → totalEvents -->
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon green">👥</div>
+        <div class="metric-body">
+          <span class="metric-label">Total de inscritos</span>
+          <strong class="metric-value">{{ stats.totalParticipants }}</strong>
+          <!-- TODO back: endpoint /stats → totalParticipants -->
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon yellow">📊</div>
+        <div class="metric-body">
+          <span class="metric-label">Ocupação média</span>
+          <strong class="metric-value">{{ stats.averageOccupancy }}%</strong>
+          <!-- TODO back: endpoint /stats → averageOccupancy -->
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon purple">🚀</div>
+        <div class="metric-body">
+          <span class="metric-label">Próximos eventos</span>
+          <strong class="metric-value">{{ stats.upcomingEvents }}</strong>
+          <!-- TODO back: endpoint /stats → upcomingEvents -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── GRÁFICO ── -->
+    <div class="dash-section">
+      <div class="section-header">
+        <span class="section-title">Inscritos por evento</span>
+        <span class="section-sub">Mostrando até 10 próximos eventos</span>
+      </div>
+
+      @if (events.filter(e => !e.isPast).length === 0) {
+        <div class="empty-chart">
+          <p>Nenhum evento futuro para exibir no gráfico.</p>
+        </div>
+      } @else {
+        <div class="chart-wrap">
+          <canvas id="dashChart"></canvas>
+        </div>
+      }
+    </div>
+
+    <!-- ── TABELA DE EVENTOS ── -->
+    <div class="dash-section">
+      <div class="section-header">
+        <span class="section-title">Todos os eventos</span>
+        <span class="section-sub">{{ events.length }} evento(s) cadastrados</span>
+      </div>
+
+      @if (events.length === 0) {
+        <div class="empty-state">
+          <p>Nenhum evento cadastrado.</p>
+          <a routerLink="/events/new" class="btn btn-primary" style="margin-top:1rem">Criar primeiro evento</a>
+        </div>
+      } @else {
+        <div class="table-wrap">
+          <table class="dash-table">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Inscritos</th>
+                <th>Capacidade</th>
+                <th>Ocupação</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (event of events; track event.id) {
+                <tr [class.row-past]="event.isPast">
+                  <td class="td-title">{{ event.title }}</td>
+                  <td class="td-date">{{ event.date }}</td>
+                  <td>{{ event.totalParticipants }}</td>
+                  <td>{{ event.maxParticipants }}</td>
+                  <td>
+                    <div class="occupancy-bar-wrap">
+                      <div class="occupancy-bar">
+                        <div
+                          class="occupancy-fill"
+                          [style.width.%]="event.occupancyPercent"
+                          [style.background]="getOccupancyColor(event.occupancyPercent)">
+                        </div>
+                      </div>
+                      <span class="occupancy-label">{{ event.occupancyPercent }}%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="getStatusClass(event)">
+                      {{ getStatusLabel(event) }}
+                    </span>
+                  </td>
+                  <td class="td-actions">
+                    @if (!event.isPast) {
+                      <a [routerLink]="['/events/edit', event.id]" class="table-action-btn">
+                        Editar
+                      </a>
+                    }
+                    <a [routerLink]="['/events', event.id]" class="table-action-btn">
+                      Ver
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- ── PLACEHOLDER: MÉTRICAS FUTURAS DO BACK ── -->
+    <div class="dash-section placeholder-section">
+      <div class="section-header">
+        <span class="section-title">📌 Aguardando backend</span>
+        <span class="section-sub">Estas seções serão ativadas quando os endpoints estiverem prontos</span>
+      </div>
+
+      <div class="placeholder-grid">
+        <div class="placeholder-card">
+          <span class="placeholder-icon">📈</span>
+          <strong>Inscrições por período</strong>
+          <p>Gráfico de linha com evolução de inscrições ao longo do tempo.</p>
+          <span class="placeholder-tag">TODO: GET /stats/registrations-timeline</span>
+        </div>
+
+        <div class="placeholder-card">
+          <span class="placeholder-icon">🏆</span>
+          <strong>Top eventos</strong>
+          <p>Ranking dos eventos com maior taxa de ocupação ou crescimento.</p>
+          <span class="placeholder-tag">TODO: GET /stats/top-events</span>
+        </div>
+
+        <div class="placeholder-card">
+          <span class="placeholder-icon">🔔</span>
+          <strong>Atividade recente</strong>
+          <p>Feed de inscrições e cancelamentos em tempo real.</p>
+          <span class="placeholder-tag">TODO: GET /activity/recent</span>
+        </div>
+      </div>
+    </div>
+
+  }
+
+</section>

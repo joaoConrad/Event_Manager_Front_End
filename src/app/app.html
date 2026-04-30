@@ -1,45 +1,69 @@
-<header class="topbar">
-  <div class="topbar-container">
-    <a routerLink="/home" class="brand" aria-label="Ir para a home">
-      <img src="logo-horizontal.png" alt="Event Manager" class="brand-logo" />
+<nav class="app-nav">
+  <div class="nav-inner">
+
+    <!-- LOGO -->
+    <a routerLink="/home" class="nav-logo">
+      <img src="/logo-horizontal.png" alt="Event Manager" class="nav-logo-img" />
     </a>
 
-    <nav class="topbar-nav">
-      <a routerLink="/home" routerLinkActive="active-link">Home</a>
-      <a routerLink="/events" routerLinkActive="active-link">Eventos</a>
+    <!-- LINKS -->
+    <div class="nav-links">
+      <a
+        routerLink="/home"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link">
+        Início
+      </a>
 
-      @if (authService.isLoggedIn() && authService.isAdmin()) {
-        <a routerLink="/events/new" routerLinkActive="active-link">Novo evento</a>
+      <a
+        routerLink="/events"
+        routerLinkActive="active"
+        class="nav-link">
+        Eventos
+      </a>
 
-        <!-- 🔥 DASHBOARD (SÓ ADMIN) -->
-        <a routerLink="/admin/dashboard" routerLinkActive="active-link">Dashboard</a>
-      }
-    </nav>
-
-    <div class="topbar-actions">
-      @if (!authService.isLoggedIn()) {
-        <a routerLink="/login" class="nav-btn nav-btn-ghost">Entrar</a>
-        <a routerLink="/register" class="nav-btn nav-btn-primary">Cadastrar</a>
-      } @else {
-        <div class="user-badge">
-          <div class="user-avatar">
-            {{ authService.getUser()?.name?.charAt(0) }}
-          </div>
-
-          <div class="user-info">
-            <span class="user-name">{{ authService.getUser()?.name }}</span>
-            <small class="user-role">{{ authService.getUser()?.role }}</small>
-          </div>
-        </div>
-
-        <button class="nav-btn nav-btn-outline" (click)="logout()">Sair</button>
+      @if (authService.isAdmin()) {
+        <a
+          routerLink="/admin/dashboard"
+          routerLinkActive="active"
+          class="nav-link">
+          Dashboard
+        </a>
       }
     </div>
+
+    <!-- AÇÕES -->
+    <div class="nav-actions">
+      @if (authService.isLoggedIn()) {
+        <span class="nav-user">
+          {{ authService.getUser()?.name }}
+        </span>
+
+        @if (authService.isAdmin()) {
+          <a routerLink="/events/new" class="btn-nav btn-nav-primary">
+            + Novo evento
+          </a>
+        }
+
+        <button class="btn-nav btn-nav-ghost" (click)="logout()">
+          Sair
+        </button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="active" class="btn-nav btn-nav-ghost">
+          Entrar
+        </a>
+        <a routerLink="/register" routerLinkActive="active" class="btn-nav btn-nav-primary">
+          Criar conta
+        </a>
+      }
+    </div>
+
   </div>
-</header>
+</nav>
 
 <main class="app-main">
-  <router-outlet></router-outlet>
+  <router-outlet />
 </main>
 
-<app-footer></app-footer>
+<app-footer />

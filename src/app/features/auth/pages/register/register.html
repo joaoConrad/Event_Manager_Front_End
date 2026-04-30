@@ -2,20 +2,65 @@
   <div class="auth-card">
     <h1>Criar conta</h1>
     <p class="subtitle">Preencha os dados para começar</p>
-    <form (ngSubmit)="submit()">
-      <label>Nome</label>
-      <input type="text" [(ngModel)]="name" name="name" placeholder="Digite seu nome" required />
 
-      <label>Email</label>
-      <input type="email" [(ngModel)]="email" name="email" placeholder="Digite seu email" required />
+    @if (errorMessage) {
+      <div class="auth-error">{{ errorMessage }}</div>
+    }
+
+    <form (ngSubmit)="submit()">
+
+      <label>Nome <span class="required">*</span></label>
+      <div class="input-wrap">
+        <input
+          type="text"
+          [(ngModel)]="name"
+          name="name"
+          placeholder="Seu nome completo"
+          maxlength="80"
+          required
+          [disabled]="loading"
+        />
+        <span class="char-counter" [class.near-limit]="name.length >= 72">
+          {{ name.length }}/80
+        </span>
+      </div>
+
+      <label>Email <span class="required">*</span></label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        placeholder="seuemail@exemplo.com"
+        maxlength="150"
+        required
+        [disabled]="loading"
+      />
 
       <label>Telefone</label>
-      <input type="text" [(ngModel)]="phone" name="phone" placeholder="Digite seu telefone" />
+      <input
+        type="text"
+        [(ngModel)]="phone"
+        name="phone"
+        placeholder="(00) 00000-0000"
+        maxlength="20"
+        [disabled]="loading"
+      />
 
-      <label>Senha</label>
-      <input type="password" [(ngModel)]="password" name="password" placeholder="Crie uma senha" required />
+      <label>Senha <span class="required">*</span></label>
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        placeholder="Mínimo 6 caracteres"
+        minlength="6"
+        maxlength="128"
+        required
+        [disabled]="loading"
+      />
 
-      <button type="submit">Cadastrar</button>
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Cadastrando...' : 'Cadastrar' }}
+      </button>
     </form>
 
     <p class="auth-footer">

@@ -1,156 +1,188 @@
 <section class="event-form-page">
-
   <div class="event-form-card">
 
     <!-- HEADER -->
     <div class="form-header">
-      <span class="form-kicker">
-        {{ isEditMode ? 'Editar evento' : 'Novo evento' }}
-      </span>
-
-      <h1>
-        {{ isEditMode ? 'Atualize o evento' : 'Criar evento' }}
-      </h1>
-
-      <p>
-        {{ isEditMode
-          ? 'Altere as informações abaixo.'
-          : 'Preencha os dados para cadastrar um evento.' }}
-      </p>
+      <span class="form-kicker">{{ isEditMode ? 'Editar evento' : 'Novo evento' }}</span>
+      <h1>{{ isEditMode ? 'Atualize o evento' : 'Criar evento' }}</h1>
+      <p>{{ isEditMode ? 'Altere as informações abaixo.' : 'Preencha os dados para cadastrar um novo evento.' }}</p>
     </div>
 
-    <!-- LOADING -->
     @if (loadingEvent) {
-      <div class="form-feedback info">
-        Carregando dados do evento...
-      </div>
+      <div class="form-feedback info">Carregando dados do evento...</div>
     }
 
-    <!-- FEEDBACK -->
     @if (errorMessage) {
-      <div class="form-feedback error">
-        {{ errorMessage }}
-      </div>
+      <div class="form-feedback error">{{ errorMessage }}</div>
     }
 
     @if (successMessage) {
-      <div class="form-feedback success">
-        {{ successMessage }}
-      </div>
+      <div class="form-feedback success">{{ successMessage }}</div>
     }
 
-    <!-- FORM -->
-    <form (ngSubmit)="submit()" class="event-form">
-
-      <!-- GRID PRINCIPAL -->
+    <form (ngSubmit)="submit()" class="event-form" novalidate>
       <div class="form-grid">
+
+        <!-- IMAGEM DE CAPA -->
+        <div class="form-group full">
+          <label>Imagem de capa</label>
+
+          @if (!imagePreview) {
+            <label class="image-dropzone" for="imageInput">
+              <div class="dropzone-inner">
+                <span class="dropzone-icon">🖼️</span>
+                <span class="dropzone-title">Clique para selecionar uma imagem</span>
+                <span class="dropzone-hint">JPG, PNG ou WebP · máximo {{ MAX_IMAGE_MB }}MB</span>
+              </div>
+              <input
+                id="imageInput"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="image-input-hidden"
+                (change)="onImageSelected($event)"
+              />
+            </label>
+          } @else {
+            <div class="image-preview-wrap">
+              <img [src]="imagePreview" alt="Pré-visualização" class="image-preview" />
+              <button type="button" class="image-remove-btn" (click)="removeImage()">
+                ✕ Remover imagem
+              </button>
+            </div>
+          }
+
+          @if (fieldErrors.imageFile) {
+            <span class="field-error-msg">{{ fieldErrors.imageFile }}</span>
+          }
+        </div>
 
         <!-- TÍTULO -->
         <div class="form-group full">
-          <label>Título</label>
+          <div class="label-row">
+            <label>Título <span class="required">*</span></label>
+            <span class="char-counter" [class.near-limit]="event.title.length >= 90">
+              {{ event.title.length }}/100
+            </span>
+          </div>
           <input
             type="text"
             [(ngModel)]="event.title"
             name="title"
             placeholder="Ex: Workshop de Angular"
-            required
+            maxlength="100"
+            [class.field-invalid]="submitted && fieldErrors.title"
             [disabled]="loadingEvent"
           />
+          @if (submitted && fieldErrors.title) {
+            <span class="field-error-msg">{{ fieldErrors.title }}</span>
+          }
         </div>
 
         <!-- DESCRIÇÃO -->
         <div class="form-group full">
-          <label>Descrição</label>
+          <div class="label-row">
+            <label>Descrição <span class="required">*</span></label>
+            <span class="char-counter" [class.near-limit]="event.description.length >= 450">
+              {{ event.description.length }}/500
+            </span>
+          </div>
           <textarea
             [(ngModel)]="event.description"
             name="description"
             rows="4"
-            placeholder="Descreva o evento..."
-            required
+            placeholder="Descreva o evento em até 500 caracteres..."
+            maxlength="500"
+            [class.field-invalid]="submitted && fieldErrors.description"
             [disabled]="loadingEvent">
           </textarea>
+          @if (submitted && fieldErrors.description) {
+            <span class="field-error-msg">{{ fieldErrors.description }}</span>
+          }
         </div>
 
         <!-- DATA -->
         <div class="form-group">
-          <label>Data</label>
+          <label>Data <span class="required">*</span></label>
           <input
             type="date"
             [(ngModel)]="event.date"
             name="date"
             [min]="minDate"
-            required
+            [class.field-invalid]="submitted && fieldErrors.date"
             [disabled]="loadingEvent"
           />
+          @if (submitted && fieldErrors.date) {
+            <span class="field-error-msg">{{ fieldErrors.date }}</span>
+          }
         </div>
 
         <!-- HORA -->
         <div class="form-group">
-          <label>Hora</label>
+          <label>Hora <span class="required">*</span></label>
           <input
             type="time"
             [(ngModel)]="event.time"
             name="time"
-            required
+            [class.field-invalid]="submitted && fieldErrors.time"
             [disabled]="loadingEvent"
           />
+          @if (submitted && fieldErrors.time) {
+            <span class="field-error-msg">{{ fieldErrors.time }}</span>
+          }
         </div>
 
         <!-- LOCAL -->
         <div class="form-group">
-          <label>Local</label>
+          <div class="label-row">
+            <label>Local <span class="required">*</span></label>
+            <span class="char-counter" [class.near-limit]="event.location.length >= 90">
+              {{ event.location.length }}/100
+            </span>
+          </div>
           <input
             type="text"
             [(ngModel)]="event.location"
             name="location"
-            placeholder="Ex: Auditório"
-            required
+            placeholder="Ex: Auditório Central, Bloco B"
+            maxlength="100"
+            [class.field-invalid]="submitted && fieldErrors.location"
             [disabled]="loadingEvent"
           />
+          @if (submitted && fieldErrors.location) {
+            <span class="field-error-msg">{{ fieldErrors.location }}</span>
+          }
         </div>
 
         <!-- VAGAS -->
         <div class="form-group">
-          <label>Vagas</label>
+          <label>Vagas <span class="required">*</span></label>
           <input
             type="number"
             [(ngModel)]="event.maxParticipants"
             name="maxParticipants"
             min="1"
-            required
+            max="10000"
+            placeholder="Ex: 100"
+            [class.field-invalid]="submitted && fieldErrors.maxParticipants"
             [disabled]="loadingEvent"
           />
+          @if (submitted && fieldErrors.maxParticipants) {
+            <span class="field-error-msg">{{ fieldErrors.maxParticipants }}</span>
+          } @else {
+            <span class="field-hint">Entre 1 e 10.000 participantes.</span>
+          }
         </div>
 
       </div>
 
-      <!-- NOTA -->
-      <div class="form-note">
-        A data e horário não podem ser no passado.
-      </div>
-
       <!-- ACTIONS -->
       <div class="form-actions">
-
-        <a routerLink="/events" class="secondary-btn">
-          Cancelar
-        </a>
-
-        <button
-          type="submit"
-          class="primary-btn"
-          [disabled]="loading || loadingEvent">
-
-          {{ loading
-            ? 'Salvando...'
-            : (isEditMode ? 'Atualizar evento' : 'Criar evento') }}
-
+        <a routerLink="/events" class="secondary-btn">Cancelar</a>
+        <button type="submit" class="primary-btn" [disabled]="loading || loadingEvent">
+          {{ loading ? 'Salvando...' : (isEditMode ? 'Atualizar evento' : 'Criar evento') }}
         </button>
-
       </div>
 
     </form>
-
   </div>
-
 </section>

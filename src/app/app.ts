@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
 import { AuthService } from './core/services/auth';
 import { Footer } from './components/footer/footer';
 
 
   @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, RouterLink,Footer],
+    imports: [RouterOutlet, RouterLink, RouterLinkActive, Footer],
     templateUrl: './app.html',
     styleUrl: './app.css',
 })

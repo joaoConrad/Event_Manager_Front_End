@@ -21,9 +21,9 @@
     </div>
 
     <div class="hero-side-card">
-      <span class="hero-side-label">Destaque</span>
+      <span class="hero-side-label">Disponíveis agora</span>
       <strong>{{ events.length }}</strong>
-      <p>eventos disponíveis em evidência para você explorar agora.</p>
+      <p>eventos aguardando sua participação.</p>
     </div>
   </section>
 
@@ -42,46 +42,56 @@
     </div>
 
     @if (loading) {
-      <div class="empty-state">
-        <p>Carregando eventos...</p>
+      <div class="carousel-wrap">
+        <div class="events-carousel">
+          @for (i of [1,2,3,4]; track i) {
+            <div class="event-slide skeleton-slide"></div>
+          }
+        </div>
       </div>
     } @else if (events.length > 0) {
       <div class="carousel-wrap">
         <div class="events-carousel" #carousel>
           @for (event of events; track event.id) {
-            <article class="event-slide">
-              <div class="event-slide-top">
-                @if ((event.registeredParticipants ?? 0) >= event.maxParticipants) {
-                  <span class="event-chip sold-out">Esgotado</span>
+            <a [routerLink]="['/events', event.id]" class="event-slide">
+
+              <!-- IMAGEM OU PLACEHOLDER -->
+              <div class="slide-image-wrap">
+                @if (event['imageUrl']) {
+                  <img [src]="event['imageUrl']" [alt]="event.title" class="slide-image" />
                 } @else {
-                  <span class="event-chip">Evento</span>
+                  <div class="slide-image-placeholder">
+                    <span class="placeholder-emoji">📅</span>
+                  </div>
                 }
-                <span class="event-time">{{ event.time }}</span>
-              </div>
 
-              <div class="event-date-box">
-                <span class="event-date-label">Data</span>
-                <strong>{{ event.date }}</strong>
-              </div>
-
-              <div class="event-slide-body">
-                <h3>{{ event.title }}</h3>
-                <p>{{ event.description }}</p>
-              </div>
-
-              <div class="event-slide-meta">
-                <span>📍 {{ event.location }}</span>
-                <span>👥 {{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }} inscritos</span>
-              </div>
-
-              <div class="event-slide-footer">
+                <!-- CHIP STATUS -->
                 @if ((event.registeredParticipants ?? 0) >= event.maxParticipants) {
-                  <span class="event-link sold-out-text">Sem vagas disponíveis</span>
+                  <span class="slide-chip sold-out">Esgotado</span>
                 } @else {
-                  <a routerLink="/events" class="event-link">Ver detalhes</a>
+                  <span class="slide-chip available">Vagas abertas</span>
                 }
               </div>
-            </article>
+
+              <!-- CORPO -->
+              <div class="slide-body">
+                <div class="slide-meta-top">
+                  <span class="slide-date">📅 {{ event.date }}</span>
+                  <span class="slide-time">🕐 {{ event.time }}</span>
+                </div>
+
+                <h3 class="slide-title">{{ event.title }}</h3>
+                <p class="slide-desc">{{ event.description }}</p>
+
+                <div class="slide-footer">
+                  <span class="slide-location">📍 {{ event.location }}</span>
+                  <span class="slide-spots">
+                    👥 {{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}
+                  </span>
+                </div>
+              </div>
+
+            </a>
           }
         </div>
       </div>

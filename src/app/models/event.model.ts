@@ -6,6 +6,7 @@ export interface EventModel {
   time: string;
   location: string;
   maxParticipants: number;
+  imageUrl?: string;    
 
   registeredParticipants?: number;
   availableSpots?: number | null;

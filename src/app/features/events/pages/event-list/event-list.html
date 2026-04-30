@@ -37,37 +37,33 @@
     </div>
   </div>
 
-    
+  <!-- FILTRO AVANÇADO -->
+  <div class="filtro-avancado">
+    <h3>Filtro Avançado</h3>
 
-<!-- FILTRO AVANÇADO -->
-<div class="filtro-avancado">
-  <h3>Filtro Avançado</h3>
+    <input type="date" [(ngModel)]="filtroData" />
 
-  <input type="date" [(ngModel)]="filtroData" />
+    <input
+      type="text"
+      placeholder="Buscar por título"
+      [(ngModel)]="filtroCategoria" />
 
-  <input
-    type="text"
-    placeholder="Categoria"
-    [(ngModel)]="filtroCategoria" />
+    <select [(ngModel)]="filtroStatus">
+      <option value="">Todos</option>
+      <option value="ativo">Ativo</option>
+      <option value="cancelado">Encerrado / Esgotado</option>
+    </select>
 
-  <select [(ngModel)]="filtroStatus">
-    <option value="">Todos</option>
-    <option value="ativo">Ativo</option>
-    <option value="cancelado">Cancelado</option>
-  </select>
-
-  <button (click)="aplicarFiltro()">Filtrar</button>
-  <button (click)="limparFiltro()">Limpar</button>
-</div>
-
-@if (getAvailableEvents().length === 0 && !loading) {
-  <div class="empty-state">
-    <p>Nenhum evento encontrado com esse filtro.</p>
+    <button (click)="aplicarFiltro()">Filtrar</button>
+    <button (click)="limparFiltro()">Limpar</button>
   </div>
-}
-  
 
-  
+  @if (getAvailableEvents().length === 0 && !loading) {
+    <div class="empty-state">
+      <p>Nenhum evento encontrado com esse filtro.</p>
+    </div>
+  }
+
   <!-- FEEDBACK -->
   @if (feedbackMessage) {
     <div
@@ -124,7 +120,7 @@
                   }
                 </div>
 
-                <!-- DESC -->
+                <!-- DESC com clamp (resumo — detalhe completo na página) -->
                 <p class="card-description">{{ event.description }}</p>
 
                 <!-- META -->
@@ -162,12 +158,12 @@
               <!-- ACTIONS -->
               <div class="event-actions">
 
-                <button
-                  class="btn btn-secondary full"
-                  type="button"
-                  (click)="openDetailsModal(event)">
+                <!-- Ver detalhes → página própria -->
+                <a
+                  [routerLink]="['/events', event.id]"
+                  class="btn btn-secondary full">
                   Ver detalhes
-                </button>
+                </a>
 
                 @if (authService.isAdmin()) {
                   <div class="card-actions admin-actions">
@@ -231,7 +227,7 @@
       </div>
     }
 
-    <!-- ESGOTADOS (SEM INSCRIÇÃO) -->
+    <!-- ESGOTADOS -->
     @if (getSoldOutEvents().length > 0) {
       <section class="sold-out-section">
         <div class="sold-out-header">
@@ -251,11 +247,9 @@
                 <p class="card-description">{{ event.description }}</p>
 
                 <div class="event-actions">
-                  <button
-                    class="btn btn-secondary full"
-                    (click)="openDetailsModal(event)">
+                  <a [routerLink]="['/events', event.id]" class="btn btn-secondary full">
                     Ver detalhes
-                  </button>
+                  </a>
 
                   <button class="btn btn-disabled full" disabled>
                     Evento esgotado
@@ -268,7 +262,7 @@
       </section>
     }
 
-    <!-- ENCERRADOS (RESUMO) -->
+    <!-- ENCERRADOS -->
     @if (getPastEvents().length > 0) {
       <section class="closed-summary">
         <div>
@@ -283,65 +277,18 @@
     }
   }
 
-  <!-- MODAL DETALHES -->
-  @if (showDetailsModal && selectedEvent) {
-    <div class="modal-backdrop" (click)="closeDetailsModal()">
-      <div class="modal-card details-modal" (click)="$event.stopPropagation()">
-
-        <div class="modal-header">
-          <h3>{{ selectedEvent.title }}</h3>
-          <p>{{ selectedEvent.description }}</p>
-        </div>
-
-        <div class="modal-actions">
-          <button class="btn btn-secondary" (click)="closeDetailsModal()">Fechar</button>
-
-          @if (!authService.isAdmin()) {
-
-            @if (isPastEvent(selectedEvent)) {
-              <button class="btn btn-disabled" disabled>Encerrado</button>
-            }
-
-            @else if (isJoined(selectedEvent.id)) {
-              <button class="btn btn-warning"
-                (click)="cancelSubscription(selectedEvent.id); closeDetailsModal()">
-                Cancelar inscrição
-              </button>
-            }
-
-            @else if (isSoldOut(selectedEvent)) {
-              <button class="btn btn-disabled" disabled>Esgotado</button>
-            }
-
-            @else if (authService.isLoggedIn()) {
-              <button class="btn btn-success"
-                (click)="joinEvent(selectedEvent.id); closeDetailsModal()">
-                Participar
-              </button>
-            }
-
-            @else {
-              <a routerLink="/login" class="btn btn-primary">
-                Entrar para participar
-              </a>
-            }
-          }
-        </div>
-
-      </div>
-    </div>
-  }
-
-  <!-- MODAL DELETE -->
+  <!-- MODAL DELETE (mantido aqui para exclusão rápida na lista) -->
   @if (showDeleteModal && eventToDelete) {
     <div class="modal-backdrop" (click)="closeDeleteModal()">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <h3>Excluir evento</h3>
-        <p>Deseja excluir {{ eventToDelete.title }}?</p>
+        <p>Deseja excluir <strong>{{ eventToDelete.title }}</strong>?</p>
 
         <div class="modal-actions">
           <button class="btn btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
-          <button class="btn btn-danger" (click)="confirmDelete()">Excluir</button>
+          <button class="btn btn-danger" (click)="confirmDelete()">
+            {{ deleting ? 'Excluindo...' : 'Excluir' }}
+          </button>
         </div>
       </div>
     </div>
