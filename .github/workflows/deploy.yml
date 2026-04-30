@@ -1,0 +1,83 @@
+name: CI/CD - Event Manager Front End
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # ─────────────────────────────────────────
+  # JOB 1: Build & Lint & Test
+  # ─────────────────────────────────────────
+  ci:
+    name: 🔍 Build, Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Instalar dependências
+        run: npm ci
+
+      - name: 🧹 Lint
+        run: npm run lint -- --max-warnings=0
+
+      - name: 🧪 Testes unitários (headless)
+        run: npm run test -- --watch=false --browsers=ChromeHeadless --no-progress
+
+      - name: 🏗️ Build de produção
+        run: npm run build -- --configuration=production
+
+      - name: 💾 Salvar artefato do build
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-event-manager
+          path: dist/
+          retention-days: 7
+
+  # ─────────────────────────────────────────
+  # JOB 2: Deploy → GitHub Pages
+  # (Roda apenas em push na main, após CI passar)
+  # ─────────────────────────────────────────
+  deploy:
+    name: 🚀 Deploy no GitHub Pages
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    permissions:
+      contents: write   # necessário para o gh-pages
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Instalar dependências
+        run: npm ci
+
+      - name: 🏗️ Build para GitHub Pages
+        # Ajuste "event-manager-front-end" para o nome real do seu repositório
+        run: npm run build -- --configuration=production --base-href="/Event_Manager_Front_End/"
+
+      - name: 🌐 Deploy no GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Aponta para a pasta gerada pelo Angular (ajuste se o nome for diferente)
+          publish_dir: ./dist/event-manager-front-end/browser
