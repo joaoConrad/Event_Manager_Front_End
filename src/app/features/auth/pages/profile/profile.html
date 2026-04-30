@@ -1,0 +1,126 @@
+<section class="profile-page">
+
+  <!-- HEADER DO PERFIL -->
+  <div class="profile-hero">
+    <div class="profile-avatar">{{ getInitials() }}</div>
+
+    <div class="profile-info">
+      <div class="profile-name-row">
+        <h1>{{ user?.name }}</h1>
+        <span class="role-badge" [class]="getRoleBadgeClass()">{{ getRoleLabel() }}</span>
+      </div>
+      <p class="profile-email">{{ user?.email }}</p>
+    </div>
+
+    <button class="btn btn-ghost btn-sm logout-btn" (click)="logout()">
+      Sair da conta
+    </button>
+  </div>
+
+  <!-- STATS -->
+  <div class="profile-stats">
+    <div class="stat-card">
+      <span class="stat-value">{{ registeredEvents.length }}</span>
+      <span class="stat-label">Inscrições</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ registeredEvents.filter(e => !isPastEvent(e)).length }}</span>
+      <span class="stat-label">Próximos eventos</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value">{{ registeredEvents.filter(e => isPastEvent(e)).length }}</span>
+      <span class="stat-label">Eventos realizados</span>
+    </div>
+  </div>
+
+  <!-- EVENTOS INSCRITOS -->
+  <div class="profile-section">
+    <div class="section-header">
+      <span class="eyebrow">Minhas inscrições</span>
+      <h2>Eventos que você está participando</h2>
+    </div>
+
+    @if (loading) {
+      <div class="profile-loading">
+        @for (i of [1,2,3]; track i) {
+          <div class="skeleton-card"></div>
+        }
+      </div>
+    } @else if (registeredEvents.length === 0) {
+      <div class="profile-empty">
+        <span class="empty-icon">🎟️</span>
+        <p>Você ainda não está inscrito em nenhum evento.</p>
+        <a routerLink="/events" class="btn btn-primary btn-sm">Explorar eventos</a>
+      </div>
+    } @else {
+
+      <!-- PRÓXIMOS -->
+      @if (registeredEvents.filter(e => !isPastEvent(e)).length > 0) {
+        <div class="events-group">
+          <span class="group-label">Próximos</span>
+          <div class="profile-events-list">
+            @for (event of registeredEvents; track event.id) {
+              @if (!isPastEvent(event)) {
+                <a [routerLink]="['/events', event.id]" class="profile-event-card">
+
+                  @if (event.imageUrl) {
+                    <div class="pec-image-wrap">
+                      <img [src]="event.imageUrl" [alt]="event.title" class="pec-image" />
+                    </div>
+                  } @else {
+                    <div class="pec-image-placeholder">📅</div>
+                  }
+
+                  <div class="pec-body">
+                    <div class="pec-head">
+                      <h3>{{ event.title }}</h3>
+                      <span class="pec-badge open">Inscrito</span>
+                    </div>
+                    <div class="pec-meta">
+                      <span>📅 {{ event.date }}</span>
+                      <span>🕐 {{ event.time }}</span>
+                      <span>📍 {{ event.location }}</span>
+                    </div>
+                    <div class="pec-spots">
+                      {{ getAvailableSpots(event) }} vagas restantes de {{ event.maxParticipants }}
+                    </div>
+                  </div>
+
+                  <span class="pec-arrow">→</span>
+                </a>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <!-- REALIZADOS -->
+      @if (registeredEvents.filter(e => isPastEvent(e)).length > 0) {
+        <div class="events-group">
+          <span class="group-label">Realizados</span>
+          <div class="profile-events-list past">
+            @for (event of registeredEvents; track event.id) {
+              @if (isPastEvent(event)) {
+                <a [routerLink]="['/events', event.id]" class="profile-event-card past-card">
+                  <div class="pec-body">
+                    <div class="pec-head">
+                      <h3>{{ event.title }}</h3>
+                      <span class="pec-badge closed">Encerrado</span>
+                    </div>
+                    <div class="pec-meta">
+                      <span>📅 {{ event.date }}</span>
+                      <span>📍 {{ event.location }}</span>
+                    </div>
+                  </div>
+                  <span class="pec-arrow">→</span>
+                </a>
+              }
+            }
+          </div>
+        </div>
+      }
+
+    }
+  </div>
+
+</section>

@@ -8,26 +8,14 @@
 
     <!-- LINKS -->
     <div class="nav-links">
-      <a
-        routerLink="/home"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-link">
+      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
         Início
       </a>
-
-      <a
-        routerLink="/events"
-        routerLinkActive="active"
-        class="nav-link">
+      <a routerLink="/events" routerLinkActive="active" class="nav-link">
         Eventos
       </a>
-
       @if (authService.isAdmin()) {
-        <a
-          routerLink="/admin/dashboard"
-          routerLinkActive="active"
-          class="nav-link">
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
           Dashboard
         </a>
       }
@@ -36,26 +24,21 @@
     <!-- AÇÕES -->
     <div class="nav-actions">
       @if (authService.isLoggedIn()) {
-        <span class="nav-user">
-          {{ authService.getUser()?.name }}
-        </span>
+
+        <!-- Avatar / link pro perfil -->
+        <a routerLink="/profile" routerLinkActive="active" class="nav-avatar" title="Meu perfil">
+          {{ getInitials() }}
+        </a>
 
         @if (authService.isAdmin()) {
-          <a routerLink="/events/new" class="btn-nav btn-nav-primary">
-            + Novo evento
-          </a>
+          <a routerLink="/events/new" class="btn-nav btn-nav-primary">+ Novo evento</a>
         }
 
-        <button class="btn-nav btn-nav-ghost" (click)="logout()">
-          Sair
-        </button>
+        <button class="btn-nav btn-nav-ghost" (click)="logout()">Sair</button>
+
       } @else {
-        <a routerLink="/login" routerLinkActive="active" class="btn-nav btn-nav-ghost">
-          Entrar
-        </a>
-        <a routerLink="/register" routerLinkActive="active" class="btn-nav btn-nav-primary">
-          Criar conta
-        </a>
+        <a routerLink="/login"    routerLinkActive="active" class="btn-nav btn-nav-ghost">Entrar</a>
+        <a routerLink="/register" routerLinkActive="active" class="btn-nav btn-nav-primary">Criar conta</a>
       }
     </div>
 

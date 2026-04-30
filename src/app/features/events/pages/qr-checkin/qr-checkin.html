@@ -1,0 +1,135 @@
+<section class="qr-page">
+
+  <a [routerLink]="['/events', eventId]" class="back-link">← Voltar para o evento</a>
+
+  @if (loading) {
+    <div class="qr-card">
+      <div class="qr-skeleton"></div>
+    </div>
+  } @else if (authService.isAdmin()) {
+
+    <!-- ── VISÃO DO ADMIN: FAZER CHECK-IN ── -->
+    <div class="qr-card">
+      <div class="qr-header">
+        <span class="eyebrow">Check-in</span>
+        <h1>Confirmar presença</h1>
+        <p>Leia o QR code do participante ou insira o código manualmente.</p>
+      </div>
+
+      @if (checkinState === 'idle' || checkinState === 'scanning') {
+
+        <div class="scanner-area" [class.active]="scannerActive">
+          @if (scannerActive) {
+            <div class="scanner-frame">
+              <div class="scanner-line"></div>
+              <span class="scanner-label">Aponte para o QR code</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" (click)="stopScanner()">Cancelar leitura</button>
+          } @else {
+            <div class="scanner-placeholder">
+              <span class="scanner-icon">📷</span>
+              <p>Câmera desativada</p>
+              <button class="btn btn-secondary btn-sm" (click)="startScanner()" disabled>
+                Usar câmera (em breve)
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="or-divider"><span>ou insira o código</span></div>
+
+        <div class="manual-input">
+          <input
+            type="text"
+            class="code-input"
+            placeholder="Cole o código UUID aqui..."
+            [(ngModel)]="manualCode"
+          />
+          <button
+            class="btn btn-primary"
+            (click)="submitManualCode()"
+            [disabled]="!manualCode.trim()"
+          >
+            Confirmar presença
+          </button>
+        </div>
+
+        <p class="todo-note">
+          💡 <strong>Pendente...</strong></p>
+
+      } @else if (checkinState === 'success') {
+        <div class="checkin-result success">
+          <span class="result-icon">✅</span>
+          <h2>Check-in realizado!</h2>
+          <p>{{ checkinResult }} confirmou presença com sucesso.</p>
+          <button class="btn btn-primary btn-sm" (click)="resetCheckin()">Próximo participante</button>
+        </div>
+
+      } @else if (checkinState === 'already') {
+
+        <div class="checkin-result warning">
+          <span class="result-icon">⚠️</span>
+          <h2>Já realizado</h2>
+          <p>Este participante já fez check-in anteriormente.</p>
+          <button class="btn btn-secondary btn-sm" (click)="resetCheckin()">Tentar outro código</button>
+        </div>
+
+      } @else if (checkinState === 'error') {
+
+        <div class="checkin-result error">
+          <span class="result-icon">❌</span>
+          <h2>Código inválido</h2>
+          <p>{{ checkinResult ?? 'Não foi possível confirmar a presença.' }}</p>
+          <button class="btn btn-secondary btn-sm" (click)="resetCheckin()">Tentar novamente</button>
+        </div>
+
+      }
+
+    </div>
+
+  } @else if (authService.isLoggedIn()) {
+
+    <!-- ── VISÃO DO USUÁRIO: SEU QR CODE ── -->
+    <div class="qr-card">
+      <div class="qr-header">
+        <span class="eyebrow">Minha inscrição</span>
+        <h1>Seu QR code de acesso</h1>
+        <p>Apresente este código na entrada do evento para confirmar sua presença.</p>
+      </div>
+
+      <div class="qr-display">
+        @if (qrDataUrl) {
+          <img [src]="qrDataUrl" alt="QR Code de acesso" class="qr-image" />
+        } @else {
+          <div class="qr-placeholder">
+            <div class="qr-mock">
+              <div class="qr-mock-inner">QR</div>
+            </div>
+            <p class="qr-pending">
+              Pendente...</p>
+          </div>
+        }
+
+        @if (isCheckedIn) {
+          <div class="checked-in-badge">✅ Check-in confirmado</div>
+        }
+      </div>
+
+      <p class="todo-note"><strong>Pendente...</strong></p>
+    </div>
+
+  } @else {
+
+    <!-- NÃO LOGADO -->
+    <div class="qr-card">
+      <div class="qr-header">
+        <span class="eyebrow">Acesso restrito</span>
+        <h1>Faça login para ver seu QR code</h1>
+        <p>Você precisa estar logado e inscrito neste evento.</p>
+      </div>
+      <a routerLink="/login" class="btn btn-primary">Entrar</a>
+    </div>
+
+  }
+
+</section>
