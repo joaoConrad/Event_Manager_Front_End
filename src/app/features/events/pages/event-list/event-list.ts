@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../../../core/services/event';
@@ -16,28 +16,18 @@ type FeedbackType = 'success' | 'error' | 'info';
   templateUrl: './event-list.html',
   styleUrl: './event-list.css'
 })
-export class EventList implements OnInit, AfterViewInit {
+export class EventList implements OnInit {
 
-  // =====================
-  // 🔎 FILTROS
-  // =====================
-  filtroData: string = '';
-  filtroCategoria: string = '';
-  filtroStatus: string = '';
+  filtroData = '';
+  filtroCategoria = '';
+  filtroStatus = '';
 
   events: EventWithRegistered[] = [];
   loading = true;
-
   sortOrder: 'recent' | 'oldest' = 'recent';
-
-  showDetailsModal = false;
-  selectedEvent: EventWithRegistered | null = null;
 
   showPastEvents = false;
   manualJoinedEventIds = new Set<number>();
-
-  private loadingStarted = false;
-  private loadedOnce = false;
 
   feedbackMessage = '';
   feedbackType: FeedbackType = 'info';
@@ -50,53 +40,37 @@ export class EventList implements OnInit, AfterViewInit {
   constructor(
     private readonly eventService: EventService,
     private readonly participantService: ParticipantService,
-    public authService: AuthService,
+    public readonly authService: AuthService,
     private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.loadEventsOnce();
-  }
-
-  ngAfterViewInit(): void {
-    this.loadEventsOnce();
-  }
-
-  loadEventsOnce(): void {
-    if (this.loadingStarted || this.loadedOnce) return;
-
-    this.loadingStarted = true;
     this.loadEvents();
   }
 
   loadEvents(): void {
     this.loading = true;
-    this.cdr.detectChanges();
 
     this.eventService.getAll(true).subscribe({
       next: (res) => {
         this.events = Array.isArray(res)
           ? res.map((event) => ({
               ...event,
+              // fix: normaliza date/time que podem vir como ISO do banco
+              date: event.date?.split('T')[0] ?? event.date,
+              time: event.time?.slice(0, 5) ?? event.time,
               registeredParticipants: event.registeredParticipants ?? 0,
-              availableSpots: event.availableSpots ?? this.calculateAvailableSpots(event),
-              isSoldOut: event.isSoldOut ?? this.calculateIsSoldOut(event),
+              availableSpots: event.availableSpots ?? this.calcSpots(event),
+              isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
               isUserRegistered: event.isUserRegistered ?? false
             }))
           : [];
-
         this.loading = false;
-        this.loadedOnce = true;
-
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Erro ao carregar eventos', err);
+      error: () => {
         this.events = [];
         this.loading = false;
-        this.loadingStarted = false;
-        this.cdr.detectChanges();
-
         this.showFeedback('Não foi possível carregar os eventos.', 'error');
       }
     });
@@ -104,248 +78,99 @@ export class EventList implements OnInit, AfterViewInit {
 
   reloadEvents(): void {
     this.eventService.clearCache();
-    this.loadingStarted = false;
-    this.loadedOnce = false;
-    this.loadEventsOnce();
+    this.loadEvents();
   }
 
-  setSortOrder(order: 'recent' | 'oldest'): void {
-    this.sortOrder = order;
-  }
+  setSortOrder(order: 'recent' | 'oldest'): void { this.sortOrder = order; }
 
-  getEventDateTime(event: EventWithRegistered): number {
-    return new Date(`${event.date}T${event.time}`).getTime();
-  }
-
-  isPastEvent(event: EventWithRegistered): boolean {
-    return this.getEventDateTime(event) < new Date().getTime();
-  }
-
-  sortEvents(events: EventWithRegistered[]): EventWithRegistered[] {
+  private sortEvents(events: EventWithRegistered[]): EventWithRegistered[] {
     return [...events].sort((a, b) => {
-      const dateA = this.getEventDateTime(a);
-      const dateB = this.getEventDateTime(b);
-
-      return this.sortOrder === 'recent'
-        ? dateA - dateB
-        : dateB - dateA;
+      const diff = this.getDateTime(a) - this.getDateTime(b);
+      return this.sortOrder === 'recent' ? diff : -diff;
     });
   }
 
-  // =====================
-  // 🔥 FILTRO APLICADO AQUI
-  // =====================
-  aplicarFiltroBase(events: EventWithRegistered[]): EventWithRegistered[] {
+  private applyFilters(events: EventWithRegistered[]): EventWithRegistered[] {
     return events.filter((event) => {
-
-      const matchData = this.filtroData
-        ? event.date === this.filtroData
-        : true;
-
-      const matchCategoria = this.filtroCategoria
-        ? (event.title || '')
-            .toLowerCase()
-            .includes(this.filtroCategoria.toLowerCase())
-        : true;
-
-      const matchStatus = this.filtroStatus
-        ? this.getStatus(event) === this.filtroStatus
-        : true;
-
-      return matchData && matchCategoria && matchStatus;
+      const matchData   = this.filtroData      ? event.date === this.filtroData : true;
+      const matchTitulo = this.filtroCategoria ? event.title.toLowerCase().includes(this.filtroCategoria.toLowerCase()) : true;
+      const matchStatus = this.filtroStatus    ? this.getStatus(event) === this.filtroStatus : true;
+      return matchData && matchTitulo && matchStatus;
     });
   }
 
-  getStatus(event: EventWithRegistered): string {
-    if (this.isPastEvent(event)) return 'cancelado';
-    if (this.isSoldOut(event)) return 'cancelado';
-    return 'ativo';
-  }
-
-  // =====================
-  // LISTAS COM FILTRO
-  // =====================
   getAvailableEvents(): EventWithRegistered[] {
-    let filtered = this.events.filter((event) => {
-      if (this.isPastEvent(event)) return false;
-
+    const base = this.events.filter((e) => {
+      if (this.isPastEvent(e)) return false;
       if (this.authService.isAdmin()) return true;
-
-      return !this.isSoldOut(event) || this.isJoined(event.id);
+      return !this.isSoldOut(e) || this.isJoined(e.id);
     });
-
-    filtered = this.aplicarFiltroBase(filtered);
-
-    return this.sortEvents(filtered);
+    return this.sortEvents(this.applyFilters(base));
   }
 
   getSoldOutEvents(): EventWithRegistered[] {
     if (this.authService.isAdmin()) return [];
-
-    let filtered = this.events.filter((event) => {
-      return !this.isPastEvent(event)
-        && this.isSoldOut(event)
-        && !this.isJoined(event.id);
-    });
-
-    filtered = this.aplicarFiltroBase(filtered);
-
-    return this.sortEvents(filtered);
+    const base = this.events.filter((e) => !this.isPastEvent(e) && this.isSoldOut(e) && !this.isJoined(e.id));
+    return this.sortEvents(this.applyFilters(base));
   }
 
   getPastEvents(): EventWithRegistered[] {
-    let filtered = this.events.filter((event) => this.isPastEvent(event));
-
-    filtered = this.aplicarFiltroBase(filtered);
-
-    return this.sortEvents(filtered);
+    return this.sortEvents(this.applyFilters(this.events.filter((e) => this.isPastEvent(e))));
   }
 
-  aplicarFiltro() {
-    // só força atualização da tela
-    this.cdr.detectChanges();
-  }
+  aplicarFiltro(): void { this.cdr.detectChanges(); }
 
-  limparFiltro() {
+  limparFiltro(): void {
     this.filtroData = '';
     this.filtroCategoria = '';
     this.filtroStatus = '';
     this.cdr.detectChanges();
   }
 
-  togglePastEvents(): void {
-    this.showPastEvents = !this.showPastEvents;
+  getStatus(event: EventWithRegistered): string {
+    if (this.isPastEvent(event) || this.isSoldOut(event)) return 'cancelado';
+    return 'ativo';
   }
 
-  openDetailsModal(event: EventWithRegistered): void {
-    this.selectedEvent = event;
-    this.showDetailsModal = true;
-    this.cdr.detectChanges();
+  togglePastEvents(): void { this.showPastEvents = !this.showPastEvents; }
+
+  // date e time já normalizados no loadEvents, mas protege por garantia
+  getDateTime(event: EventWithRegistered): number {
+    const date = event.date?.split('T')[0] ?? event.date;
+    const time = event.time?.slice(0, 5) ?? event.time;
+    return new Date(`${date}T${time}`).getTime();
   }
 
-  closeDetailsModal(): void {
-    this.showDetailsModal = false;
-    this.selectedEvent = null;
-    this.cdr.detectChanges();
+  isPastEvent(event: EventWithRegistered): boolean {
+    return this.getDateTime(event) < Date.now();
   }
 
-  showFeedback(message: string, type: FeedbackType): void {
-    this.feedbackMessage = message;
-    this.feedbackType = type;
-
-    if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
-
-    this.feedbackTimeout = setTimeout(() => {
-      this.feedbackMessage = '';
-      this.cdr.detectChanges();
-    }, 3500);
-
-    this.cdr.detectChanges();
+  calcSpots(event: EventWithRegistered): number {
+    return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
   }
 
-  clearFeedback(): void {
-    this.feedbackMessage = '';
+  calcSoldOut(event: EventWithRegistered): boolean { return this.calcSpots(event) <= 0; }
 
-    if (this.feedbackTimeout) {
-      clearTimeout(this.feedbackTimeout);
-      this.feedbackTimeout = null;
-    }
-
-    this.cdr.detectChanges();
+  getAvailableSpots(event: EventWithRegistered): number {
+    return typeof event.availableSpots === 'number' ? event.availableSpots : this.calcSpots(event);
   }
 
-  openDeleteModal(event: EventWithRegistered): void {
-    this.eventToDelete = event;
-    this.showDeleteModal = true;
-    this.cdr.detectChanges();
-  }
-
-  closeDeleteModal(): void {
-    if (this.deleting) return;
-
-    this.showDeleteModal = false;
-    this.eventToDelete = null;
-    this.cdr.detectChanges();
-  }
-
-  confirmDelete(): void {
-    if (!this.eventToDelete?.id) return;
-
-    this.deleting = true;
-    this.cdr.detectChanges();
-
-    this.eventService.delete(this.eventToDelete.id).subscribe({
-      next: () => {
-        this.deleting = false;
-        this.showDeleteModal = false;
-        this.eventToDelete = null;
-
-        this.showFeedback('Evento excluído com sucesso.', 'success');
-        this.reloadEvents();
-      },
-      error: (err) => {
-        console.error('Erro ao excluir evento', err);
-        this.deleting = false;
-        this.showFeedback(
-          err?.error?.message || 'Não foi possível excluir o evento.',
-          'error'
-        );
-        this.cdr.detectChanges();
-      }
-    });
+  isSoldOut(event: EventWithRegistered): boolean {
+    return typeof event.isSoldOut === 'boolean' ? event.isSoldOut : this.calcSoldOut(event);
   }
 
   isJoined(eventId?: number): boolean {
     if (!eventId) return false;
-
-    const event = this.events.find((item) => item.id === eventId);
-
+    const event = this.events.find((e) => e.id === eventId);
     return event?.isUserRegistered === true || this.manualJoinedEventIds.has(eventId);
-  }
-
-  calculateAvailableSpots(event: EventWithRegistered): number {
-    return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
-  }
-
-  calculateIsSoldOut(event: EventWithRegistered): boolean {
-    return this.calculateAvailableSpots(event) <= 0;
-  }
-
-  getAvailableSpots(event: EventWithRegistered): number {
-    if (typeof event.availableSpots === 'number') {
-      return event.availableSpots;
-    }
-
-    return this.calculateAvailableSpots(event);
-  }
-
-  isSoldOut(event: EventWithRegistered): boolean {
-    if (typeof event.isSoldOut === 'boolean') {
-      return event.isSoldOut;
-    }
-
-    return this.calculateIsSoldOut(event);
   }
 
   joinEvent(id?: number): void {
     if (!id) return;
-
-    const event = this.events.find((item) => item.id === id);
-
-    if (event && this.isPastEvent(event)) {
-      this.showFeedback('Este evento já foi encerrado.', 'info');
-      return;
-    }
-
-    if (event && this.isSoldOut(event) && !this.isJoined(id)) {
-      this.showFeedback('Este evento está esgotado.', 'info');
-      return;
-    }
-
-    if (!this.authService.isLoggedIn()) {
-      this.showFeedback('Você precisa estar logado para se inscrever.', 'info');
-      return;
-    }
+    const event = this.events.find((e) => e.id === id);
+    if (event && this.isPastEvent(event)) { this.showFeedback('Este evento já foi encerrado.', 'info'); return; }
+    if (event && this.isSoldOut(event))   { this.showFeedback('Este evento está esgotado.', 'info'); return; }
+    if (!this.authService.isLoggedIn())   { this.showFeedback('Você precisa estar logado para se inscrever.', 'info'); return; }
 
     this.participantService.subscribe(id).subscribe({
       next: () => {
@@ -353,32 +178,67 @@ export class EventList implements OnInit, AfterViewInit {
         this.showFeedback('Inscrição realizada com sucesso.', 'success');
         this.reloadEvents();
       },
-      error: (err) => {
-        console.error('Erro ao inscrever', err);
-        this.showFeedback(
-          err?.error?.message || 'Não foi possível concluir a inscrição.',
-          'error'
-        );
-      }
+      error: (err) => this.showFeedback(err?.error?.message || 'Não foi possível concluir a inscrição.', 'error')
     });
   }
 
   cancelSubscription(id?: number): void {
     if (!id) return;
-
     this.participantService.cancelMySubscription(id).subscribe({
       next: () => {
         this.manualJoinedEventIds.delete(id);
         this.showFeedback('Inscrição cancelada com sucesso.', 'success');
         this.reloadEvents();
       },
+      error: (err) => this.showFeedback(err?.error?.message || 'Não foi possível cancelar a inscrição.', 'error')
+    });
+  }
+
+  openDeleteModal(event: EventWithRegistered): void {
+    this.eventToDelete = event;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    if (this.deleting) return;
+    this.showDeleteModal = false;
+    this.eventToDelete = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.eventToDelete?.id) return;
+    this.deleting = true;
+
+    this.eventService.delete(this.eventToDelete.id).subscribe({
+      next: () => {
+        this.deleting = false;
+        this.showDeleteModal = false;
+        this.eventToDelete = null;
+        this.showFeedback('Evento excluído com sucesso.', 'success');
+        this.reloadEvents();
+      },
       error: (err) => {
-        console.error('Erro ao cancelar', err);
-        this.showFeedback(
-          err?.error?.message || 'Não foi possível cancelar a inscrição.',
-          'error'
-        );
+        this.deleting = false;
+        this.showFeedback(err?.error?.message || 'Não foi possível excluir o evento.', 'error');
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  showFeedback(message: string, type: FeedbackType): void {
+    this.feedbackMessage = message;
+    this.feedbackType = type;
+    if (this.feedbackTimeout) clearTimeout(this.feedbackTimeout);
+    this.feedbackTimeout = setTimeout(() => {
+      this.feedbackMessage = '';
+      this.cdr.detectChanges();
+    }, 3500);
+    this.cdr.detectChanges();
+  }
+
+  clearFeedback(): void {
+    this.feedbackMessage = '';
+    if (this.feedbackTimeout) { clearTimeout(this.feedbackTimeout); this.feedbackTimeout = null; }
+    this.cdr.detectChanges();
   }
 }

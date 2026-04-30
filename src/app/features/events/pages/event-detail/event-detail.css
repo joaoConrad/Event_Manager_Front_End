@@ -461,3 +461,18 @@
     align-items: flex-start;
   }
 }
+
+/* ── IMAGEM DE CAPA NO DETALHE ── */
+.detail-cover-wrap {
+  margin: -2rem -2rem 1.5rem;
+  height: 260px;
+  overflow: hidden;
+  border-radius: 26px 26px 0 0;
+}
+
+.detail-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

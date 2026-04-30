@@ -36,7 +36,6 @@ export class Home implements OnInit, AfterViewInit {
 
   loadEventsOnce(): void {
     if (this.loadingStarted || this.loadedOnce) return;
-
     this.loadingStarted = true;
     this.loadEvents();
   }
@@ -71,36 +70,28 @@ export class Home implements OnInit, AfterViewInit {
   scrollCarousel(direction: 'left' | 'right'): void {
     const container = this.carouselRef?.nativeElement;
     if (!container) return;
-
     const amount = Math.round(container.clientWidth * 0.85);
-
-    container.scrollBy({
-      left: direction === 'left' ? -amount : amount,
-      behavior: 'smooth'
-    });
+    container.scrollBy({ left: direction === 'left' ? -amount : amount, behavior: 'smooth' });
   }
 
+  // ── fix: normaliza date e time antes de montar a data ──
   getEventDateTime(event: EventModel): number {
-    return new Date(`${event.date}T${event.time}`).getTime();
+    const date = event.date?.split('T')[0] ?? event.date;
+    const time = (event.time?.slice(0, 5)) ?? event.time;
+    return new Date(`${date}T${time}`).getTime();
   }
 
   isPastEvent(event: EventModel): boolean {
-    return this.getEventDateTime(event) < new Date().getTime();
+    return this.getEventDateTime(event) < Date.now();
   }
 
   getAvailableSpots(event: EventModel): number {
-    if (typeof event.availableSpots === 'number') {
-      return event.availableSpots;
-    }
-
+    if (typeof event.availableSpots === 'number') return event.availableSpots;
     return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
   }
 
   isSoldOut(event: EventModel): boolean {
-    if (typeof event.isSoldOut === 'boolean') {
-      return event.isSoldOut;
-    }
-
+    if (typeof event.isSoldOut === 'boolean') return event.isSoldOut;
     return this.getAvailableSpots(event) <= 0;
   }
 }

@@ -54,7 +54,15 @@ export class EventDetail implements OnInit {
     this.loading = true;
     this.eventService.getById(id).subscribe({
       next: (res: any) => {
-        this.event = res?.data ?? res;
+        const raw = res?.data ?? res;
+
+        // ── fix: normaliza date e time que podem vir como ISO do banco ──
+        this.event = {
+          ...raw,
+          date: raw.date?.split('T')[0] ?? raw.date,
+          time: raw.time?.slice(0, 5) ?? raw.time
+        };
+
         this.loading = false;
 
         if (this.authService.isAdmin() && this.event?.id) {
@@ -86,11 +94,14 @@ export class EventDetail implements OnInit {
     });
   }
 
-  // ── helpers ──────────────────────────────────────────
+  // ── helpers ────────────────────────────────────────────
 
+  // date e time já normalizados no loadEvent, mas protege por garantia
   getEventDateTime(): number {
     if (!this.event) return 0;
-    return new Date(`${this.event.date}T${this.event.time}`).getTime();
+    const date = this.event.date?.split('T')[0] ?? this.event.date;
+    const time = this.event.time?.slice(0, 5) ?? this.event.time;
+    return new Date(`${date}T${time}`).getTime();
   }
 
   isPastEvent(): boolean {
@@ -113,15 +124,11 @@ export class EventDetail implements OnInit {
     return this.event?.isUserRegistered === true;
   }
 
-  // ── ações ──────────────────────────────────────────
+  // ── ações ──────────────────────────────────────────────
 
   joinEvent(): void {
     if (!this.event?.id) return;
-
-    if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
-      return;
-    }
+    if (!this.authService.isLoggedIn()) { this.router.navigate(['/login']); return; }
 
     this.actionLoading = true;
     this.participantService.subscribe(this.event.id).subscribe({
@@ -170,9 +177,7 @@ export class EventDetail implements OnInit {
     });
   }
 
-  openDeleteModal(): void {
-    this.showDeleteModal = true;
-  }
+  openDeleteModal(): void { this.showDeleteModal = true; }
 
   closeDeleteModal(): void {
     if (this.deleting) return;
