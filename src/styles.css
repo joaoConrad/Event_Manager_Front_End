@@ -63,3 +63,21 @@ select:focus {
   --brand-dark: #111827;
   --brand-bg: #f3f4f6;
 }
+/* ===== MOBILE GLOBAL ===== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+button, a {
+  min-height: 44px;
+}
+
+input, select {
+  font-size: 16px;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+}

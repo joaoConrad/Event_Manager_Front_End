@@ -787,3 +787,157 @@
 .filtro-avancado button:last-of-type:hover {
   background-color: #d1d5db;
 }
+/* =========================
+   AJUSTES GERAIS RESPONSIVOS
+========================= */
+
+/* Container central (novo do HTML) */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Botão full no mobile */
+.full-mobile {
+  width: auto;
+}
+
+@media (max-width: 768px) {
+  .full-mobile {
+    width: 100%;
+  }
+}
+
+/* =========================
+   HEADER MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .page-header-text h1 {
+    font-size: 1.7rem;
+  }
+}
+
+/* =========================
+   TOOLBAR MOBILE (MELHORADO)
+========================= */
+
+@media (max-width: 768px) {
+  .list-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-text {
+    width: 100%;
+  }
+
+  .sort-actions {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+
+  .sort-btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* =========================
+   FILTRO RESPONSIVO (IMPORTANTE)
+========================= */
+
+.filtro-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.filtro-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .filtro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtro-actions {
+    flex-direction: column;
+  }
+
+  .filtro-actions button {
+    width: 100%;
+  }
+}
+
+/* =========================
+   EVENT CARD MOBILE (CRÍTICO)
+========================= */
+
+@media (max-width: 768px) {
+  .event-card {
+    grid-template-columns: 1fr;
+  }
+
+  .event-aside {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+  }
+
+  .aside-divider {
+    display: none;
+  }
+
+  .aside-vacancies {
+    font-size: 1.4rem;
+  }
+}
+
+/* =========================
+   META GRID MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  .event-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
+   BOTÕES MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .admin-actions .btn {
+    width: 100%;
+  }
+}
+
+/* =========================
+   MODAL MOBILE
+========================= */
+
+@media (max-width: 768px) {
+  .modal-card {
+    width: 100%;
+    max-width: 100%;
+  }
+}
