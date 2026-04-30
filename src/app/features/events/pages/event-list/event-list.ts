@@ -5,6 +5,7 @@ import { EventService } from '../../../../core/services/event';
 import { ParticipantService } from '../../../../core/services/participant';
 import { EventModel } from '../../../../models/event.model';
 import { AuthService } from '../../../../core/services/auth';
+import { EventHistoryModalComponent } from './event-list-modal.component';
 
 type EventWithRegistered = EventModel & { registeredParticipants?: number };
 type FeedbackType = 'success' | 'error' | 'info';
@@ -12,12 +13,11 @@ type FeedbackType = 'success' | 'error' | 'info';
 @Component({
   selector: 'app-event-list',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, EventHistoryModalComponent],
   templateUrl: './event-list.html',
-  styleUrl: './event-list.css'
+  styleUrl: './event-list.css',
 })
 export class EventList implements OnInit {
-
   filtroData = '';
   filtroCategoria = '';
   filtroStatus = '';
@@ -36,12 +36,27 @@ export class EventList implements OnInit {
   showDeleteModal = false;
   eventToDelete: EventWithRegistered | null = null;
   deleting = false;
+  showHistoryModal = false;
+  historyEventId: number | null = null;
+  historyEventName = '';
+
+  openHistoryModal(event: EventWithRegistered): void {
+    this.historyEventId = event.id ?? null;
+    this.historyEventName = event.title;
+    this.showHistoryModal = true;
+  }
+
+  closeHistoryModal(): void {
+    this.showHistoryModal = false;
+    this.historyEventId = null;
+    this.historyEventName = '';
+  }
 
   constructor(
     private readonly eventService: EventService,
     private readonly participantService: ParticipantService,
     public readonly authService: AuthService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -62,7 +77,7 @@ export class EventList implements OnInit {
               registeredParticipants: event.registeredParticipants ?? 0,
               availableSpots: event.availableSpots ?? this.calcSpots(event),
               isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
-              isUserRegistered: event.isUserRegistered ?? false
+              isUserRegistered: event.isUserRegistered ?? false,
             }))
           : [];
         this.loading = false;
@@ -72,7 +87,7 @@ export class EventList implements OnInit {
         this.events = [];
         this.loading = false;
         this.showFeedback('Não foi possível carregar os eventos.', 'error');
-      }
+      },
     });
   }
 
@@ -81,7 +96,9 @@ export class EventList implements OnInit {
     this.loadEvents();
   }
 
-  setSortOrder(order: 'recent' | 'oldest'): void { this.sortOrder = order; }
+  setSortOrder(order: 'recent' | 'oldest'): void {
+    this.sortOrder = order;
+  }
 
   private sortEvents(events: EventWithRegistered[]): EventWithRegistered[] {
     return [...events].sort((a, b) => {
@@ -92,9 +109,11 @@ export class EventList implements OnInit {
 
   private applyFilters(events: EventWithRegistered[]): EventWithRegistered[] {
     return events.filter((event) => {
-      const matchData   = this.filtroData      ? event.date === this.filtroData : true;
-      const matchTitulo = this.filtroCategoria ? event.title.toLowerCase().includes(this.filtroCategoria.toLowerCase()) : true;
-      const matchStatus = this.filtroStatus    ? this.getStatus(event) === this.filtroStatus : true;
+      const matchData = this.filtroData ? event.date === this.filtroData : true;
+      const matchTitulo = this.filtroCategoria
+        ? event.title.toLowerCase().includes(this.filtroCategoria.toLowerCase())
+        : true;
+      const matchStatus = this.filtroStatus ? this.getStatus(event) === this.filtroStatus : true;
       return matchData && matchTitulo && matchStatus;
     });
   }
@@ -110,7 +129,9 @@ export class EventList implements OnInit {
 
   getSoldOutEvents(): EventWithRegistered[] {
     if (this.authService.isAdmin()) return [];
-    const base = this.events.filter((e) => !this.isPastEvent(e) && this.isSoldOut(e) && !this.isJoined(e.id));
+    const base = this.events.filter(
+      (e) => !this.isPastEvent(e) && this.isSoldOut(e) && !this.isJoined(e.id),
+    );
     return this.sortEvents(this.applyFilters(base));
   }
 
@@ -118,7 +139,9 @@ export class EventList implements OnInit {
     return this.sortEvents(this.applyFilters(this.events.filter((e) => this.isPastEvent(e))));
   }
 
-  aplicarFiltro(): void { this.cdr.detectChanges(); }
+  aplicarFiltro(): void {
+    this.cdr.detectChanges();
+  }
 
   limparFiltro(): void {
     this.filtroData = '';
@@ -132,7 +155,9 @@ export class EventList implements OnInit {
     return 'ativo';
   }
 
-  togglePastEvents(): void { this.showPastEvents = !this.showPastEvents; }
+  togglePastEvents(): void {
+    this.showPastEvents = !this.showPastEvents;
+  }
 
   // date e time já normalizados no loadEvents, mas protege por garantia
   getDateTime(event: EventWithRegistered): number {
@@ -149,7 +174,9 @@ export class EventList implements OnInit {
     return Math.max(event.maxParticipants - (event.registeredParticipants ?? 0), 0);
   }
 
-  calcSoldOut(event: EventWithRegistered): boolean { return this.calcSpots(event) <= 0; }
+  calcSoldOut(event: EventWithRegistered): boolean {
+    return this.calcSpots(event) <= 0;
+  }
 
   getAvailableSpots(event: EventWithRegistered): number {
     return typeof event.availableSpots === 'number' ? event.availableSpots : this.calcSpots(event);
@@ -168,9 +195,18 @@ export class EventList implements OnInit {
   joinEvent(id?: number): void {
     if (!id) return;
     const event = this.events.find((e) => e.id === id);
-    if (event && this.isPastEvent(event)) { this.showFeedback('Este evento já foi encerrado.', 'info'); return; }
-    if (event && this.isSoldOut(event))   { this.showFeedback('Este evento está esgotado.', 'info'); return; }
-    if (!this.authService.isLoggedIn())   { this.showFeedback('Você precisa estar logado para se inscrever.', 'info'); return; }
+    if (event && this.isPastEvent(event)) {
+      this.showFeedback('Este evento já foi encerrado.', 'info');
+      return;
+    }
+    if (event && this.isSoldOut(event)) {
+      this.showFeedback('Este evento está esgotado.', 'info');
+      return;
+    }
+    if (!this.authService.isLoggedIn()) {
+      this.showFeedback('Você precisa estar logado para se inscrever.', 'info');
+      return;
+    }
 
     this.participantService.subscribe(id).subscribe({
       next: () => {
@@ -178,7 +214,8 @@ export class EventList implements OnInit {
         this.showFeedback('Inscrição realizada com sucesso.', 'success');
         this.reloadEvents();
       },
-      error: (err) => this.showFeedback(err?.error?.message || 'Não foi possível concluir a inscrição.', 'error')
+      error: (err) =>
+        this.showFeedback(err?.error?.message || 'Não foi possível concluir a inscrição.', 'error'),
     });
   }
 
@@ -190,7 +227,8 @@ export class EventList implements OnInit {
         this.showFeedback('Inscrição cancelada com sucesso.', 'success');
         this.reloadEvents();
       },
-      error: (err) => this.showFeedback(err?.error?.message || 'Não foi possível cancelar a inscrição.', 'error')
+      error: (err) =>
+        this.showFeedback(err?.error?.message || 'Não foi possível cancelar a inscrição.', 'error'),
     });
   }
 
@@ -221,7 +259,7 @@ export class EventList implements OnInit {
         this.deleting = false;
         this.showFeedback(err?.error?.message || 'Não foi possível excluir o evento.', 'error');
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -238,7 +276,10 @@ export class EventList implements OnInit {
 
   clearFeedback(): void {
     this.feedbackMessage = '';
-    if (this.feedbackTimeout) { clearTimeout(this.feedbackTimeout); this.feedbackTimeout = null; }
+    if (this.feedbackTimeout) {
+      clearTimeout(this.feedbackTimeout);
+      this.feedbackTimeout = null;
+    }
     this.cdr.detectChanges();
   }
 }
