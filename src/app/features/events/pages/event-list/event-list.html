@@ -16,20 +16,10 @@
     <div class="toolbar-sort">
       <span class="toolbar-label">Ordenar</span>
       <div class="sort-actions">
-        <button
-          type="button"
-          class="sort-btn"
-          [class.active]="sortOrder === 'recent'"
-          (click)="setSortOrder('recent')"
-        >
+        <button type="button" class="sort-btn" [class.active]="sortOrder === 'recent'" (click)="setSortOrder('recent')">
           Mais próximos
         </button>
-        <button
-          type="button"
-          class="sort-btn"
-          [class.active]="sortOrder === 'oldest'"
-          (click)="setSortOrder('oldest')"
-        >
+        <button type="button" class="sort-btn" [class.active]="sortOrder === 'oldest'" (click)="setSortOrder('oldest')">
           Mais distantes
         </button>
       </div>
@@ -46,12 +36,7 @@
         <label class="filter-label">Título</label>
         <div class="filter-input-wrap">
           <span class="filter-icon">🔍</span>
-          <input
-            type="text"
-            class="filter-input filter-input--icon"
-            placeholder="Buscar por título..."
-            [(ngModel)]="filtroCategoria"
-          />
+          <input type="text" class="filter-input filter-input--icon" placeholder="Buscar por título..." [(ngModel)]="filtroCategoria" />
         </div>
       </div>
       <div class="filter-group">
@@ -72,12 +57,10 @@
 
   <!-- FEEDBACK -->
   @if (feedbackMessage) {
-    <div
-      class="feedback-banner"
+    <div class="feedback-banner"
       [class.success]="feedbackType === 'success'"
       [class.error]="feedbackType === 'error'"
-      [class.info]="feedbackType === 'info'"
-    >
+      [class.info]="feedbackType === 'info'">
       <span>{{ feedbackMessage }}</span>
       <button type="button" class="feedback-close" (click)="clearFeedback()">×</button>
     </div>
@@ -85,14 +68,11 @@
 
   <!-- LOADING -->
   @if (loading) {
-    <div class="empty-state">
-      <p>Carregando eventos...</p>
-    </div>
+    <div class="empty-state"><p>Carregando eventos...</p></div>
   } @else {
+
     @if (getAvailableEvents().length === 0) {
-      <div class="empty-state">
-        <p>Nenhum evento encontrado com esse filtro.</p>
-      </div>
+      <div class="empty-state"><p>Nenhum evento encontrado com esse filtro.</p></div>
     }
 
     <!-- EVENTOS DISPONÍVEIS -->
@@ -100,11 +80,12 @@
       <div class="events-grid">
         @for (event of getAvailableEvents(); track event.id) {
           <article class="event-card">
+
             <!-- ASIDE -->
             <div class="event-aside">
               <span class="aside-label">Evento</span>
               <strong class="aside-date">{{ event.date }}</strong>
-              <span class="aside-time">{{ event.time }}</span>
+              <span class="aside-time">{{ event.startTime }} – {{ event.endTime }}</span>
               <div class="aside-divider"></div>
               <span class="aside-vacancies-label">Vagas</span>
               <strong class="aside-vacancies">
@@ -114,7 +95,6 @@
 
             <!-- CONTEÚDO -->
             <div class="event-content">
-              <!-- IMAGEM DE CAPA (aparece quando imageUrl vier do back) -->
               @if (event.imageUrl) {
                 <div class="card-image-wrap">
                   <img [src]="event.imageUrl" [alt]="event.title" class="card-image" />
@@ -144,9 +124,7 @@
                   </div>
                   <div class="meta-item">
                     <span class="meta-label">Inscritos</span>
-                    <span class="meta-value"
-                      >{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span
-                    >
+                    <span class="meta-value">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span>
                   </div>
                   <div class="meta-item">
                     <span class="meta-label">Disponibilidade</span>
@@ -157,9 +135,7 @@
                     } @else if (isSoldOut(event)) {
                       <span class="meta-value danger">Sem vagas</span>
                     } @else {
-                      <span class="meta-value highlight"
-                        >{{ getAvailableSpots(event) }} restantes</span
-                      >
+                      <span class="meta-value highlight">{{ getAvailableSpots(event) }} restantes</span>
                     }
                   </div>
                 </div>
@@ -167,33 +143,21 @@
 
               <!-- AÇÕES -->
               <div class="event-actions">
-                <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm"
-                  >Ver detalhes</a
-                >
+                <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm">Ver detalhes</a>
 
                 @if (authService.isAdmin()) {
-                  <button class="btn btn-secondary btn-sm" (click)="openHistoryModal(event)">
-                    Histórico
-                  </button>
-                  <a class="btn btn-secondary btn-sm" [routerLink]="['/events/edit', event.id]"
-                    >Editar</a
-                  >
-                  <button class="btn btn-danger btn-sm" (click)="openDeleteModal(event)">
-                    Excluir
-                  </button>
+                  <button class="btn btn-secondary btn-sm" (click)="openHistoryModal(event)">Histórico</button>
+                  <a class="btn btn-secondary btn-sm" [routerLink]="['/events/edit', event.id]">Editar</a>
+                  <button class="btn btn-danger btn-sm" (click)="openDeleteModal(event)">Excluir</button>
                 } @else if (authService.isLoggedIn()) {
                   @if (isPastEvent(event)) {
                     <button class="btn btn-disabled btn-sm" disabled>Encerrado</button>
                   } @else if (isJoined(event.id)) {
-                    <button class="btn btn-warning btn-sm" (click)="cancelSubscription(event.id)">
-                      Cancelar inscrição
-                    </button>
+                    <button class="btn btn-warning btn-sm" (click)="cancelSubscription(event.id)">Cancelar inscrição</button>
                   } @else if (isSoldOut(event)) {
                     <button class="btn btn-disabled btn-sm" disabled>Esgotado</button>
                   } @else {
-                    <button class="btn btn-success btn-sm" (click)="joinEvent(event.id)">
-                      Participar
-                    </button>
+                    <button class="btn btn-success btn-sm" (click)="joinEvent(event.id)">Participar</button>
                   }
                 } @else {
                   @if (isPastEvent(event)) {
@@ -235,9 +199,7 @@
                   <p class="card-description">{{ event.description }}</p>
                 </div>
                 <div class="event-actions">
-                  <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm"
-                    >Ver detalhes</a
-                  >
+                  <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm">Ver detalhes</a>
                   <button class="btn btn-disabled btn-sm" disabled>Esgotado</button>
                 </div>
               </div>
@@ -258,6 +220,7 @@
           {{ showPastEvents ? 'Ocultar' : 'Ver encerrados' }}
         </button>
       </section>
+
       @if (showPastEvents && getPastEvents().length > 0) {
         <div class="events-grid" style="margin-top: 1rem">
           @for (event of getPastEvents(); track event.id) {
@@ -265,7 +228,7 @@
               <div class="event-aside">
                 <span class="aside-label">Encerrado</span>
                 <strong class="aside-date">{{ event.date }}</strong>
-                <span class="aside-time">{{ event.time }}</span>
+                <span class="aside-time">{{ event.startTime }} – {{ event.endTime }}</span>
               </div>
               <div class="event-content">
                 @if (event.imageUrl) {
@@ -286,16 +249,12 @@
                     </div>
                     <div class="meta-item">
                       <span class="meta-label">Inscritos</span>
-                      <span class="meta-value"
-                        >{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span
-                      >
+                      <span class="meta-value">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span>
                     </div>
                   </div>
                 </div>
                 <div class="event-actions">
-                  <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm"
-                    >Ver detalhes</a
-                  >
+                  <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm">Ver detalhes</a>
                 </div>
               </div>
             </article>
@@ -308,63 +267,32 @@
   <!-- PAGINAÇÃO -->
   @if (pagination && pagination.totalPages > 1) {
     <div class="pagination-bar">
-
       <span class="pagination-info">
         Página {{ currentPage }} de {{ pagination.totalPages }}
         <span class="pagination-total">({{ pagination.totalItems }} eventos)</span>
       </span>
-
       <div class="pagination-controls">
-
-        <button
-          class="page-btn page-btn--nav"
-          [disabled]="!pagination.hasPreviousPage"
-          (click)="prevPage()">
-          ←
-        </button>
-
+        <button class="page-btn page-btn--nav" [disabled]="!pagination.hasPreviousPage" (click)="prevPage()">←</button>
         @for (page of getPageNumbers(); track page) {
           @if (page === -1) {
             <span class="page-dots">…</span>
           } @else {
-            <button
-              class="page-btn"
-              [class.active]="page === currentPage"
-              (click)="goToPage(page)">
-              {{ page }}
-            </button>
+            <button class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
           }
         }
-
-        <button
-          class="page-btn page-btn--nav"
-          [disabled]="!pagination.hasNextPage"
-          (click)="nextPage()">
-          →
-        </button>
-
+        <button class="page-btn page-btn--nav" [disabled]="!pagination.hasNextPage" (click)="nextPage()">→</button>
       </div>
     </div>
   }
-
 
   <!-- MODAL DELETE -->
   @if (showDeleteModal && eventToDelete) {
     <div class="modal-backdrop" (click)="closeDeleteModal()">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <h3>Excluir evento</h3>
-        <p>
-          Deseja excluir <strong>{{ eventToDelete.title }}</strong
-          >? Essa ação não pode ser desfeita.
-        </p>
+        <p>Deseja excluir <strong>{{ eventToDelete.title }}</strong>? Essa ação não pode ser desfeita.</p>
         <div class="modal-actions">
-          <button
-            class="btn btn-secondary btn-sm"
-            (click)="closeDeleteModal()"
-            [disabled]="deleting"
-          >
-            Cancelar
-          </button>
+          <button class="btn btn-secondary btn-sm" (click)="closeDeleteModal()" [disabled]="deleting">Cancelar</button>
           <button class="btn btn-danger btn-sm" (click)="confirmDelete()" [disabled]="deleting">
             {{ deleting ? 'Excluindo...' : 'Excluir' }}
           </button>
@@ -378,8 +306,8 @@
     <app-event-history-modal
       [eventId]="historyEventId"
       [eventName]="historyEventName"
-      (close)="closeHistoryModal()"
-    >
+      (close)="closeHistoryModal()">
     </app-event-history-modal>
   }
+
 </section>

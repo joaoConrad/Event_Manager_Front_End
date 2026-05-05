@@ -1,18 +1,11 @@
 <section class="detail-page">
 
-  <!-- VOLTAR -->
-  <a routerLink="/events" class="back-link">
-    ← Voltar para eventos
-  </a>
+  <a routerLink="/events" class="back-link">← Voltar para eventos</a>
 
-  <!-- LOADING -->
   @if (loading) {
-    <div class="detail-skeleton">
-      <p>Carregando evento...</p>
-    </div>
+    <div class="detail-skeleton"><p>Carregando evento...</p></div>
   }
 
-  <!-- NOT FOUND -->
   @else if (notFound || !event) {
     <div class="detail-not-found">
       <span class="eyebrow">Ops</span>
@@ -22,12 +15,10 @@
     </div>
   }
 
-  <!-- CONTEÚDO -->
   @else {
-    <!-- FEEDBACK -->
+
     @if (feedbackMessage) {
-      <div
-        class="feedback-banner"
+      <div class="feedback-banner"
         [class.success]="feedbackType === 'success'"
         [class.error]="feedbackType === 'error'"
         [class.info]="feedbackType === 'info'">
@@ -44,7 +35,6 @@
         <div class="detail-hero">
           <div class="detail-hero-top">
             <span class="eyebrow">Evento</span>
-
             @if (isPastEvent()) {
               <span class="status-badge closed">Encerrado</span>
             } @else if (isJoined()) {
@@ -57,10 +47,10 @@
           </div>
 
           @if (event.imageUrl) {
-              <div class="detail-cover-wrap">
-                <img [src]="event.imageUrl" [alt]="event.title" class="detail-cover" />
-              </div>
-            }
+            <div class="detail-cover-wrap">
+              <img [src]="event.imageUrl" [alt]="event.title" class="detail-cover" />
+            </div>
+          }
 
           <h1>{{ event.title }}</h1>
         </div>
@@ -76,14 +66,20 @@
           <span class="section-label">Informações</span>
 
           <div class="detail-info-grid">
+
             <div class="info-item">
               <span class="info-label">📅 Data</span>
               <span class="info-value">{{ event.date }}</span>
             </div>
 
             <div class="info-item">
-              <span class="info-label">🕐 Horário</span>
-              <span class="info-value">{{ event.time }}</span>
+              <span class="info-label">🕐 Início</span>
+              <span class="info-value">{{ event.startTime }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">🕔 Término</span>
+              <span class="info-value">{{ event.endTime }}</span>
             </div>
 
             <div class="info-item">
@@ -99,17 +95,20 @@
             </div>
 
             @if (!isPastEvent()) {
-              <div class="info-item" [class.highlight-item]="!isSoldOut()" [class.danger-item]="isSoldOut()">
+              <div class="info-item"
+                [class.highlight-item]="!isSoldOut()"
+                [class.danger-item]="isSoldOut()">
                 <span class="info-label">🎟️ Vagas restantes</span>
                 <span class="info-value">
                   {{ isSoldOut() ? 'Sem vagas' : getAvailableSpots() + ' vagas' }}
                 </span>
               </div>
             }
+
           </div>
         </div>
 
-        <!-- LISTA DE PARTICIPANTES (somente admin) -->
+        <!-- PARTICIPANTES (admin) -->
         @if (authService.isAdmin()) {
           <div class="detail-section">
             <span class="section-label">
@@ -152,13 +151,14 @@
 
       </div>
 
-      <!-- SIDEBAR DE AÇÃO -->
+      <!-- SIDEBAR -->
       <aside class="detail-sidebar">
         <div class="sidebar-card">
+
           <div class="sidebar-date-block">
             <span class="sidebar-date-label">Data do evento</span>
             <strong class="sidebar-date">{{ event.date }}</strong>
-            <span class="sidebar-time">{{ event.time }}</span>
+            <span class="sidebar-time">{{ event.startTime }} – {{ event.endTime }}</span>
           </div>
 
           <div class="sidebar-divider"></div>
@@ -168,8 +168,7 @@
             @if (isPastEvent()) {
               <strong class="sidebar-spots-value muted-value">—</strong>
             } @else {
-              <strong
-                class="sidebar-spots-value"
+              <strong class="sidebar-spots-value"
                 [class.danger-value]="isSoldOut()"
                 [class.ok-value]="!isSoldOut()">
                 {{ isSoldOut() ? '0' : getAvailableSpots() }}
@@ -180,40 +179,39 @@
 
           <div class="sidebar-divider"></div>
 
-          <!-- AÇÕES DO ADMIN -->
+          <!-- ADMIN -->
           @if (authService.isAdmin()) {
-            <a
-              [routerLink]="['/events/edit', event.id]"
-              class="btn btn-secondary full">
+            <a [routerLink]="['/events/edit', event.id]" class="btn btn-secondary full">
               Editar evento
             </a>
-
-            <button
-              class="btn btn-danger full"
-              style="margin-top: 0.6rem"
-              (click)="openDeleteModal()">
+            <a [routerLink]="['/events', event.id, 'checkin']"
+              class="btn btn-secondary full"
+              style="margin-top: 0.6rem">
+              📷 Check-in
+            </a>
+            <button class="btn btn-danger full" style="margin-top: 0.6rem" (click)="openDeleteModal()">
               Excluir evento
             </button>
           }
 
-          <!-- AÇÕES DO USUÁRIO LOGADO -->
+          <!-- USUÁRIO LOGADO -->
           @else if (authService.isLoggedIn()) {
             @if (isPastEvent()) {
               <button class="btn btn-disabled full" disabled>Evento encerrado</button>
             } @else if (isJoined()) {
-              <button
-                class="btn btn-warning full"
-                [disabled]="actionLoading"
-                (click)="cancelSubscription()">
+              <button class="btn btn-warning full" [disabled]="actionLoading" (click)="cancelSubscription()">
                 {{ actionLoading ? 'Aguarde...' : 'Cancelar inscrição' }}
               </button>
+              <!-- link pro QR code quando inscrito -->
+              <a [routerLink]="['/events', event.id, 'checkin']"
+                class="btn btn-secondary full"
+                style="margin-top: 0.6rem">
+                🎟️ Ver meu QR code
+              </a>
             } @else if (isSoldOut()) {
               <button class="btn btn-disabled full" disabled>Evento esgotado</button>
             } @else {
-              <button
-                class="btn btn-success full"
-                [disabled]="actionLoading"
-                (click)="joinEvent()">
+              <button class="btn btn-success full" [disabled]="actionLoading" (click)="joinEvent()">
                 {{ actionLoading ? 'Aguarde...' : 'Participar' }}
               </button>
             }
@@ -226,11 +224,10 @@
             } @else if (isSoldOut()) {
               <button class="btn btn-disabled full" disabled>Evento esgotado</button>
             } @else {
-              <a routerLink="/login" class="btn btn-primary full">
-                Entrar para participar
-              </a>
+              <a routerLink="/login" class="btn btn-primary full">Entrar para participar</a>
             }
           }
+
         </div>
       </aside>
 
@@ -243,7 +240,6 @@
       <div class="modal-card" (click)="$event.stopPropagation()">
         <h3>Excluir evento</h3>
         <p>Deseja excluir <strong>{{ event.title }}</strong>? Essa ação não pode ser desfeita.</p>
-
         <div class="modal-actions">
           <button class="btn btn-secondary" (click)="closeDeleteModal()" [disabled]="deleting">Cancelar</button>
           <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">

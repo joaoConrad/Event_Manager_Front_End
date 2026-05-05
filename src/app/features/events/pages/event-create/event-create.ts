@@ -11,12 +11,12 @@ const LIMITS = {
   maxParticipants: { min: 1, max: 10_000 }
 } as const;
 
-// Campos que podem ter erro de validação
 type FieldError = {
   title?: string;
   description?: string;
   date?: string;
-  time?: string;
+  startTime?: string;
+  endTime?: string;
   location?: string;
   maxParticipants?: string;
   imageFile?: string;
@@ -33,7 +33,8 @@ export class EventCreate implements OnInit {
     title: '',
     description: '',
     date: '',
-    time: '',
+    startTime: '',
+    endTime: '',
     location: '',
     maxParticipants: 1
   };
@@ -41,17 +42,14 @@ export class EventCreate implements OnInit {
   isEditMode = false;
   eventId: number | null = null;
 
-  // Feedback geral
   errorMessage = '';
   successMessage = '';
   loading = false;
   loadingEvent = false;
 
-  // Validação por campo
   fieldErrors: FieldError = {};
   submitted = false;
 
-  // Imagem
   imagePreview: string | null = null;
   imageFile: File | null = null;
   readonly MAX_IMAGE_MB = 5;
@@ -68,7 +66,6 @@ export class EventCreate implements OnInit {
 
   ngOnInit(): void {
     this.minDate = new Date().toISOString().split('T')[0];
-
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.isEditMode = true;
@@ -77,7 +74,7 @@ export class EventCreate implements OnInit {
     }
   }
 
-  // ── Imagem ──────────────────────────────────────────
+  // ── Imagem ──────────────────────────────────────────────
 
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -88,28 +85,20 @@ export class EventCreate implements OnInit {
 
     if (!this.ALLOWED_TYPES.includes(file.type)) {
       this.fieldErrors = { ...this.fieldErrors, imageFile: 'Formato inválido. Use JPG, PNG ou WebP.' };
-      this.imageFile = null;
-      this.imagePreview = null;
-      this.cdr.detectChanges();
-      return;
+      this.imageFile = null; this.imagePreview = null;
+      this.cdr.detectChanges(); return;
     }
 
     const maxBytes = this.MAX_IMAGE_MB * 1024 * 1024;
     if (file.size > maxBytes) {
       this.fieldErrors = { ...this.fieldErrors, imageFile: `A imagem deve ter no máximo ${this.MAX_IMAGE_MB}MB.` };
-      this.imageFile = null;
-      this.imagePreview = null;
-      this.cdr.detectChanges();
-      return;
+      this.imageFile = null; this.imagePreview = null;
+      this.cdr.detectChanges(); return;
     }
 
     this.imageFile = file;
-
     const reader = new FileReader();
-    reader.onload = (e) => {
-      this.imagePreview = e.target?.result as string;
-      this.cdr.detectChanges();
-    };
+    reader.onload = (e) => { this.imagePreview = e.target?.result as string; this.cdr.detectChanges(); };
     reader.readAsDataURL(file);
   }
 
@@ -120,9 +109,9 @@ export class EventCreate implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // ── Validação ──────────────────────────────────────
+  // ── Validação ────────────────────────────────────────────
 
-  private isPastDateTime(date: string, time: string): boolean {
+  private isPast(date: string, time: string): boolean {
     if (!date || !time) return false;
     return new Date(`${date}T${time}`).getTime() < Date.now();
   }
@@ -131,48 +120,33 @@ export class EventCreate implements OnInit {
     const errors: FieldError = {};
     const e = this.event;
 
-    if (!e.title?.trim()) {
-      errors.title = 'O título é obrigatório.';
-    } else if (e.title.length > LIMITS.title) {
-      errors.title = `Máximo de ${LIMITS.title} caracteres.`;
-    }
+    if (!e.title?.trim())                          errors.title = 'O título é obrigatório.';
+    else if (e.title.length > LIMITS.title)        errors.title = `Máximo de ${LIMITS.title} caracteres.`;
 
-    if (!e.description?.trim()) {
-      errors.description = 'A descrição é obrigatória.';
-    } else if (e.description.length > LIMITS.description) {
-      errors.description = `Máximo de ${LIMITS.description} caracteres.`;
-    }
+    if (!e.description?.trim())                    errors.description = 'A descrição é obrigatória.';
+    else if (e.description.length > LIMITS.description) errors.description = `Máximo de ${LIMITS.description} caracteres.`;
 
-    if (!e.date) {
-      errors.date = 'A data é obrigatória.';
-    }
+    if (!e.date)                                   errors.date = 'A data é obrigatória.';
 
-    if (!e.time) {
-      errors.time = 'O horário é obrigatório.';
-    }
+    if (!e.startTime)                              errors.startTime = 'O horário de início é obrigatório.';
+    else if (e.date && this.isPast(e.date, e.startTime)) errors.startTime = 'O horário de início não pode ser no passado.';
 
-    if (e.date && e.time && this.isPastDateTime(e.date, e.time)) {
-      errors.time = 'A data e hora não podem ser no passado.';
-    }
+    if (!e.endTime)                                errors.endTime = 'O horário de término é obrigatório.';
+    else if (e.startTime && e.endTime && e.endTime <= e.startTime) errors.endTime = 'O término deve ser depois do início.';
 
-    if (!e.location?.trim()) {
-      errors.location = 'O local é obrigatório.';
-    } else if (e.location.length > LIMITS.location) {
-      errors.location = `Máximo de ${LIMITS.location} caracteres.`;
-    }
+    if (!e.location?.trim())                       errors.location = 'O local é obrigatório.';
+    else if (e.location.length > LIMITS.location)  errors.location = `Máximo de ${LIMITS.location} caracteres.`;
 
     const vagas = Number(e.maxParticipants);
-    if (!e.maxParticipants || isNaN(vagas)) {
-      errors.maxParticipants = 'Informe o número de vagas.';
-    } else if (vagas < LIMITS.maxParticipants.min || vagas > LIMITS.maxParticipants.max) {
+    if (!e.maxParticipants || isNaN(vagas))        errors.maxParticipants = 'Informe o número de vagas.';
+    else if (vagas < LIMITS.maxParticipants.min || vagas > LIMITS.maxParticipants.max)
       errors.maxParticipants = `Entre ${LIMITS.maxParticipants.min} e ${LIMITS.maxParticipants.max.toLocaleString('pt-BR')} vagas.`;
-    }
 
     this.fieldErrors = errors;
     return Object.keys(errors).length === 0;
   }
 
-  // ── Submit ──────────────────────────────────────────
+  // ── Carrega evento pra edição ─────────────────────────────
 
   loadEvent(id: number): void {
     this.loadingEvent = true;
@@ -181,13 +155,11 @@ export class EventCreate implements OnInit {
         const ev = response?.data ?? response;
         this.event = {
           ...ev,
-          date: ev.date?.split('T')[0] ?? ev.date,
-          time: ev.time?.slice(0, 5) ?? ev.time
+          date:      ev.date?.split('T')[0] ?? ev.date,
+          startTime: ev.startTime?.slice(0, 5) ?? ev.startTime ?? '',
+          endTime:   ev.endTime?.slice(0, 5)   ?? ev.endTime   ?? '',
         };
-        // Se o evento já tiver imagem salva no back, mostra preview da URL
-        if (ev.imageUrl) {
-          this.imagePreview = ev.imageUrl;
-        }
+        if (ev.imageUrl) this.imagePreview = ev.imageUrl;
         this.loadingEvent = false;
         this.cdr.detectChanges();
       },
@@ -199,24 +171,21 @@ export class EventCreate implements OnInit {
     });
   }
 
+  // ── Submit ────────────────────────────────────────────────
+
   submit(): void {
     this.submitted = true;
     this.errorMessage = '';
     this.successMessage = '';
 
     if (!this.validate()) {
-      // Faz scroll pro primeiro erro visível
       setTimeout(() => {
-        const el = document.querySelector('.field-error-msg');
-        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.querySelector('.field-error-msg')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 50);
       return;
     }
 
     this.loading = true;
-
-    // NOTA: quando o back aceitar upload de imagem, inclua o imageFile aqui via FormData
-    // Exemplo: const fd = new FormData(); fd.append('image', this.imageFile); ...
 
     const request = this.isEditMode
       ? this.eventService.update(this.eventId!, this.event)
@@ -225,15 +194,13 @@ export class EventCreate implements OnInit {
     request.subscribe({
       next: () => {
         this.loading = false;
-        this.successMessage = this.isEditMode
-          ? 'Evento atualizado com sucesso.'
-          : 'Evento criado com sucesso.';
+        this.successMessage = this.isEditMode ? 'Evento atualizado com sucesso.' : 'Evento criado com sucesso.';
         this.eventService.clearCache();
         setTimeout(() => this.router.navigate(['/events']), 800);
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err?.error?.message || 'Erro ao salvar.';
+        this.errorMessage = err?.error?.error?.message || err?.error?.message || 'Erro ao salvar.';
         this.cdr.detectChanges();
       }
     });

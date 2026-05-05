@@ -6,56 +6,35 @@
     <div class="qr-card">
       <div class="qr-skeleton"></div>
     </div>
-  } @else if (authService.isAdmin()) {
+  }
 
-    <!-- ── VISÃO DO ADMIN: FAZER CHECK-IN ── -->
+  @else if (authService.isAdmin()) {
+    <!-- VISÃO DO ADMIN: FAZER CHECK-IN -->
     <div class="qr-card">
       <div class="qr-header">
         <span class="eyebrow">Check-in</span>
         <h1>Confirmar presença</h1>
-        <p>Leia o QR code do participante ou insira o código manualmente.</p>
+        <p>Insira o token do participante para confirmar a presença no evento.</p>
       </div>
 
       @if (checkinState === 'idle' || checkinState === 'scanning') {
 
-        <div class="scanner-area" [class.active]="scannerActive">
-          @if (scannerActive) {
-            <div class="scanner-frame">
-              <div class="scanner-line"></div>
-              <span class="scanner-label">Aponte para o QR code</span>
-            </div>
-            <button class="btn btn-ghost btn-sm" (click)="stopScanner()">Cancelar leitura</button>
-          } @else {
-            <div class="scanner-placeholder">
-              <span class="scanner-icon">📷</span>
-              <p>Câmera desativada</p>
-              <button class="btn btn-secondary btn-sm" (click)="startScanner()" disabled>
-                Usar câmera (em breve)
-              </button>
-            </div>
-          }
-        </div>
-
-        <div class="or-divider"><span>ou insira o código</span></div>
+        <div class="or-divider"><span>código do participante</span></div>
 
         <div class="manual-input">
           <input
             type="text"
             class="code-input"
-            placeholder="Cole o código UUID aqui..."
+            placeholder="Cole o token aqui..."
             [(ngModel)]="manualCode"
           />
           <button
             class="btn btn-primary"
             (click)="submitManualCode()"
-            [disabled]="!manualCode.trim()"
-          >
+            [disabled]="!manualCode.trim()">
             Confirmar presença
           </button>
         </div>
-
-        <p class="todo-note">
-          💡 <strong>Pendente...</strong></p>
 
       } @else if (checkinState === 'success') {
         <div class="checkin-result success">
@@ -66,7 +45,6 @@
         </div>
 
       } @else if (checkinState === 'already') {
-
         <div class="checkin-result warning">
           <span class="result-icon">⚠️</span>
           <h2>Já realizado</h2>
@@ -75,21 +53,20 @@
         </div>
 
       } @else if (checkinState === 'error') {
-
         <div class="checkin-result error">
           <span class="result-icon">❌</span>
           <h2>Código inválido</h2>
-          <p>{{ checkinResult ?? 'Não foi possível confirmar a presença.' }}</p>
+          <p>{{ checkinResult ?? 'Token não encontrado ou não pertence a este evento.' }}</p>
           <button class="btn btn-secondary btn-sm" (click)="resetCheckin()">Tentar novamente</button>
         </div>
-
       }
 
     </div>
+  }
 
-  } @else if (authService.isLoggedIn()) {
+  @else if (authService.isLoggedIn()) {
 
-    <!-- ── VISÃO DO USUÁRIO: SEU QR CODE ── -->
+    <!-- VISÃO DO USUÁRIO: SEU QR CODE -->
     <div class="qr-card">
       <div class="qr-header">
         <span class="eyebrow">Minha inscrição</span>
@@ -97,30 +74,51 @@
         <p>Apresente este código na entrada do evento para confirmar sua presença.</p>
       </div>
 
-      <div class="qr-display">
-        @if (qrDataUrl) {
-          <img [src]="qrDataUrl" alt="QR Code de acesso" class="qr-image" />
-        } @else {
-          <div class="qr-placeholder">
-            <div class="qr-mock">
-              <div class="qr-mock-inner">QR</div>
+      @if (checkinState === 'not-registered') {
+        <div class="checkin-result error">
+          <span class="result-icon">🎟️</span>
+          <h2>Você não está inscrito</h2>
+          <p>Inscreva-se no evento para obter seu QR code.</p>
+          <a [routerLink]="['/events', eventId]" class="btn btn-primary btn-sm">Ver evento</a>
+        </div>
+      } @else {
+
+        <div class="qr-display">
+          @if (qrDataUrl) {
+            <img [src]="qrDataUrl" alt="QR Code de acesso" class="qr-image" />
+          } @else {
+            <div class="qr-placeholder">
+              <div class="qr-mock">
+                <div class="qr-mock-inner">QR</div>
+              </div>
+              @if (subscriptionToken) {
+                <p class="qr-pending">
+                  Instale a lib para gerar o QR:<br/>
+                  <small>npm install qrcode @types/qrcode</small>
+                </p>
+              } @else {
+                <p class="qr-pending">Carregando seu código...</p>
+              }
             </div>
-            <p class="qr-pending">
-              Pendente...</p>
-          </div>
-        }
+          }
 
-        @if (isCheckedIn) {
-          <div class="checked-in-badge">✅ Check-in confirmado</div>
-        }
-      </div>
+          @if (isCheckedIn) {
+            <div class="checked-in-badge">✅ Check-in confirmado</div>
+          }
 
-      <p class="todo-note"><strong>Pendente...</strong></p>
+          @if (subscriptionToken) {
+            <div class="token-display">
+              <span class="token-label">Seu token de acesso</span>
+              <code class="token-code">{{ subscriptionToken }}</code>
+            </div>
+          }
+        </div>
+
+      }
     </div>
+  }
 
-  } @else {
-
-    <!-- NÃO LOGADO -->
+  @else {
     <div class="qr-card">
       <div class="qr-header">
         <span class="eyebrow">Acesso restrito</span>
@@ -129,7 +127,6 @@
       </div>
       <a routerLink="/login" class="btn btn-primary">Entrar</a>
     </div>
-
   }
 
 </section>

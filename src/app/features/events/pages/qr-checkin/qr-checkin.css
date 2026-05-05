@@ -298,3 +298,35 @@
 
 .btn-ghost { background: transparent; color: #6b7280; border: 1px solid #e5e7eb; }
 .btn-ghost:hover { background: #f3f4f6; }
+
+/* Cole no final do qr-checkin.css existente */
+
+.token-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.token-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #9ca3af;
+}
+
+.token-code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: #374151;
+  background: #f1f5f9;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.6rem 0.85rem;
+  word-break: break-all;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}

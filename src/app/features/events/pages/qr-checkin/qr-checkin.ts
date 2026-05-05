@@ -2,18 +2,15 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
-import { ParticipantService } from '../../../../core/services/participant';
+import { ParticipantService, MySubscription } from '../../../../core/services/participant';
 
-// Quando o back implementar GET /api/events/:id/participants/me
-// importar aqui e usar participantService.getMySubscription(eventId)
-
-type CheckinState = 'idle' | 'scanning' | 'success' | 'error' | 'already';
+type CheckinState = 'idle' | 'scanning' | 'success' | 'error' | 'already' | 'not-registered';
 
 @Component({
   selector: 'app-qr-checkin',
   standalone: true,
   imports: [RouterLink, FormsModule],
-  templateUrl:'./qr-checkin.html',
+  templateUrl: './qr-checkin.html',
   styleUrl: './qr-checkin.css'
 })
 export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
@@ -21,18 +18,17 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
   eventId: number | null = null;
   loading = true;
 
-  // ── Estado do usuário comum ──────────────────────────
-  // Quando back implementar, substituir por dado real do endpoint
-  registrationCode: string | null = null; // TODO: GET /api/events/:id/participants/me → registrationCode
-  isCheckedIn = false;                    // TODO: idem → isCheckedIn
-  qrDataUrl: string | null = null;        // gerado localmente pela lib qrcode
+  // ── Usuário comum ──────────────────────────────────────
+  subscription: MySubscription | null = null;
+  qrDataUrl: string | null = null;
 
-  // ── Estado do admin ──────────────────────────────────
+  get isCheckedIn(): boolean { return this.subscription?.isCheckedIn === true; }
+  get subscriptionToken(): string | null { return this.subscription?.subscriptionToken ?? null; }
+
+  // ── Admin ──────────────────────────────────────────────
   checkinState: CheckinState = 'idle';
   checkinResult: string | null = null;
   scannerActive = false;
-
-  // Simulação de código lido (substituir por leitura real de câmera)
   manualCode = '';
 
   constructor(
@@ -47,54 +43,69 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
     if (idParam && !isNaN(Number(idParam))) {
       this.eventId = Number(idParam);
     }
-    this.loadSubscription();
+
+    // admin não precisa carregar sua própria inscrição
+    if (!this.authService.isAdmin() && this.authService.isLoggedIn()) {
+      this.loadSubscription();
+    } else {
+      this.loading = false;
+    }
   }
 
-  ngAfterViewInit(): void {
-    // Quando back implementar e registrationCode estiver disponível,
-    // gerar o QR code aqui usando: npm install qrcode
-    // import QRCode from 'qrcode';
-    // QRCode.toDataURL(this.registrationCode).then(url => { this.qrDataUrl = url; });
-  }
+  ngAfterViewInit(): void {}
+  ngOnDestroy(): void { this.stopScanner(); }
 
-  ngOnDestroy(): void {
-    this.stopScanner();
-  }
+  // ── Carrega inscrição do usuário ───────────────────────
 
   loadSubscription(): void {
+    if (!this.eventId) { this.loading = false; return; }
+
     this.loading = true;
-
-    // TODO: quando back implementar GET /api/events/:id/participants/me
-    // this.participantService.getMySubscription(this.eventId!).subscribe({
-    //   next: (sub) => {
-    //     this.registrationCode = sub.registrationCode;
-    //     this.isCheckedIn = sub.isCheckedIn;
-    //     this.loading = false;
-    //     this.generateQr();
-    //   }
-    // });
-
-    // Por ora: simula carregamento e mostra placeholder
-    setTimeout(() => {
-      this.loading = false;
-      this.cdr.detectChanges();
-    }, 600);
+    this.participantService.getMySubscription(this.eventId).subscribe({
+      next: (res) => {
+        this.subscription = res.data;
+        this.loading = false;
+        this.generateQr();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.loading = false;
+        // 404 = usuário não está inscrito neste evento
+        if (err.status === 404) {
+          this.checkinState = 'not-registered';
+        }
+        this.cdr.detectChanges();
+      }
+    });
   }
+
+  // ── Gera QR code ───────────────────────────────────────
 
   generateQr(): void {
-    // Instalar: npm install qrcode @types/qrcode
-    // import QRCode from 'qrcode';
-    // QRCode.toDataURL(this.registrationCode!, { width: 280, margin: 2 })
-    //   .then(url => { this.qrDataUrl = url; this.cdr.detectChanges(); });
+    if (!this.subscriptionToken) return;
+
+    ///@types/qrcode
+    import('qrcode').then((QRCode) => {
+      QRCode.toDataURL(this.subscriptionToken!, {
+        width: 280,
+        margin: 2,
+        color: { dark: '#0F2557', light: '#FFFFFF' }
+      }).then(url => {
+        this.qrDataUrl = url;
+        this.cdr.detectChanges();
+      });
+    }).catch(() => {
+      // lib não instalada — mostra placeholder
+      this.qrDataUrl = null;
+      this.cdr.detectChanges();
+    });
   }
 
-  // ── Admin: check-in ───────────────────────────────────
+  // ── Admin: check-in via token ──────────────────────────
 
   startScanner(): void {
     this.scannerActive = true;
     this.checkinState = 'scanning';
-    // TODO: integrar com BarcodeDetector API ou biblioteca como zxing-js/browser
-    // https://developer.mozilla.org/en-US/docs/Web/API/BarcodeDetector
     this.cdr.detectChanges();
   }
 
@@ -109,27 +120,30 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
     this.performCheckin(this.manualCode.trim());
   }
 
-  private performCheckin(code: string): void {
+  private performCheckin(token: string): void {
+    if (!this.eventId) return;
+
     this.checkinState = 'idle';
-
-    // TODO: qnd o back implementar POST /api/events/:id/checkin
-    // this.http.post(`/api/events/${this.eventId}/checkin`, { registrationCode: code }, {
-    //   headers: this.authService.getAuthHeaders()
-    // }).subscribe({
-    //   next: (res: any) => {
-    //     this.checkinState = 'success';
-    //     this.checkinResult = res.participant?.name ?? 'Participante';
-    //   },
-    //   error: (err) => {
-    //     this.checkinState = err.status === 409 ? 'already' : 'error';
-    //     this.checkinResult = err.error?.message ?? null;
-    //   }
-    // });
-
-    // Placeholder visual enquanto back não implementa
-    this.checkinState = 'error';
-    this.checkinResult = 'Endpoint POST /api/events/:id/checkin ainda não implementado.';
     this.cdr.detectChanges();
+
+    // O back tem GET /:id/validate/:token
+    this.participantService.validateCheckin(this.eventId, token).subscribe({
+      next: (res) => {
+        this.checkinState = 'success';
+        this.checkinResult = res.data?.name ?? 'Participante';
+        this.manualCode = '';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        if (err.status === 409) {
+          this.checkinState = 'already';
+        } else {
+          this.checkinState = 'error';
+        }
+        this.checkinResult = err.error?.error?.message ?? err.error?.message ?? null;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   resetCheckin(): void {

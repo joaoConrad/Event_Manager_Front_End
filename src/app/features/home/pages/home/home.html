@@ -3,9 +3,7 @@
     <div class="hero-content">
       <span class="eyebrow">Event Manager</span>
 
-      <h1>
-        Descubra eventos incríveis com uma experiência mais elegante.
-      </h1>
+      <h1>Descubra eventos incríveis com uma experiência mais elegante.</h1>
 
       <p>
         Explore eventos em destaque, acompanhe vagas disponíveis e participe de forma simples, rápida e organizada.
@@ -13,7 +11,6 @@
 
       <div class="hero-actions">
         <a routerLink="/events" class="btn btn-primary">Explorar eventos</a>
-
         @if (!authService.isLoggedIn()) {
           <a routerLink="/register" class="btn btn-secondary">Criar conta</a>
         }
@@ -57,15 +54,14 @@
 
               <!-- IMAGEM OU PLACEHOLDER -->
               <div class="slide-image-wrap">
-                @if (event['imageUrl']) {
-                  <img [src]="event['imageUrl']" [alt]="event.title" class="slide-image" />
+                @if (event.imageUrl) {
+                  <img [src]="event.imageUrl" [alt]="event.title" class="slide-image" />
                 } @else {
                   <div class="slide-image-placeholder">
                     <span class="placeholder-emoji">📅</span>
                   </div>
                 }
 
-                <!-- CHIP STATUS -->
                 @if ((event.registeredParticipants ?? 0) >= event.maxParticipants) {
                   <span class="slide-chip sold-out">Esgotado</span>
                 } @else {
@@ -77,7 +73,7 @@
               <div class="slide-body">
                 <div class="slide-meta-top">
                   <span class="slide-date">📅 {{ event.date }}</span>
-                  <span class="slide-time">🕐 {{ event.time }}</span>
+                  <span class="slide-time">🕐 {{ event.startTime }} – {{ event.endTime }}</span>
                 </div>
 
                 <h3 class="slide-title">{{ event.title }}</h3>

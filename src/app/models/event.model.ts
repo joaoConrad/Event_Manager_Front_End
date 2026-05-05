@@ -1,25 +1,23 @@
 export interface EventModel {
   id?: number;
-
-  // 🔥 backend usa "name", mas mantemos "title" compatível
   title: string;
-
   description: string;
   date: string;
-  time: string;
+  startTime: string;   // substitui 'time' — hora de início
+  endTime: string;     // novo — hora de término
   location: string;
   maxParticipants: number;
-
   imageUrl?: string;
 
-  // 🔥 VEM DO BACK (ESSENCIAL PRO DASHBOARD)
+  // calculados pelo back
   registeredParticipants?: number;
-
-  // opcionais (mantém)
   availableSpots?: number | null;
   isSoldOut?: boolean;
   isUserRegistered?: boolean;
 
-  // 🔥 ADICIONA ISSO PRA MAPEAR DO BACK
-  name?: string;
+  // soft delete
+  deletedAt?: string | null;
+
+  // legacy — mantido pra não quebrar código que ainda usa .time
+  time?: string;
 }
