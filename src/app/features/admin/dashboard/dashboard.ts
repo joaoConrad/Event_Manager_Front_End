@@ -67,6 +67,9 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     // 🔥 USANDO SERVICE TIPADO (SEM ANY)
     this.eventService.getEvents().subscribe({
       next: (res) => {
+
+        console.log('RESPOSTA API:', res); // 👈 COLOCA AQUI
+
         const now = Date.now();
 
         this.events = res.data.map((e: EventModel) => {
