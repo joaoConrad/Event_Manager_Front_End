@@ -10,15 +10,18 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
 
+    // 🔥 HTTP CLIENT (ESSENCIAL PRO BACKEND)
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),
 
+    // 🔥 ROTAS
     provideRouter(
       routes,
       withRouterConfig({ onSameUrlNavigation: 'reload' })
     ),
 
+    // 🔥 FORMS
     importProvidersFrom(FormsModule)
   ],
 };

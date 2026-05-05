@@ -362,3 +362,21 @@
   .dash-header { flex-direction: column; align-items: flex-start; }
   .chart-wrap { height: 220px; }
 }
+.cards {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #1e1e2f;
+  color: white;
+  padding: 16px;
+  border-radius: 10px;
+  width: 200px;
+}
+
+.total {
+  font-size: 20px;
+  margin-bottom: 20px;
+}

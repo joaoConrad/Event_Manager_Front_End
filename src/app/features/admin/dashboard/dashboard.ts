@@ -1,16 +1,17 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { EventService } from '../../../core/services/event';
+
 import { Chart, registerables } from 'chart.js';
+import { EventModel } from '../../../models/event.model';
+import { EventoService } from '../../../services/evento.service';
 
 Chart.register(...registerables);
 
-// Quando o back mandar esses dados, substituir os placeholders
 interface DashboardStats {
   totalEvents: number;
   totalParticipants: number;
-  averageOccupancy: number;   // % média de ocupação
+  averageOccupancy: number;
   upcomingEvents: number;
 }
 
@@ -37,7 +38,6 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   events: EventWithCount[] = [];
   loading = true;
 
-  // Stats calculadas localmente até o back mandar endpoint dedicado
   stats: DashboardStats = {
     totalEvents: 0,
     totalParticipants: 0,
@@ -47,18 +47,15 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
   private chart: Chart | null = null;
 
-  // Colunas da tabela de eventos recentes
   readonly tableColumns = ['Evento', 'Data', 'Inscritos', 'Capacidade', 'Ocupação', 'Status'];
 
-  constructor(private readonly eventService: EventService) {}
+  constructor(private readonly eventService: EventoService) {}
 
   ngOnInit(): void {
     this.loadData();
   }
 
-  ngAfterViewInit(): void {
-    // Chart criado depois que os dados chegarem
-  }
+  ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
     this.chart?.destroy();
@@ -67,19 +64,22 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   loadData(): void {
     this.loading = true;
 
-    this.eventService.getEventsWithCount().subscribe({
-      next: (data) => {
+    // 🔥 USANDO SERVICE TIPADO (SEM ANY)
+    this.eventService.getEvents().subscribe({
+      next: (res) => {
         const now = Date.now();
 
-        this.events = data.map((e: any) => {
+        this.events = res.data.map((e: EventModel) => {
           const isPast = new Date(`${e.date}T${e.time ?? '00:00'}`).getTime() < now;
-          const total = e.totalParticipants ?? 0;
+
+          const total = e.registeredParticipants ?? 0;
           const max = e.maxParticipants ?? 1;
+
           const occupancy = Math.round((total / max) * 100);
 
           return {
             id: e.id,
-            title: e.title,
+            title: e.name || e.title,
             date: e.date,
             maxParticipants: max,
             totalParticipants: total,
@@ -91,16 +91,17 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
         this.computeStats();
         this.loading = false;
+
         setTimeout(() => this.buildChart(), 0);
       },
-      error: () => {
+      error: (err) => {
+        console.error('Erro ao carregar eventos:', err);
         this.loading = false;
       }
     });
   }
 
   private computeStats(): void {
-    const now = Date.now();
     const upcoming = this.events.filter(e => !e.isPast);
 
     this.stats = {
@@ -142,7 +143,11 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     this.chart?.destroy();
 
     const upcoming = this.events.filter(e => !e.isPast).slice(0, 10);
-    const labels = upcoming.map(e => e.title.length > 20 ? e.title.slice(0, 18) + '…' : e.title);
+
+    const labels = upcoming.map(e =>
+      e.title.length > 20 ? e.title.slice(0, 18) + '…' : e.title
+    );
+
     const inscribed = upcoming.map(e => e.totalParticipants);
     const available = upcoming.map(e => Math.max(e.maxParticipants - e.totalParticipants, 0));
 
@@ -155,15 +160,13 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             label: 'Inscritos',
             data: inscribed,
             backgroundColor: '#2563eb',
-            borderRadius: 6,
-            borderSkipped: false
+            borderRadius: 6
           },
           {
             label: 'Vagas restantes',
             data: available,
             backgroundColor: '#e0e7ff',
-            borderRadius: 6,
-            borderSkipped: false
+            borderRadius: 6
           }
         ]
       },
@@ -171,20 +174,11 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { position: 'top' },
-          tooltip: {
-            callbacks: {
-              footer: (items) => {
-                const idx = items[0].dataIndex;
-                const ev = upcoming[idx];
-                return `Ocupação: ${ev.occupancyPercent}%`;
-              }
-            }
-          }
+          legend: { position: 'top' }
         },
         scales: {
-          x: { stacked: true, grid: { display: false } },
-          y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' } }
+          x: { stacked: true },
+          y: { stacked: true, beginAtZero: true }
         }
       }
     });
