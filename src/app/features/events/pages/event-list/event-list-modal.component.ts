@@ -62,32 +62,36 @@ import { EventHistoryService } from '../../../../core/services/event.history';
       .modal-backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(15, 23, 42, 0.66);
+        backdrop-filter: blur(2px);
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 1000;
+        z-index: 1100;
+        padding: 1rem;
       }
 
       .modal-history {
-        background: #fff;
+        background: #ffffff;
+        border: 1px solid #dbe4f0;
         border-radius: 16px;
-        padding: 2rem;
-        width: 90%;
-        max-width: 700px;
-        max-height: 80vh;
+        width: min(980px, 100%);
+        max-height: 88vh;
         display: flex;
         flex-direction: column;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        box-shadow:
+          0 20px 40px rgba(2, 6, 23, 0.28),
+          0 2px 10px rgba(2, 6, 23, 0.12);
       }
 
       .modal-history-header {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #eee;
+        padding: 1.25rem 1.5rem 1rem;
+        border-bottom: 1px solid #e7edf5;
+        background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
       }
 
       .modal-history-header h3 {
@@ -97,19 +101,19 @@ import { EventHistoryService } from '../../../../core/services/event.history';
       }
 
       .modal-history-subtitle {
-        font-size: 0.85rem;
-        color: #888;
+        font-size: 0.9rem;
+        color: #516174;
       }
 
       .modal-history-body {
         overflow-y: auto;
         flex: 1;
-        margin-bottom: 1.5rem;
+        padding: 0.5rem 1rem 1rem;
       }
 
       .history-empty {
         text-align: center;
-        color: #888;
+        color: #617487;
         padding: 2rem 0;
       }
 
@@ -119,38 +123,64 @@ import { EventHistoryService } from '../../../../core/services/event.history';
 
       .history-table {
         width: 100%;
-        border-collapse: collapse;
-        font-size: 0.9rem;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+        font-size: 0.92rem;
       }
 
       .history-table th {
         text-align: left;
-        padding: 0.6rem 1rem;
-        background: #f8f9fa;
-        font-weight: 600;
-        color: #555;
-        border-bottom: 2px solid #e9ecef;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: 0.75rem 0.9rem;
+        background: #f1f6fd;
+        font-weight: 700;
+        color: #2c3e50;
+        border-bottom: 1px solid #dce7f3;
+      }
+
+      .history-table th:nth-child(1) {
+        width: 120px;
+      }
+
+      .history-table th:nth-child(2) {
+        width: 220px;
+      }
+
+      .history-table th:nth-child(3) {
+        width: 170px;
       }
 
       .history-table td {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid #f0f0f0;
-        color: #333;
-        vertical-align: middle;
+        padding: 0.8rem 0.9rem;
+        border-bottom: 1px solid #edf2f7;
+        color: #243241;
+        vertical-align: top;
+        word-break: break-word;
       }
 
       .history-table tr:last-child td {
         border-bottom: none;
       }
 
+      .history-table tbody tr:nth-child(even) td {
+        background: #fbfdff;
+      }
+
       .history-table tr:hover td {
-        background: #fafafa;
+        background: #f3f8ff;
       }
 
       .history-badge {
-        padding: 0.25rem 0.7rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 84px;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
         font-weight: 700;
         letter-spacing: 0.03em;
         text-transform: uppercase;
@@ -172,8 +202,49 @@ import { EventHistoryService } from '../../../../core/services/event.history';
       .modal-actions {
         display: flex;
         justify-content: flex-end;
-        padding-top: 1rem;
-        border-top: 1px solid #eee;
+        padding: 0.9rem 1.25rem 1rem;
+        border-top: 1px solid #e7edf5;
+        background: #fcfdff;
+      }
+
+      @media (max-width: 768px) {
+        .modal-history {
+          max-height: 92vh;
+        }
+
+        .modal-history-header {
+          padding: 1rem 1rem 0.85rem;
+        }
+
+        .modal-history-body {
+          padding: 0.4rem 0.75rem 0.85rem;
+        }
+
+        .history-table {
+          font-size: 0.84rem;
+        }
+
+        .history-table th,
+        .history-table td {
+          padding: 0.65rem 0.55rem;
+        }
+
+        .history-table th:nth-child(1) {
+          width: 94px;
+        }
+
+        .history-table th:nth-child(2) {
+          width: 160px;
+        }
+
+        .history-table th:nth-child(3) {
+          width: 130px;
+        }
+
+        .history-badge {
+          min-width: 74px;
+          padding: 0.25rem 0.55rem;
+        }
       }
     `,
   ],
