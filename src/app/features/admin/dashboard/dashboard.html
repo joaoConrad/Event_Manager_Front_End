@@ -4,13 +4,19 @@
   <div class="dash-header">
 
     <div>
-      <span class="eyebrow">Administração</span>
 
-      <h1>Dashboard</h1>
+      <span class="eyebrow">
+        Administração
+      </span>
+
+      <h1>
+        Dashboard
+      </h1>
 
       <p>
         Visão geral dos eventos e inscrições.
       </p>
+
     </div>
 
     <a
@@ -23,336 +29,319 @@
 
   </div>
 
-  <!-- LOADING -->
-  @if (loading) {
+  <!-- =============================== -->
+  <!-- MÉTRICAS -->
+  <!-- =============================== -->
 
-    <div class="dash-loading">
+  <div class="metrics-grid">
 
-      <div class="skeleton-grid">
+    <!-- EVENTOS -->
+    <div class="metric-card">
 
-        @for (i of [1,2,3,4]; track i) {
-          <div class="skeleton-card"></div>
-        }
+      <div class="metric-icon blue">
+        📅
+      </div>
+
+      <div class="metric-body">
+
+        <span class="metric-label">
+          Total de eventos
+        </span>
+
+        <strong class="metric-value">
+          {{ stats.totalEvents }}
+        </strong>
 
       </div>
 
     </div>
 
-  } @else {
+    <!-- INSCRITOS -->
+    <div class="metric-card">
 
-    <!-- =============================== -->
-    <!-- MÉTRICAS -->
-    <!-- =============================== -->
-
-    <div class="metrics-grid">
-
-      <!-- EVENTOS -->
-      <div class="metric-card">
-
-        <div class="metric-icon blue">
-          📅
-        </div>
-
-        <div class="metric-body">
-
-          <span class="metric-label">
-            Total de eventos
-          </span>
-
-          <strong class="metric-value">
-            {{ stats.totalEvents }}
-          </strong>
-
-        </div>
-
+      <div class="metric-icon green">
+        👥
       </div>
 
-      <!-- INSCRITOS -->
-      <div class="metric-card">
+      <div class="metric-body">
 
-        <div class="metric-icon green">
-          👥
-        </div>
+        <span class="metric-label">
+          Total de inscritos
+        </span>
 
-        <div class="metric-body">
-
-          <span class="metric-label">
-            Total de inscritos
-          </span>
-
-          <strong class="metric-value">
-            {{ stats.totalParticipants }}
-          </strong>
-
-        </div>
-
-      </div>
-
-      <!-- OCUPAÇÃO -->
-      <div class="metric-card">
-
-        <div class="metric-icon yellow">
-          📊
-        </div>
-
-        <div class="metric-body">
-
-          <span class="metric-label">
-            Ocupação média
-          </span>
-
-          <strong class="metric-value">
-            {{ stats.averageOccupancy }}%
-          </strong>
-
-        </div>
-
-      </div>
-
-      <!-- PRÓXIMOS -->
-      <div class="metric-card">
-
-        <div class="metric-icon purple">
-          🚀
-        </div>
-
-        <div class="metric-body">
-
-          <span class="metric-label">
-            Próximos eventos
-          </span>
-
-          <strong class="metric-value">
-            {{ stats.upcomingEvents }}
-          </strong>
-
-        </div>
+        <strong class="metric-value">
+          {{ stats.totalParticipants }}
+        </strong>
 
       </div>
 
     </div>
 
-    <!-- =============================== -->
-    <!-- GRÁFICOS -->
-    <!-- =============================== -->
+    <!-- OCUPAÇÃO -->
+    <div class="metric-card">
 
-    <div class="charts-grid">
-
-      <!-- GRÁFICO BARRAS -->
-      <div class="dash-section">
-
-        <div class="section-header">
-
-          <span class="section-title">
-            Inscritos por evento
-          </span>
-
-          <span class="section-sub">
-            Quantidade de participantes
-          </span>
-
-        </div>
-
-        <div class="chart-container">
-
-          <canvas
-            baseChart
-            [data]="barChartData"
-            [options]="barChartOptions"
-            type="bar">
-          </canvas>
-
-        </div>
-
+      <div class="metric-icon yellow">
+        📊
       </div>
 
-      <!-- GRÁFICO PIZZA -->
-      <div class="dash-section">
+      <div class="metric-body">
 
-        <div class="section-header">
+        <span class="metric-label">
+          Ocupação média
+        </span>
 
-          <span class="section-title">
-            Status dos eventos
-          </span>
-
-          <span class="section-sub">
-            Ativos, esgotados e encerrados
-          </span>
-
-        </div>
-
-        <div class="chart-container pie-chart">
-
-          <canvas
-            baseChart
-            [data]="pieChartData"
-            type="pie">
-          </canvas>
-
-        </div>
+        <strong class="metric-value">
+          {{ stats.averageOccupancy }}%
+        </strong>
 
       </div>
 
     </div>
 
-    <!-- =============================== -->
-    <!-- TABELA -->
-    <!-- =============================== -->
+    <!-- PRÓXIMOS -->
+    <div class="metric-card">
 
+      <div class="metric-icon purple">
+        🚀
+      </div>
+
+      <div class="metric-body">
+
+        <span class="metric-label">
+          Próximos eventos
+        </span>
+
+        <strong class="metric-value">
+          {{ stats.upcomingEvents }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =============================== -->
+  <!-- GRÁFICOS -->
+  <!-- =============================== -->
+
+  <div class="charts-grid">
+
+    <!-- GRÁFICO BARRAS -->
     <div class="dash-section">
 
       <div class="section-header">
 
         <span class="section-title">
-          Eventos cadastrados
+          Inscritos por evento
         </span>
 
         <span class="section-sub">
-          {{ events.length }} evento(s)
+          Quantidade de participantes
         </span>
 
       </div>
 
-      @if (events.length === 0) {
+      <div class="chart-container">
 
-        <div class="empty-state">
+        <canvas
+          baseChart
+          [data]="barChartData"
+          [options]="barChartOptions"
+          type="bar">
+        </canvas>
 
-          <p>Nenhum evento cadastrado.</p>
-
-          <a
-            routerLink="/events/new"
-            class="btn btn-primary"
-            style="margin-top: 1rem">
-
-            Criar primeiro evento
-
-          </a>
-
-        </div>
-
-      } @else {
-
-        <div class="table-wrap">
-
-          <table class="dash-table">
-
-            <thead>
-
-              <tr>
-
-                <th>Evento</th>
-                <th>Data</th>
-                <th>Inscritos</th>
-                <th>Capacidade</th>
-                <th>Ocupação</th>
-                <th>Status</th>
-                <th></th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              @for (event of events; track event.id) {
-
-                <tr [class.row-past]="event.isPast">
-
-                  <!-- EVENTO -->
-                  <td class="td-title">
-                    {{ event.title }}
-                  </td>
-
-                  <!-- DATA -->
-                  <td class="td-date">
-                    {{ event.date }}
-                  </td>
-
-                  <!-- INSCRITOS -->
-                  <td>
-                    {{ event.totalParticipants }}
-                  </td>
-
-                  <!-- CAPACIDADE -->
-                  <td>
-                    {{ event.maxParticipants }}
-                  </td>
-
-                  <!-- OCUPAÇÃO -->
-                  <td>
-
-                    <div class="occupancy-bar-wrap">
-
-                      <div class="occupancy-bar">
-
-                        <div
-                          class="occupancy-fill"
-                          [style.width.%]="event.occupancyPercent"
-                          [style.background]="getOccupancyColor(event.occupancyPercent)">
-                        </div>
-
-                      </div>
-
-                      <span class="occupancy-label">
-                        {{ event.occupancyPercent }}%
-                      </span>
-
-                    </div>
-
-                  </td>
-
-                  <!-- STATUS -->
-                  <td>
-
-                    <span
-                      class="status-badge"
-                      [class]="getStatusClass(event)">
-
-                      {{ getStatusLabel(event) }}
-
-                    </span>
-
-                  </td>
-
-                  <!-- AÇÕES -->
-                  <td class="td-actions">
-
-                    @if (!event.isPast) {
-
-                      <a
-                        [routerLink]="['/events/edit', event.id]"
-                        class="table-action-btn">
-
-                        Editar
-
-                      </a>
-
-                    }
-
-                    <a
-                      [routerLink]="['/events', event.id]"
-                      class="table-action-btn">
-
-                      Ver
-
-                    </a>
-
-                  </td>
-
-                </tr>
-
-              }
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      }
+      </div>
 
     </div>
 
-  }
+    <!-- GRÁFICO PIZZA -->
+    <div class="dash-section">
+
+      <div class="section-header">
+
+        <span class="section-title">
+          Status dos eventos
+        </span>
+
+        <span class="section-sub">
+          Ativos, esgotados e encerrados
+        </span>
+
+      </div>
+
+      <div class="chart-container pie-chart">
+
+        <canvas
+          baseChart
+          [data]="pieChartData"
+          type="pie">
+        </canvas>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =============================== -->
+  <!-- TABELA -->
+  <!-- =============================== -->
+
+  <div class="dash-section">
+
+    <div class="section-header">
+
+      <span class="section-title">
+        Eventos cadastrados
+      </span>
+
+      <span class="section-sub">
+        {{ events.length }} evento(s)
+      </span>
+
+    </div>
+
+    @if (events.length === 0) {
+
+      <div class="empty-state">
+
+        <p>
+          Nenhum evento cadastrado.
+        </p>
+
+        <a
+          routerLink="/events/new"
+          class="btn btn-primary"
+          style="margin-top: 1rem">
+
+          Criar primeiro evento
+
+        </a>
+
+      </div>
+
+    } @else {
+
+      <div class="table-wrap">
+
+        <table class="dash-table">
+
+          <thead>
+
+            <tr>
+
+              <th>Evento</th>
+              <th>Data</th>
+              <th>Inscritos</th>
+              <th>Capacidade</th>
+              <th>Ocupação</th>
+              <th>Status</th>
+              <th></th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            @for (event of events; track event.id) {
+
+              <tr [class.row-past]="event.isPast">
+
+                <!-- EVENTO -->
+                <td class="td-title">
+                  {{ event.title }}
+                </td>
+
+                <!-- DATA -->
+                <td class="td-date">
+                  {{ event.date }}
+                </td>
+
+                <!-- INSCRITOS -->
+                <td>
+                  {{ event.totalParticipants }}
+                </td>
+
+                <!-- CAPACIDADE -->
+                <td>
+                  {{ event.maxParticipants }}
+                </td>
+
+                <!-- OCUPAÇÃO -->
+                <td>
+
+                  <div class="occupancy-bar-wrap">
+
+                    <div class="occupancy-bar">
+
+                      <div
+                        class="occupancy-fill"
+                        [style.width.%]="event.occupancyPercent"
+                        [style.background]="getOccupancyColor(event.occupancyPercent)">
+                      </div>
+
+                    </div>
+
+                    <span class="occupancy-label">
+                      {{ event.occupancyPercent }}%
+                    </span>
+
+                  </div>
+
+                </td>
+
+                <!-- STATUS -->
+                <td>
+
+                  <span
+                    class="status-badge"
+                    [class]="getStatusClass(event)">
+
+                    {{ getStatusLabel(event) }}
+
+                  </span>
+
+                </td>
+
+                <!-- AÇÕES -->
+                <td class="td-actions">
+
+                  @if (!event.isPast) {
+
+                    <a
+                      [routerLink]="['/events/edit', event.id]"
+                      class="table-action-btn">
+
+                      Editar
+
+                    </a>
+
+                  }
+
+                  <a
+                    [routerLink]="['/events', event.id]"
+                    class="table-action-btn">
+
+                    Ver
+
+                  </a>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    }
+
+  </div>
 
 </section>

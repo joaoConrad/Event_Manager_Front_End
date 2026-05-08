@@ -123,15 +123,32 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
 
     this.loading = true;
 
+    console.log('🚀 Carregando dashboard...');
+
     this.eventService.getEventsWithCount().subscribe({
 
-      next: (data) => {
+      next: (response: any) => {
+
+        console.log('✅ RESPOSTA DA API:', response);
+
+        // =========================
+        // TRATA DIFERENTES FORMATOS
+        // =========================
+
+        const data = Array.isArray(response)
+          ? response
+          : response?.data || [];
+
+        console.log('📦 DADOS TRATADOS:', data);
 
         const now = Date.now();
 
-        this.events = data.map((e) => {
+        this.events = data.map((e: any) => {
 
-          const timeStr = e.startTime ?? e.time ?? '00:00';
+          const timeStr =
+            e.startTime ??
+            e.time ??
+            '00:00';
 
           const isPast =
             new Date(`${e.date}T${timeStr}`).getTime() < now;
@@ -139,22 +156,42 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
           const total =
             e.totalParticipants ??
             e.registeredParticipants ??
+            e.participantsCount ??
             0;
 
           const max =
             e.maxParticipants ?? 1;
 
           return {
+
             id: e.id,
-            title: e.title,
-            date: e.date,
-            maxParticipants: max,
-            totalParticipants: total,
-            occupancyPercent: Math.round((total / max) * 100),
-            isSoldOut: total >= max,
+
+            title:
+              e.title ??
+              'Evento sem nome',
+
+            date:
+              e.date,
+
+            maxParticipants:
+              max,
+
+            totalParticipants:
+              total,
+
+            occupancyPercent:
+              Math.round((total / max) * 100),
+
+            isSoldOut:
+              total >= max,
+
             isPast
+
           };
+
         });
+
+        console.log('🎯 EVENTOS FORMATADOS:', this.events);
 
         this.computeStats();
 
@@ -165,7 +202,21 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
       },
 
       error: (err) => {
-        console.error('Erro ao carregar dashboard:', err);
+
+        console.error('❌ ERRO AO CARREGAR DASHBOARD:', err);
+
+        if (err.status === 401) {
+          console.error('🔒 Token inválido ou expirado');
+        }
+
+        if (err.status === 404) {
+          console.error('🌐 Rota não encontrada');
+        }
+
+        if (err.status === 500) {
+          console.error('💥 Erro interno do servidor');
+        }
+
         this.loading = false;
       }
 
@@ -203,9 +254,13 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         upcoming.length
     };
 
+    console.log('📊 STATS:', this.stats);
+
   }
 
   private updateCharts(): void {
+
+    console.log('📈 Atualizando gráficos...');
 
     // =========================
     // BARRAS
@@ -244,7 +299,13 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
       ).length;
 
     this.pieChartData = {
-      labels: ['Ativos', 'Esgotados', 'Encerrados'],
+
+      labels: [
+        'Ativos',
+        'Esgotados',
+        'Encerrados'
+      ],
+
       datasets: [
         {
           data: [
@@ -252,6 +313,7 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
             soldOut,
             closed
           ],
+
           backgroundColor: [
             '#2563eb',
             '#dc2626',
@@ -260,6 +322,8 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         }
       ]
     };
+
+    console.log('✅ Gráficos atualizados');
 
   }
 
