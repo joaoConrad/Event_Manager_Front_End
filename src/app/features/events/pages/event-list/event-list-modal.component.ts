@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { EventHistory } from '../../../../models/history.model';
 import { EventHistoryService } from '../../../../core/services/event.history';
 
@@ -189,35 +190,42 @@ export class EventHistoryModalComponent implements OnInit {
   error = '';
 
   ngOnInit(): void {
-    this.loading = false;
-    this.history = [
-      {
-        id: 1,
-        eventId: this.eventId,
-        eventName: this.eventName,
-        action: 'CRIADO',
-        changedBy: 'admin@email.com',
-        changedAt: '2025-01-10T10:00:00',
-        details: 'Evento criado.',
+    this.loadHistory();
+  }
+
+  private loadHistory(): void {
+    this.loading = true;
+    this.error = '';
+
+    this.historyService.getByEventId(this.eventId).subscribe({
+      next: (history) => {
+        this.history = history;
+        this.loading = false;
       },
-      {
-        id: 2,
-        eventId: this.eventId,
-        eventName: this.eventName,
-        action: 'EDITADO',
-        changedBy: 'admin@email.com',
-        changedAt: '2025-02-15T14:30:00',
-        details: 'Local alterado para Auditório Central.',
+      error: (err: unknown) => {
+        this.history = [];
+        this.loading = false;
+        this.error = this.historyLoadErrorMessage(err);
       },
-      {
-        id: 3,
-        eventId: this.eventId,
-        eventName: this.eventName,
-        action: 'EDITADO',
-        changedBy: 'admin@email.com',
-        changedAt: '2025-03-20T09:15:00',
-        details: 'Vagas aumentadas de 50 para 100.',
-      },
-    ];
+    });
+  }
+
+  private historyLoadErrorMessage(err: unknown): string {
+    if (err instanceof HttpErrorResponse) {
+      if (err.status === 401) {
+        return 'Sessão expirada ou token inválido. Faça login novamente.';
+      }
+      if (err.status === 403) {
+        return 'Apenas administradores podem consultar o histórico de eventos.';
+      }
+      if (err.status === 404) {
+        return 'Evento não encontrado.';
+      }
+      const body = err.error as { message?: string } | null;
+      if (body?.message && typeof body.message === 'string') {
+        return body.message;
+      }
+    }
+    return 'Não foi possível carregar o histórico. Tente novamente.';
   }
 }
