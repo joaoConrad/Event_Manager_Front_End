@@ -31,9 +31,9 @@
         [attr.aria-label]="theme.isDark() ? 'Ativar modo claro' : 'Ativar modo escuro'"
       >
         @if (theme.isDark()) {
-          <span aria-hidden="true">☀️</span>
+          <span aria-hidden="true">Claro</span>
         } @else {
-          <span aria-hidden="true">🌙</span>
+          <span aria-hidden="true">Escuro</span>
         }
       </button>
       @if (authService.isLoggedIn()) {
