@@ -23,8 +23,8 @@
 /* ── LOADING / NOT FOUND ── */
 .detail-skeleton,
 .detail-not-found {
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 26px;
   padding: 3rem 2rem;
   text-align: center;
@@ -34,12 +34,12 @@
 .detail-not-found h1 {
   margin: 0.5rem 0 0.75rem;
   font-size: 2rem;
-  color: #111827;
+  color: var(--text);
 }
 
 .detail-not-found p {
   margin: 0 0 1.5rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 /* ── FEEDBACK ── */
@@ -86,8 +86,8 @@
 
 /* ── HERO ── */
 .detail-hero {
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 26px;
   padding: 2rem;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
@@ -106,7 +106,7 @@
   margin: 0;
   font-size: 2.2rem;
   line-height: 1.2;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -114,8 +114,8 @@
 
 /* ── SECTIONS ── */
 .detail-section {
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 26px;
   padding: 1.6rem 2rem;
   box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
@@ -136,13 +136,13 @@
 }
 
 .participant-count {
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
 .detail-description {
   margin: 0;
-  color: #374151;
+  color: var(--text-secondary);
   line-height: 1.8;
   font-size: 1rem;
   white-space: pre-wrap;
@@ -158,8 +158,8 @@
 }
 
 .info-item {
-  background: #f8fafc;
-  border: 1px solid #e9eef5;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   padding: 1rem 1.1rem;
   display: flex;
@@ -182,18 +182,18 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .info-value {
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
   font-size: 1rem;
   overflow-wrap: anywhere;
 }
 
 .muted {
-  color: #9ca3af;
+  color: var(--text-muted-2);
   font-size: 0.95rem;
 }
 
@@ -201,7 +201,7 @@
 .participants-table-wrap {
   overflow-x: auto;
   border-radius: 16px;
-  border: 1px solid #e9eef5;
+  border: 1px solid var(--border-soft);
 }
 
 .participants-table {
@@ -211,21 +211,21 @@
 }
 
 .participants-table th {
-  background: #f8fafc;
+  background: var(--surface-subtle);
   padding: 0.75rem 1rem;
   text-align: left;
   font-size: 0.76rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #6b7280;
-  border-bottom: 1px solid #e9eef5;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .participants-table td {
   padding: 0.85rem 1rem;
-  color: #374151;
-  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-table);
   overflow-wrap: anywhere;
 }
 
@@ -234,11 +234,11 @@
 }
 
 .participants-table tbody tr:hover td {
-  background: #f8fafc;
+  background: var(--surface-subtle);
 }
 
 .td-index {
-  color: #9ca3af;
+  color: var(--text-muted-2);
   font-weight: 600;
   width: 40px;
 }
@@ -337,7 +337,7 @@
 .status-badge.open   { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
 .status-badge.joined { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
 .status-badge.sold-out { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-.status-badge.closed { background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; }
+.status-badge.closed { background: var(--page-bg); color: var(--text-secondary); border: 1px solid #d1d5db; }
 
 /* ── BOTÕES ── */
 .btn {
@@ -386,16 +386,16 @@
 .modal-card {
   width: 100%;
   max-width: 460px;
-  background: #ffffff;
-  border: 1px solid #e8edf3;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 22px;
   box-shadow: 0 24px 60px rgba(15,23,42,.18);
   padding: 1.6rem;
   animation: modalFadeUp 0.18s ease;
 }
 
-.modal-card h3 { margin: 0 0 0.5rem; color: #111827; }
-.modal-card p  { margin: 0 0 1.2rem; color: #5b6472; line-height: 1.65; }
+.modal-card h3 { margin: 0 0 0.5rem; color: var(--text); }
+.modal-card p  { margin: 0 0 1.2rem; color: var(--text-muted); line-height: 1.65; }
 
 .modal-actions {
   display: flex;
@@ -405,12 +405,12 @@
 
 /* override branco nos botões do modal (fundo claro) */
 .modal-card .btn-secondary {
-  background: #f5f7fb;
-  color: #111827;
-  border: 1px solid #dbe3ee;
+  background: var(--btn-secondary-bg);
+  color: var(--text);
+  border: 1px solid var(--border-input);
 }
 
-.modal-card .btn-secondary:hover { background: #eef2f7; }
+.modal-card .btn-secondary:hover { background: var(--btn-secondary-hover); }
 
 @keyframes modalFadeUp {
   from { opacity: 0; transform: translateY(8px) scale(0.98); }

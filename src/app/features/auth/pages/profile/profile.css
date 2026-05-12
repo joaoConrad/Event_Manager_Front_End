@@ -19,8 +19,8 @@
 
 /* ── HERO ── */
 .profile-hero {
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 26px;
   padding: 2rem;
   display: flex;
@@ -58,7 +58,7 @@
 .profile-name-row h1 {
   margin: 0;
   font-size: 1.6rem;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
@@ -78,7 +78,7 @@
 
 .profile-email {
   margin: 0;
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 0.92rem;
 }
 
@@ -95,8 +95,8 @@
 }
 
 .stat-card {
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 20px;
   padding: 1.4rem 1.2rem;
   display: flex;
@@ -110,22 +110,22 @@
 .stat-value {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   line-height: 1;
 }
 
 .stat-label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-muted-2);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 /* ── SECTION ── */
 .profile-section {
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 26px;
   padding: 2rem;
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
@@ -136,7 +136,7 @@
 .section-header h2 {
   margin: 0;
   font-size: 1.4rem;
-  color: #111827;
+  color: var(--text);
 }
 
 /* ── LOADING SKELETON ── */
@@ -145,7 +145,7 @@
 .skeleton-card {
   height: 88px;
   border-radius: 16px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-a) 25%, var(--skeleton-b) 50%, var(--skeleton-a) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
@@ -167,7 +167,7 @@
 
 .empty-icon { font-size: 2.5rem; }
 
-.profile-empty p { margin: 0; color: #9ca3af; font-size: 0.95rem; }
+.profile-empty p { margin: 0; color: var(--text-muted-2); font-size: 0.95rem; }
 
 /* ── GRUPOS ── */
 .events-group { margin-bottom: 1.5rem; }
@@ -179,7 +179,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #9ca3af;
+  color: var(--text-muted-2);
   margin-bottom: 0.75rem;
 }
 
@@ -190,8 +190,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: #f8fafc;
-  border: 1px solid #e9eef5;
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   padding: 1rem 1.2rem;
   text-decoration: none;
@@ -202,7 +202,7 @@
 .profile-event-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-  background: #ffffff;
+  background: var(--surface);
 }
 
 .past-card { opacity: 0.72; }
@@ -243,7 +243,7 @@
   margin: 0;
   font-size: 0.98rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   overflow-wrap: anywhere;
 }
 
@@ -258,14 +258,14 @@
 }
 
 .pec-badge.open   { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-.pec-badge.closed { background: #f3f4f6; color: #6b7280; border: 1px solid #d1d5db; }
+.pec-badge.closed { background: var(--page-bg); color: var(--text-muted); border: 1px solid #d1d5db; }
 
 .pec-meta {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
@@ -307,8 +307,8 @@
 .btn-primary { background: #2563eb; color: #fff; box-shadow: 0 8px 20px rgba(37,99,235,.22); }
 .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
 
-.btn-ghost { background: transparent; color: #6b7280; border: 1px solid #e5e7eb; }
-.btn-ghost:hover { background: #f3f4f6; color: #111827; }
+.btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--page-bg); color: var(--text); }
 
 /* ── RESPONSIVO ── */
 @media (max-width: 640px) {

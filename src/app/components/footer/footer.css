@@ -1,7 +1,7 @@
 .app-footer {
   margin-top: 4rem;
-  background: #111827;
-  color: #ffffff;
+  background: var(--footer-bg);
+  color: var(--footer-text);
   padding: 2.5rem 1rem 1.5rem;
 }
 
@@ -24,11 +24,12 @@
 .footer-brand h2 {
   margin: 0;
   font-size: 1.6rem;
+  color: var(--footer-text);
 }
 
 .footer-brand p {
   margin-top: 0.8rem;
-  color: #9ca3af;
+  color: var(--footer-muted);
   line-height: 1.5;
 }
 
@@ -50,7 +51,7 @@
 
 .github-link:hover {
   background: #2563eb;
-  color: #fff;
+  color: #ffffff;
   transform: translateY(-2px);
 }
 
@@ -77,7 +78,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6b7280;
+  color: var(--footer-muted);
   margin-bottom: 0.4rem;
 }
 
@@ -104,10 +105,10 @@
   max-width: 1120px;
   margin: 2rem auto 0;
   padding-top: 1rem;
-  border-top: 1px solid #374151;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
   text-align: center;
   font-size: 0.85rem;
-  color: #9ca3af;
+  color: var(--footer-muted);
 }
 
 /* RESPONSIVO */

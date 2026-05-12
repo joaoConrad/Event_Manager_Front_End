@@ -23,6 +23,19 @@
 
     <!-- AÇÕES -->
     <div class="nav-actions">
+      <button
+        type="button"
+        class="btn-nav btn-nav-theme"
+        (click)="theme.toggle()"
+        [attr.title]="theme.isDark() ? 'Modo claro' : 'Modo escuro'"
+        [attr.aria-label]="theme.isDark() ? 'Ativar modo claro' : 'Ativar modo escuro'"
+      >
+        @if (theme.isDark()) {
+          <span aria-hidden="true">☀️</span>
+        } @else {
+          <span aria-hidden="true">🌙</span>
+        }
+      </button>
       @if (authService.isLoggedIn()) {
 
         <!-- Avatar / link pro perfil -->

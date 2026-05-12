@@ -28,13 +28,13 @@
 .dash-header h1 {
   margin: 0 0 0.3rem;
   font-size: 2.2rem;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.02em;
 }
 
 .dash-header p {
   margin: 0;
-  color: #667085;
+  color: var(--text-muted);
 }
 
 /* ── SKELETON ── */
@@ -46,7 +46,7 @@
 
 .skeleton-card {
   height: 110px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, var(--skeleton-a) 25%, var(--skeleton-b) 50%, var(--skeleton-a) 75%);
   background-size: 200% 100%;
   border-radius: 20px;
   animation: shimmer 1.4s infinite;
@@ -65,8 +65,8 @@
 }
 
 .metric-card {
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 22px;
   padding: 1.4rem 1.5rem;
   display: flex;
@@ -94,14 +94,14 @@
 
 .metric-icon.blue   { background: #eff6ff; }
 .metric-icon.green  { background: #ecfdf5; }
-.metric-icon.yellow { background: #fffbeb; }
+.metric-icon.yellow { background: var(--surface)beb; }
 .metric-icon.purple { background: #f5f3ff; }
 
 .metric-body { display: flex; flex-direction: column; gap: 0.2rem; }
 
 .metric-label {
   font-size: 0.82rem;
-  color: #6b7280;
+  color: var(--text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -110,14 +110,14 @@
 .metric-value {
   font-size: 2rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   line-height: 1;
 }
 
 /* ── SECTIONS ── */
 .dash-section {
-  background: #ffffff;
-  border: 1px solid #e6ebf2;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: 22px;
   padding: 1.5rem;
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
@@ -134,12 +134,12 @@
 .section-title {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
 }
 
 .section-sub {
   font-size: 0.84rem;
-  color: #9ca3af;
+  color: var(--text-muted-2);
 }
 
 /* ── CHART ── */
@@ -151,14 +151,14 @@
 .empty-chart {
   text-align: center;
   padding: 2rem;
-  color: #9ca3af;
+  color: var(--text-muted-2);
 }
 
 /* ── TABELA ── */
 .table-wrap {
   overflow-x: auto;
   border-radius: 16px;
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--border-table);
 }
 
 .dash-table {
@@ -168,34 +168,34 @@
 }
 
 .dash-table th {
-  background: #f8fafc;
+  background: var(--surface-subtle);
   padding: 0.75rem 1rem;
   text-align: left;
   font-size: 0.76rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #6b7280;
-  border-bottom: 1px solid #e9eef5;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-soft);
   white-space: nowrap;
 }
 
 .dash-table td {
   padding: 0.9rem 1rem;
-  color: #374151;
-  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-table);
   vertical-align: middle;
 }
 
 .dash-table tbody tr:last-child td { border-bottom: none; }
 
-.dash-table tbody tr:hover td { background: #f8fafc; }
+.dash-table tbody tr:hover td { background: var(--surface-subtle); }
 
 .row-past td { opacity: 0.6; }
 
 .td-title {
   font-weight: 600;
-  color: #111827;
+  color: var(--text);
   max-width: 240px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -214,7 +214,7 @@
 .occupancy-bar {
   flex: 1;
   height: 8px;
-  background: #f1f5f9;
+  background: var(--surface-muted);
   border-radius: 999px;
   overflow: hidden;
   min-width: 60px;
@@ -229,7 +229,7 @@
 .occupancy-label {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--text-secondary);
   white-space: nowrap;
   min-width: 36px;
 }
@@ -247,7 +247,7 @@
 
 .badge-active   { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
 .badge-sold-out { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-.badge-closed   { background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; }
+.badge-closed   { background: var(--page-bg); color: var(--text-secondary); border: 1px solid #d1d5db; }
 
 /* AÇÕES DA TABELA */
 .td-actions {
@@ -269,18 +269,18 @@
   white-space: nowrap;
 }
 
-.table-action-btn:hover { background: #dbeafe; }
+.table-action-btn:hover { background: rgba(37, 99, 235, 0.18); }
 
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #9ca3af;
+  color: var(--text-muted-2);
 }
 
 /* ── PLACEHOLDERS BACK ── */
 .placeholder-section {
-  border: 2px dashed #e5e7eb;
-  background: #fafafa;
+  border: 2px dashed var(--border);
+  background: var(--surface-secondary);
   box-shadow: none;
 }
 
@@ -291,8 +291,8 @@
 }
 
 .placeholder-card {
-  background: #ffffff;
-  border: 1px solid #e9eef5;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
   border-radius: 18px;
   padding: 1.4rem;
   display: flex;
@@ -304,21 +304,21 @@
 
 .placeholder-card strong {
   font-size: 0.95rem;
-  color: #374151;
+  color: var(--text-secondary);
 }
 
 .placeholder-card p {
   margin: 0;
   font-size: 0.85rem;
-  color: #9ca3af;
+  color: var(--text-muted-2);
   line-height: 1.6;
 }
 
 .placeholder-tag {
   font-size: 0.76rem;
   font-family: monospace;
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--surface-muted);
+  color: var(--text-muted-2);
   padding: 0.3rem 0.5rem;
   border-radius: 6px;
   margin-top: 0.25rem;

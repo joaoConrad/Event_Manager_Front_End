@@ -62,7 +62,7 @@ import { EventHistoryService } from '../../../../core/services/event.history';
       .modal-backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(15, 23, 42, 0.66);
+        background: var(--backdrop-scrim);
         backdrop-filter: blur(2px);
         display: flex;
         align-items: center;
@@ -72,8 +72,8 @@ import { EventHistoryService } from '../../../../core/services/event.history';
       }
 
       .modal-history {
-        background: #ffffff;
-        border: 1px solid #dbe4f0;
+        background: var(--surface);
+        border: 1px solid var(--border-strong);
         border-radius: 16px;
         width: min(980px, 100%);
         max-height: 88vh;
@@ -90,19 +90,19 @@ import { EventHistoryService } from '../../../../core/services/event.history';
         flex-direction: column;
         gap: 0.25rem;
         padding: 1.25rem 1.5rem 1rem;
-        border-bottom: 1px solid #e7edf5;
-        background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+        border-bottom: 1px solid var(--border-strong);
+        background: linear-gradient(180deg, var(--surface-subtle) 0%, var(--surface) 100%);
       }
 
       .modal-history-header h3 {
         margin: 0;
         font-size: 1.3rem;
-        color: #1a1a2e;
+        color: var(--text);
       }
 
       .modal-history-subtitle {
         font-size: 0.9rem;
-        color: #516174;
+        color: var(--text-muted);
       }
 
       .modal-history-body {
@@ -113,7 +113,7 @@ import { EventHistoryService } from '../../../../core/services/event.history';
 
       .history-empty {
         text-align: center;
-        color: #617487;
+        color: var(--text-muted);
         padding: 2rem 0;
       }
 
@@ -135,10 +135,10 @@ import { EventHistoryService } from '../../../../core/services/event.history';
         top: 0;
         z-index: 1;
         padding: 0.75rem 0.9rem;
-        background: #f1f6fd;
+        background: var(--surface-subtle);
         font-weight: 700;
-        color: #2c3e50;
-        border-bottom: 1px solid #dce7f3;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-soft);
       }
 
       .history-table th:nth-child(1) {
@@ -155,8 +155,8 @@ import { EventHistoryService } from '../../../../core/services/event.history';
 
       .history-table td {
         padding: 0.8rem 0.9rem;
-        border-bottom: 1px solid #edf2f7;
-        color: #243241;
+        border-bottom: 1px solid var(--border-table);
+        color: var(--text);
         vertical-align: top;
         word-break: break-word;
       }
@@ -166,11 +166,11 @@ import { EventHistoryService } from '../../../../core/services/event.history';
       }
 
       .history-table tbody tr:nth-child(even) td {
-        background: #fbfdff;
+        background: var(--surface-subtle);
       }
 
       .history-table tr:hover td {
-        background: #f3f8ff;
+        background: rgba(37, 99, 235, 0.08);
       }
 
       .history-badge {
@@ -203,8 +203,8 @@ import { EventHistoryService } from '../../../../core/services/event.history';
         display: flex;
         justify-content: flex-end;
         padding: 0.9rem 1.25rem 1rem;
-        border-top: 1px solid #e7edf5;
-        background: #fcfdff;
+        border-top: 1px solid var(--border-strong);
+        background: var(--surface-subtle);
       }
 
       @media (max-width: 768px) {

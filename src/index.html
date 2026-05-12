@@ -5,11 +5,29 @@
   <title>Event Manager</title>
   <base href="/">
 
+  <script>
+    (function () {
+      try {
+        var k = 'eventmanager_theme';
+        var s = localStorage.getItem(k);
+        var theme =
+          s === 'light' || s === 'dark'
+            ? s
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute('content', theme === 'dark' ? '#0f172a' : '#f3f4f6');
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- RESPONSIVIDADE (já tinha, mantido e correto) -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
   <!-- Melhor compatibilidade mobile -->
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#f3f4f6">
   <meta name="mobile-web-app-capable" content="yes">
 
   <!-- Favicon -->

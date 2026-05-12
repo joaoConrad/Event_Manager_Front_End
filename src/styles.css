@@ -7,8 +7,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Poppins', Arial, Helvetica, sans-serif;
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--page-bg);
+  color: var(--text);
 }
 
 body {
@@ -36,11 +36,11 @@ input,
 textarea,
 select {
   width: 100%;
-  border: 1px solid #dbe3ee;
+  border: 1px solid var(--border-input);
   border-radius: 12px;
   padding: 0.85rem 0.95rem;
-  background: #ffffff;
-  color: #111827;
+  background: var(--surface);
+  color: var(--text);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -56,13 +56,8 @@ select:focus {
   background: rgba(124, 58, 237, 0.18);
 }
 
-:root {
-  --brand-blue: #2563eb;
-  --brand-purple: #7c3aed;
-  --brand-green: #10b981;
-  --brand-dark: #111827;
-  --brand-bg: #f3f4f6;
-}
+/* Tokens de marca / tema: ver src/styles/theme.css */
+
 /* ===== MOBILE GLOBAL ===== */
 
 html {

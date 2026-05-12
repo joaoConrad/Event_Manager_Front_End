@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
 import { AuthService } from './core/services/auth';
+import { ThemeService } from './core/services/theme.service';
 import { Footer } from './components/footer/footer';
 
 @Component({
@@ -10,6 +11,8 @@ import { Footer } from './components/footer/footer';
   styleUrl: './app.css',
 })
 export class App {
+  readonly theme = inject(ThemeService);
+
   constructor(
     public authService: AuthService,
     private readonly router: Router
