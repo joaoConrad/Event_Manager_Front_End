@@ -6,6 +6,9 @@ import { ParticipantService, MySubscription } from '../../../../core/services/pa
 
 type CheckinState = 'idle' | 'scanning' | 'success' | 'error' | 'already' | 'not-registered';
 
+// Intervalo do polling em ms — busca o status a cada 5 segundos
+const POLL_INTERVAL_MS = 5000;
+
 @Component({
   selector: 'app-qr-checkin',
   standalone: true,
@@ -21,6 +24,9 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
   // ── Usuário comum ──────────────────────────────────────
   subscription: MySubscription | null = null;
   qrDataUrl: string | null = null;
+
+  // Timer do polling — cancelado no ngOnDestroy
+  private pollTimer: ReturnType<typeof setInterval> | null = null;
 
   get isCheckedIn(): boolean { return this.subscription?.isCheckedIn === true; }
   get subscriptionToken(): string | null { return this.subscription?.subscriptionToken ?? null; }
@@ -44,7 +50,7 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
       this.eventId = Number(idParam);
     }
 
-    // admin não precisa carregar sua própria inscrição
+    // admin não precisa carregar sua própria inscrição nem iniciar polling
     if (!this.authService.isAdmin() && this.authService.isLoggedIn()) {
       this.loadSubscription();
     } else {
@@ -53,7 +59,11 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {}
-  ngOnDestroy(): void { this.stopScanner(); }
+
+  ngOnDestroy(): void {
+    this.stopScanner();
+    this.stopPolling();
+  }
 
   // ── Carrega inscrição do usuário ───────────────────────
 
@@ -67,10 +77,15 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
         this.loading = false;
         this.generateQr();
         this.cdr.detectChanges();
+
+        // Inicia polling apenas se o check-in ainda não foi feito.
+        // Se já está confirmado quando o usuário abre a tela, não há necessidade.
+        if (!this.subscription?.isCheckedIn) {
+          this.startPolling();
+        }
       },
       error: (err) => {
         this.loading = false;
-        // 404 = usuário não está inscrito neste evento
         if (err.status === 404) {
           this.checkinState = 'not-registered';
         }
@@ -79,12 +94,47 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  // ── Polling: atualiza status do check-in silenciosamente ──
+
+  private startPolling(): void {
+    this.stopPolling(); // garante que não haja timer duplicado
+
+    this.pollTimer = setInterval(() => {
+      if (!this.eventId || !this.authService.isLoggedIn()) {
+        this.stopPolling();
+        return;
+      }
+
+      this.participantService.getMySubscription(this.eventId).subscribe({
+        next: (res) => {
+          const wasCheckedIn = this.subscription?.isCheckedIn;
+          this.subscription = res.data;
+
+          // Assim que o check-in for confirmado: para o polling e atualiza a tela
+          if (!wasCheckedIn && res.data.isCheckedIn) {
+            this.stopPolling();
+            this.cdr.detectChanges();
+          }
+        },
+        error: () => {
+          // Silencia erros de polling para não atrapalhar a experiência
+        }
+      });
+    }, POLL_INTERVAL_MS);
+  }
+
+  private stopPolling(): void {
+    if (this.pollTimer !== null) {
+      clearInterval(this.pollTimer);
+      this.pollTimer = null;
+    }
+  }
+
   // ── Gera QR code ───────────────────────────────────────
 
   generateQr(): void {
     if (!this.subscriptionToken) return;
 
-    ///@types/qrcode
     import('qrcode').then((QRCode) => {
       QRCode.toDataURL(this.subscriptionToken!, {
         width: 280,
@@ -95,7 +145,6 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       });
     }).catch(() => {
-      // lib não instalada — mostra placeholder
       this.qrDataUrl = null;
       this.cdr.detectChanges();
     });
@@ -126,8 +175,7 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
     this.checkinState = 'idle';
     this.cdr.detectChanges();
 
-    // O back tem GET /:id/validate/:token
-    this.participantService.validateCheckin(this.eventId, token).subscribe({
+    this.participantService.checkIn(this.eventId, token).subscribe({
       next: (res) => {
         this.checkinState = 'success';
         this.checkinResult = res.data?.name ?? 'Participante';

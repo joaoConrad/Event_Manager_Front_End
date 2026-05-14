@@ -60,7 +60,8 @@ export class EventDetail implements OnInit {
         this.event = {
           ...raw,
           date: raw.date?.split('T')[0] ?? raw.date,
-          time: raw.time?.slice(0, 5) ?? raw.time
+          time: raw.startTime?.slice(0, 5) ?? raw.startTime,
+          isCheckedIn: raw.isCheckedIn ?? false
         };
 
         this.loading = false;
@@ -100,7 +101,7 @@ export class EventDetail implements OnInit {
   getEventDateTime(): number {
     if (!this.event) return 0;
     const date = this.event.date?.split('T')[0] ?? this.event.date;
-    const time = this.event.time?.slice(0, 5) ?? this.event.time;
+    const time = this.event.startTime?.slice(0, 5) ?? this.event.startTime;
     return new Date(`${date}T${time}`).getTime();
   }
 

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap, map, forkJoin } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, tap, map } from 'rxjs';
 import { EventModel } from '../../models/event.model';
 import { AuthService } from './auth';
 import { environment } from '../../../environments/environment';
@@ -14,6 +14,12 @@ interface PaginatedResponse {
   hasPreviousPage: boolean;
   hasNextPage: boolean;
   data: EventModel[];
+}
+
+// Envelope de resposta de criação/edição do back
+interface EventResponse {
+  message?: string;
+  data: EventModel;
 }
 
 // Meta de paginação exposta pro componente
@@ -32,7 +38,6 @@ export class EventService {
   private readonly http        = inject(HttpClient);
   private readonly authService = inject(AuthService);
 
-  // URL vinda do environment — sem hardcode de localhost
   private readonly apiUrl      = `${environment.apiUrl}/events`;
 
   // Cache da última página buscada
@@ -42,12 +47,6 @@ export class EventService {
 
   // ── Paginação ──────────────────────────────────────────
 
-  /**
-   * Busca uma página de eventos.
-   * Quando forceRefresh=true ignora o cache.
-   * Retorna um Observable com { events, meta } para o componente
-   * poder exibir controles de paginação.
-   */
   getPage(page = 1, limit = 10, forceRefresh = false): Observable<{ events: EventModel[]; meta: PaginationMeta }> {
     return this.http.get<PaginatedResponse>(this.apiUrl, {
       headers: this.authService.getAuthHeaders(),
@@ -71,11 +70,6 @@ export class EventService {
     );
   }
 
-  /**
-   * Mantém compatibilidade com o código existente que chama getAll().
-   * Internamente chama getPage(1, 50) e retorna só o array de eventos.
-   * Quando o back implementar busca sem paginação, trocar aqui.
-   */
   getAll(forceRefresh = false): Observable<EventModel[]> {
     if (!forceRefresh && this.cacheValid && this.eventsCache.length > 0) {
       return new Observable(observer => {
@@ -114,19 +108,34 @@ export class EventService {
     });
   }
 
-  create(event: EventModel): Observable<EventModel> {
-    return this.http.post<EventModel>(this.apiUrl, event, {
-      headers: this.authService.getAuthHeaders()
-    }).pipe(
-      tap(() => this.clearCache())
+  /**
+   * FIX — aceita FormData (multipart/form-data) quando há imagem.
+   *
+   * Quando o componente passa FormData, NÃO setamos Content-Type —
+   * o browser define automaticamente com o boundary correto para que
+   * o multer no backend consiga ler req.file.
+   *
+   * Quando não há imagem o componente pode continuar passando o objeto
+   * puro (JSON), que é serializado normalmente.
+   */
+  create(payload: FormData | EventModel): Observable<EventModel> {
+    const headers = this.buildHeaders(payload);
+
+    return this.http.post<EventResponse>(this.apiUrl, payload, { headers }).pipe(
+      tap(() => this.clearCache()),
+      map((res) => res.data ?? (res as unknown as EventModel))
     );
   }
 
-  update(id: number, event: Partial<EventModel>): Observable<EventModel> {
-    return this.http.put<EventModel>(`${this.apiUrl}/${id}`, event, {
-      headers: this.authService.getAuthHeaders()
-    }).pipe(
-      tap(() => this.clearCache())
+  /**
+   * FIX — mesmo ajuste do create(): aceita FormData para envio de imagem.
+   */
+  update(id: number, payload: FormData | Partial<EventModel>): Observable<EventModel> {
+    const headers = this.buildHeaders(payload);
+
+    return this.http.put<EventResponse>(`${this.apiUrl}/${id}`, payload, { headers }).pipe(
+      tap(() => this.clearCache()),
+      map((res) => res.data ?? (res as unknown as EventModel))
     );
   }
 
@@ -140,11 +149,6 @@ export class EventService {
 
   // ── Dashboard ──────────────────────────────────────────
 
-  /**
-   * Busca eventos com contagem de participantes para o dashboard.
-   * O back já retorna registeredParticipants em cada evento,
-   * então usamos isso diretamente em vez do forkJoin antigo.
-   */
   getEventsWithCount(): Observable<any[]> {
     return this.http.get<PaginatedResponse>(this.apiUrl, {
       headers: this.authService.getAuthHeaders(),
@@ -155,5 +159,27 @@ export class EventService {
         totalParticipants: event.registeredParticipants ?? 0
       })))
     );
+  }
+
+  // ── Helpers ────────────────────────────────────────────
+
+  /**
+   * Monta os headers corretos conforme o tipo do payload.
+   *
+   * FormData  → apenas Authorization (browser define Content-Type com boundary)
+   * Objeto    → Authorization + Content-Type: application/json
+   */
+  private buildHeaders(payload: FormData | object): HttpHeaders {
+    const token = this.authService.getToken() ?? '';
+
+    if (payload instanceof FormData) {
+      // NÃO incluir Content-Type — o browser precisa setar o boundary do multipart
+      return new HttpHeaders({ Authorization: `Bearer ${token}` });
+    }
+
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
   }
 }

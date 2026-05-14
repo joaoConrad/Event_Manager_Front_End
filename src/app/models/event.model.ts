@@ -15,6 +15,11 @@ export interface EventModel {
   isSoldOut?: boolean;
   isUserRegistered?: boolean;
 
+  // FIX: indica se o usuário logado já fez check-in neste evento.
+  // Retornado pelo back em getAllEvents e getEventById.
+  // Usado para ocultar o botão "Cancelar inscrição" após o check-in.
+  isCheckedIn?: boolean;
+
   // soft delete
   deletedAt?: string | null;
 

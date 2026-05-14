@@ -199,9 +199,14 @@
             @if (isPastEvent()) {
               <button class="btn btn-disabled full" disabled>Evento encerrado</button>
             } @else if (isJoined()) {
-              <button class="btn btn-warning full" [disabled]="actionLoading" (click)="cancelSubscription()">
-                {{ actionLoading ? 'Aguarde...' : 'Cancelar inscrição' }}
-              </button>
+              <!-- Oculta cancelar se o usuário já fez check-in neste evento -->
+              @if (!event.isCheckedIn) {
+                <button class="btn btn-warning full" [disabled]="actionLoading" (click)="cancelSubscription()">
+                  {{ actionLoading ? 'Aguarde...' : 'Cancelar inscrição' }}
+                </button>
+              } @else {
+                <button class="btn btn-disabled full" disabled>Check-in confirmado</button>
+              }
               <!-- link pro QR code quando inscrito -->
               <a [routerLink]="['/events', event.id, 'checkin']"
                 class="btn btn-secondary full"

@@ -153,7 +153,12 @@
                   @if (isPastEvent(event)) {
                     <button class="btn btn-disabled btn-sm" disabled>Encerrado</button>
                   } @else if (isJoined(event.id)) {
-                    <button class="btn btn-warning btn-sm" (click)="cancelSubscription(event.id)">Cancelar inscrição</button>
+                    <!-- Oculta cancelar se o usuário já fez check-in neste evento -->
+                    @if (!event.isCheckedIn) {
+                      <button class="btn btn-warning btn-sm" (click)="cancelSubscription(event.id)">Cancelar inscrição</button>
+                    } @else {
+                      <button class="btn btn-disabled btn-sm" disabled>✅ Check-in feito</button>
+                    }
                   } @else if (isSoldOut(event)) {
                     <button class="btn btn-disabled btn-sm" disabled>Esgotado</button>
                   } @else {

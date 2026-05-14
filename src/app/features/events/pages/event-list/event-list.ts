@@ -67,11 +67,12 @@ export class EventList implements OnInit {
         this.events = events.map((event) => ({
           ...event,
           date: event.date?.split('T')[0] ?? event.date,
-          time: event.time?.slice(0, 5) ?? event.time,
+          time: event.startTime?.slice(0, 5) ?? event.startTime,
           registeredParticipants: event.registeredParticipants ?? 0,
           availableSpots: event.availableSpots ?? this.calcSpots(event),
           isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
           isUserRegistered: event.isUserRegistered ?? false,
+          isCheckedIn: event.isCheckedIn ?? false,
         }));
 
         this.pagination = meta;
@@ -195,7 +196,7 @@ export class EventList implements OnInit {
 
   getDateTime(event: EventWithRegistered): number {
     const date = event.date?.split('T')[0] ?? event.date;
-    const time = event.time?.slice(0, 5) ?? event.time;
+    const time = event.startTime?.slice(0, 5) ?? event.startTime;
     return new Date(`${date}T${time}`).getTime();
   }
 

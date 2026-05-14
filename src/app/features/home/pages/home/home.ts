@@ -77,7 +77,7 @@ export class Home implements OnInit, AfterViewInit {
   // ── fix: normaliza date e time antes de montar a data ──
   getEventDateTime(event: EventModel): number {
     const date = event.date?.split('T')[0] ?? event.date;
-    const time = (event.time?.slice(0, 5)) ?? event.time;
+    const time = event.startTime?.slice(0, 5) ?? event.startTime;
     return new Date(`${date}T${time}`).getTime();
   }
 
