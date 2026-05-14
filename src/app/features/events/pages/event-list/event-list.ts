@@ -31,6 +31,11 @@ export class EventList implements OnInit {
   readonly pageSize = 10;
   pagination: PaginationMeta | null = null;
 
+  // Quando há filtro ativo, carregamos todos os eventos de uma vez
+  // e a paginação server-side é desabilitada
+  filterMode = false;
+  allEvents: EventWithRegistered[] = [];
+
   showPastEvents = false;
   manualJoinedEventIds = new Set<number>();
 
@@ -64,17 +69,7 @@ export class EventList implements OnInit {
 
     this.eventService.getPage(this.currentPage, this.pageSize).subscribe({
       next: ({ events, meta }) => {
-        this.events = events.map((event) => ({
-          ...event,
-          date: event.date?.split('T')[0] ?? event.date,
-          time: event.startTime?.slice(0, 5) ?? event.startTime,
-          registeredParticipants: event.registeredParticipants ?? 0,
-          availableSpots: event.availableSpots ?? this.calcSpots(event),
-          isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
-          isUserRegistered: event.isUserRegistered ?? false,
-          isCheckedIn: event.isCheckedIn ?? false,
-        }));
-
+        this.events = this.normalizeEvents(events);
         this.pagination = meta;
         this.loading = false;
         this.cdr.detectChanges();
@@ -85,6 +80,72 @@ export class EventList implements OnInit {
         this.showFeedback('Não foi possível carregar os eventos.', 'error');
       },
     });
+  }
+
+  // Carrega TODOS os eventos buscando todas as páginas sequencialmente
+  loadAllEvents(): void {
+    this.loading = true;
+
+    // Busca a primeira página para saber quantas páginas existem no total
+    this.eventService.getPage(1, 50, true).subscribe({
+      next: ({ events: firstPage, meta }) => {
+        if (meta.totalPages <= 1) {
+          // Só uma página — usa direto
+          this.allEvents = this.normalizeEvents(firstPage);
+          this.events = this.allEvents;
+          this.pagination = null;
+          this.loading = false;
+          this.cdr.detectChanges();
+          return;
+        }
+
+        // Monta requisições para as páginas restantes
+        const pageRequests = Array.from(
+          { length: meta.totalPages - 1 },
+          (_, i) => this.eventService.getPage(i + 2, 50, true)
+        );
+
+        // Importa forkJoin dinamicamente e busca todas as páginas
+        import('rxjs').then(({ forkJoin }) => {
+          forkJoin(pageRequests).subscribe({
+            next: (results) => {
+              const allPages = [firstPage, ...results.map(r => r.events)].flat();
+              this.allEvents = this.normalizeEvents(allPages);
+              this.events = this.allEvents;
+              this.pagination = null;
+              this.loading = false;
+              this.cdr.detectChanges();
+            },
+            error: () => {
+              // Fallback: usa só o que veio da primeira página
+              this.allEvents = this.normalizeEvents(firstPage);
+              this.events = this.allEvents;
+              this.pagination = null;
+              this.loading = false;
+              this.cdr.detectChanges();
+            }
+          });
+        });
+      },
+      error: () => {
+        this.allEvents = [];
+        this.loading = false;
+        this.showFeedback('Não foi possível carregar os eventos.', 'error');
+      },
+    });
+  }
+
+  private normalizeEvents(events: EventWithRegistered[]): EventWithRegistered[] {
+    return events.map((event) => ({
+      ...event,
+      date: event.date?.split('T')[0] ?? event.date,
+      time: event.startTime?.slice(0, 5) ?? event.startTime,
+      registeredParticipants: event.registeredParticipants ?? 0,
+      availableSpots: event.availableSpots ?? this.calcSpots(event),
+      isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
+      isUserRegistered: event.isUserRegistered ?? false,
+      isCheckedIn: event.isCheckedIn ?? false,
+    }));
   }
 
   reloadEvents(): void {
@@ -150,7 +211,11 @@ export class EventList implements OnInit {
     return events.filter((event) => {
       const matchData    = this.filtroData      ? event.date === this.filtroData : true;
       const matchTitulo  = this.filtroCategoria ? event.title.toLowerCase().includes(this.filtroCategoria.toLowerCase()) : true;
-      const matchStatus  = this.filtroStatus    ? this.getStatus(event) === this.filtroStatus : true;
+      const matchStatus  = this.filtroStatus === 'inscrito'
+        ? this.isJoined(event.id)
+        : this.filtroStatus
+          ? this.getStatus(event) === this.filtroStatus
+          : true;
       return matchData && matchTitulo && matchStatus;
     });
   }
@@ -176,17 +241,42 @@ export class EventList implements OnInit {
     return this.sortEvents(this.applyFilters(this.events.filter((e) => this.isPastEvent(e))));
   }
 
-  aplicarFiltro(): void { this.cdr.detectChanges(); }
+  aplicarFiltro(): void {
+    const hasFilter = !!(this.filtroData || this.filtroCategoria || this.filtroStatus);
+
+    if (hasFilter && !this.filterMode) {
+      // Entra no modo filtro: busca todos os eventos de uma vez
+      this.filterMode = true;
+      this.loadAllEvents();
+    } else if (!hasFilter && this.filterMode) {
+      // Sai do modo filtro: volta para paginação server-side
+      this.filterMode = false;
+      this.currentPage = 1;
+      this.reloadEvents();
+    } else {
+      this.cdr.detectChanges();
+    }
+  }
 
   limparFiltro(): void {
     this.filtroData = '';
     this.filtroCategoria = '';
     this.filtroStatus = '';
-    this.cdr.detectChanges();
+
+    if (this.filterMode) {
+      // Volta para paginação server-side
+      this.filterMode = false;
+      this.allEvents = [];
+      this.currentPage = 1;
+      this.reloadEvents();
+    } else {
+      this.cdr.detectChanges();
+    }
   }
 
   getStatus(event: EventWithRegistered): string {
     if (this.isPastEvent(event) || this.isSoldOut(event)) return 'cancelado';
+    if (this.isJoined(event.id)) return 'inscrito';
     return 'ativo';
   }
 

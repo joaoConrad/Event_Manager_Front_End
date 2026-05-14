@@ -44,6 +44,7 @@
         <select class="filter-input filter-select" [(ngModel)]="filtroStatus">
           <option value="">Todos</option>
           <option value="ativo">Ativo</option>
+          <option value="inscrito">Inscrito</option>
           <option value="cancelado">Encerrado / Esgotado</option>
         </select>
       </div>
@@ -182,33 +183,23 @@
 
     <!-- ESGOTADOS -->
     @if (getSoldOutEvents().length > 0) {
-      <section class="sold-out-section">
-        <div class="sold-out-header">
-          <span class="eyebrow">Esgotados</span>
-          <h2>Eventos sem vagas disponíveis</h2>
+      <section class="compact-section">
+        <div class="compact-section-header">
+          <div class="compact-section-title">
+            <span class="eyebrow">Esgotados</span>
+            <span class="compact-count">{{ getSoldOutEvents().length }} evento(s)</span>
+          </div>
         </div>
-        <div class="events-grid">
+        <div class="compact-list">
           @for (event of getSoldOutEvents(); track event.id) {
-            <article class="event-card sold-out-card">
-              <div class="event-content">
-                @if (event.imageUrl) {
-                  <div class="card-image-wrap">
-                    <img [src]="event.imageUrl" [alt]="event.title" class="card-image" />
-                  </div>
-                }
-                <div class="event-main">
-                  <div class="event-head">
-                    <h2>{{ event.title }}</h2>
-                    <span class="status-badge sold-out">Esgotado</span>
-                  </div>
-                  <p class="card-description">{{ event.description }}</p>
-                </div>
-                <div class="event-actions">
-                  <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm">Ver detalhes</a>
-                  <button class="btn btn-disabled btn-sm" disabled>Esgotado</button>
-                </div>
+            <div class="compact-card sold-out-card">
+              <div class="compact-card-info">
+                <span class="status-badge sold-out">Esgotado</span>
+                <span class="compact-title">{{ event.title }}</span>
+                <span class="compact-meta">{{ event.date }} · {{ event.location }}</span>
               </div>
-            </article>
+              <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm">Ver detalhes</a>
+            </div>
           }
         </div>
       </section>
@@ -216,56 +207,37 @@
 
     <!-- ENCERRADOS -->
     @if (getPastEvents().length > 0) {
-      <section class="closed-summary">
-        <div>
-          <span class="eyebrow">Encerrados</span>
-          <h2>{{ getPastEvents().length }} evento(s) já realizados</h2>
+      <section class="compact-section">
+        <div class="compact-section-header">
+          <div class="compact-section-title">
+            <span class="eyebrow">Encerrados</span>
+            <span class="compact-count">{{ getPastEvents().length }} evento(s) já realizados</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" (click)="togglePastEvents()">
+            {{ showPastEvents ? 'Ocultar' : 'Ver encerrados' }}
+          </button>
         </div>
-        <button class="btn btn-secondary btn-sm" (click)="togglePastEvents()">
-          {{ showPastEvents ? 'Ocultar' : 'Ver encerrados' }}
-        </button>
-      </section>
 
-      @if (showPastEvents && getPastEvents().length > 0) {
-        <div class="events-grid" style="margin-top: 1rem">
-          @for (event of getPastEvents(); track event.id) {
-            <article class="event-card sold-out-card">
-              <div class="event-aside">
-                <span class="aside-label">Encerrado</span>
-                <strong class="aside-date">{{ event.date }}</strong>
-                <span class="aside-time">{{ event.startTime }} – {{ event.endTime }}</span>
-              </div>
-              <div class="event-content">
-                @if (event.imageUrl) {
-                  <div class="card-image-wrap">
-                    <img [src]="event.imageUrl" [alt]="event.title" class="card-image" />
-                  </div>
-                }
-                <div class="event-main">
-                  <div class="event-head">
-                    <h2>{{ event.title }}</h2>
-                    <span class="status-badge closed">Encerrado</span>
-                  </div>
-                  <p class="card-description">{{ event.description }}</p>
-                  <div class="event-meta">
-                    <div class="meta-item">
-                      <span class="meta-label">Local</span>
-                      <span class="meta-value">{{ event.location }}</span>
-                    </div>
-                    <div class="meta-item">
-                      <span class="meta-label">Inscritos</span>
-                      <span class="meta-value">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }}</span>
-                    </div>
-                  </div>
+        @if (showPastEvents) {
+          <div class="compact-list">
+            @for (event of getPastEvents(); track event.id) {
+              <div class="compact-card closed-card">
+                <div class="compact-card-info">
+                  <span class="status-badge closed">Encerrado</span>
+                  <span class="compact-title">{{ event.title }}</span>
+                  <span class="compact-meta">
+                    {{ event.date }} · {{ event.startTime }} – {{ event.endTime }} · {{ event.location }}
+                  </span>
                 </div>
-                <div class="event-actions">
+                <div class="compact-card-right">
+                  <span class="compact-participants">{{ event.registeredParticipants ?? 0 }}/{{ event.maxParticipants }} inscritos</span>
                   <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm">Ver detalhes</a>
                 </div>
               </div>
-            </article>
-          }
-        </div>
-      }
+            }
+          </div>
+        }
+      </section>
     }
   }
 
