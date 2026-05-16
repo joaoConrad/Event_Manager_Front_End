@@ -5,19 +5,22 @@ import { ParticipantService } from '../../../../core/services/participant';
 import { AuthService } from '../../../../core/services/auth';
 import { EventModel } from '../../../../models/event.model';
 import { ParticipantModel } from '../../../../models/participant.model';
+import { FormsModule } from '@angular/forms';
 
 type FeedbackType = 'success' | 'error' | 'info';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, FormsModule],
   templateUrl: './event-detail.html',
   styleUrl: './event-detail.css'
 })
 export class EventDetail implements OnInit {
   event: EventModel | null = null;
   participants: ParticipantModel[] = [];
+  searchParticipant = '';
+  filteredParticipants: any[] = [];
 
   loading = true;
   loadingParticipants = false;
@@ -85,6 +88,7 @@ export class EventDetail implements OnInit {
     this.participantService.listByEvent(eventId).subscribe({
       next: (res) => {
         this.participants = Array.isArray(res) ? res : [];
+        this.filteredParticipants = this.participants;
         this.loadingParticipants = false;
         this.cdr.detectChanges();
       },
@@ -212,4 +216,14 @@ export class EventDetail implements OnInit {
     }, 3500);
     this.cdr.detectChanges();
   }
+
+  filterParticipant() {
+  this.filteredParticipants = this.participants.filter(p =>
+    p.name.toLowerCase().includes(this.searchParticipant.toLowerCase())
+  );
+
+  if (this.filteredParticipants.length === 0) {
+    console.log("Nenhum participante encontrado");
+  }
+}
 }

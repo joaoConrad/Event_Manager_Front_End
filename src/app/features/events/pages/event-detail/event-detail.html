@@ -118,6 +118,13 @@
               }
             </span>
 
+            <input
+              type="text"
+              placeholder="Buscar por nome do participante..."
+              [(ngModel)]="searchParticipant"
+              (input)="filterParticipant()"
+              style="margin: 10px 0; padding: 6px; width: 100%;"
+            />
             @if (loadingParticipants) {
               <p class="muted">Carregando participantes...</p>
             } @else if (participants.length === 0) {
@@ -134,7 +141,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @for (p of participants; track p.id; let i = $index) {
+                     @for (p of filteredParticipants; track p.id; let i = $index) {
                       <tr>
                         <td class="td-index">{{ i + 1 }}</td>
                         <td>{{ p.name }}</td>
@@ -145,6 +152,9 @@
                   </tbody>
                 </table>
               </div>
+              @if (filteredParticipants.length === 0) {
+                  <p>Nenhum participante encontrado</p>
+              }
             }
           </div>
         }
