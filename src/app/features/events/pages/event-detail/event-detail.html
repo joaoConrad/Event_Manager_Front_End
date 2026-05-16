@@ -118,6 +118,7 @@
               }
             </span>
 
+          <div class="filter-container">
             <input
               type="text"
               placeholder="Buscar por nome do participante..."
@@ -125,6 +126,13 @@
               (input)="filterParticipant()"
               style="margin: 10px 0; padding: 6px; width: 100%;"
             />
+
+              <select #ordenacao (change)="sortParticipants(ordenacao.value)">
+                <option value="name">Ordenar por nome</option>
+                <option value="date">Ordenar por data</option>
+                <option value="status">Ordenar por presença</option>
+              </select>
+          </div>
             @if (loadingParticipants) {
               <p class="muted">Carregando participantes...</p>
             } @else if (participants.length === 0) {
@@ -138,6 +146,8 @@
                       <th>Nome</th>
                       <th>Email</th>
                       <th>Telefone</th>
+                      <th>Data inscrição</th>
+                      <th>Presença</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -147,6 +157,8 @@
                         <td>{{ p.name }}</td>
                         <td>{{ p.email }}</td>
                         <td>{{ p.phone ?? '—' }}</td>
+                        <td>{{ p.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>  <!-- 👈 NOVO -->
+                        <td>{{ p.isCheckedIn ? 'Presente' : 'Ausente' }}</td>
                       </tr>
                     }
                   </tbody>

@@ -4,4 +4,7 @@ export interface ParticipantModel {
   email: string;
   phone?: string;
   eventId?: number;
+  createdAt?: string;
+  isCheckedIn?: boolean;
+  checkedInAt?: string;
 }

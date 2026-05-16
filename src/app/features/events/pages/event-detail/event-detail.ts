@@ -6,13 +6,14 @@ import { AuthService } from '../../../../core/services/auth';
 import { EventModel } from '../../../../models/event.model';
 import { ParticipantModel } from '../../../../models/participant.model';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 type FeedbackType = 'success' | 'error' | 'info';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, DatePipe],
   templateUrl: './event-detail.html',
   styleUrl: './event-detail.css'
 })
@@ -87,15 +88,18 @@ export class EventDetail implements OnInit {
     this.loadingParticipants = true;
     this.participantService.listByEvent(eventId).subscribe({
       next: (res) => {
+        console.log(res); //
+
         this.participants = Array.isArray(res) ? res : [];
         this.filteredParticipants = this.participants;
+        this.sortParticipants('name');
         this.loadingParticipants = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.loadingParticipants = false;
         this.cdr.detectChanges();
-      }
+        }
     });
   }
 
@@ -224,6 +228,26 @@ export class EventDetail implements OnInit {
 
   if (this.filteredParticipants.length === 0) {
     console.log("Nenhum participante encontrado");
+  }
+}
+
+sortParticipants(type: string) {
+  if (type === 'name') {
+    this.filteredParticipants.sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }
+
+  if (type === 'date') {
+    this.filteredParticipants.sort((a, b) =>
+      new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
+    );
+  }
+
+  if (type === 'status') {
+    this.filteredParticipants.sort((a, b) =>
+      Number(b.isCheckedIn) - Number(a.isCheckedIn)
+    );
   }
 }
 }

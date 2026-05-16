@@ -476,3 +476,22 @@
   object-fit: cover;
   display: block;
 }
+
+/* ── FILTRO E ORDENAÇÃO ── */
+.filter-container {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+  align-items: center;
+}
+
+.filter-container input {
+  flex: 2;
+  padding: 6px;
+}
+
+.filter-container select {
+  flex: 1;
+  max-width: 200px;
+  padding: 6px;
+}
