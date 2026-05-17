@@ -1,0 +1,141 @@
+/* CONTAINER GERAL */
+:host {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 700px;
+  padding: 30px;
+}
+
+/* TÍTULO */
+h2 {
+  margin-bottom: 25px;
+  font-size: 24px;
+}
+
+/* FORM */
+.form {
+  max-width: 500px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #1e293b;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* INPUTS */
+input, textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #121a2f;
+  color: white;
+  font-size: 14px;
+}
+
+/* BOTÃO PUBLICAR */
+.form button {
+  background: #4f8cff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.form button:hover {
+  background: #3a6edc;
+  transform: translateY(-2px);
+}
+
+/* LISTA */
+.news-card {
+  background: #1e293b;
+  padding: 18px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  border-left: 5px solid #4f8cff;
+  max-width: 600px;
+  transition: 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.news-card:hover {
+  transform: scale(1.01);
+}
+
+/* TÍTULO DO CARD */
+.news-card h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+/* TEXTO */
+.news-card p {
+  margin: 8px 0;
+}
+
+/* DATA */
+.news-card small {
+  color: #aaa;
+}
+
+/* BOTÃO EXCLUIR */
+.news-card button {
+  margin-top: 10px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.news-card button:hover {
+  background: #cc0000;
+  transform: translateY(-2px);
+}
+
+.form button {
+  width: 100%;
+  font-size: 15px;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* LABEL AZUL PEQUENA */
+.page-label {
+  color: #4f8cff;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* DESCRIÇÃO */
+.page-description {
+  color: #9aa4b2;
+  margin-bottom: 25px;
+  max-width: 500px;
+}

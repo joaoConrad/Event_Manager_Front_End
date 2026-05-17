@@ -1,0 +1,6 @@
+<div *ngIf="isAdmin" class="form">
+  <input [(ngModel)]="newTitle" placeholder="Título">
+  <textarea [(ngModel)]="newContent" placeholder="Conteúdo"></textarea>
+  <button (click)="addNews()">Publicar</button>
+  <button *ngIf="isAdmin" (click)="removeNews(i)">Excluir</button>
+</div>

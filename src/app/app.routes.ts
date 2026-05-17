@@ -11,6 +11,7 @@ import { NotFound } from './features/shared/not-found/not-found';
 import { adminGuard } from './core/guards/admin-guard';
 import { authGuard } from './core/guards/auth-guard';
 import { Dashboard } from './features/admin/dashboard/dashboard';
+import { NewsComponent } from './features/events/pages/news/news';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -32,6 +33,9 @@ export const routes: Routes = [
 
   // dashboard — só admin
   { path: 'admin/dashboard', component: Dashboard, canActivate: [adminGuard] },
+
+  // avisos — lista de notícias internas do sistema
+  { path: 'news', component: NewsComponent },
 
   // 404 — deve ser a última
   { path: '**', component: NotFound }

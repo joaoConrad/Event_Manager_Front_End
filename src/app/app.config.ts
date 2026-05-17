@@ -2,26 +2,26 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, importProvidersF
 import { provideRouter, withRouterConfig } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
 
-    // 🔥 HTTP CLIENT (ESSENCIAL PRO BACKEND)
+    // HTTP CLIENT (ESSENCIAL PRO BACKEND)
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),
 
-    // 🔥 ROTAS
+    //  ROTAS
     provideRouter(
       routes,
       withRouterConfig({ onSameUrlNavigation: 'reload' })
     ),
 
-    // 🔥 FORMS
+    // FORMS
     importProvidersFrom(FormsModule)
   ],
 };
