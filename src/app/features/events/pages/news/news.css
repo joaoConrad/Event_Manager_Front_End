@@ -125,7 +125,7 @@ button:active {
 
 /* LABEL AZUL PEQUENA */
 .page-label {
-  color: var(--primary);
+  color: var(--brand-blue);
   font-size: 12px;
   font-weight: bold;
   letter-spacing: 1px;

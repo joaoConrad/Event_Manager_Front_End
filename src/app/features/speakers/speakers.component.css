@@ -69,10 +69,18 @@ h1 {
 .form textarea {
   padding: 12px;
   border-radius: 10px;
-  border: none;
-  background: var(--input);
+  border: 1px solid var(--border-input);
+  background: var(--surface);
   color: var(--text);
   font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.form input:focus,
+.form textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
 .form textarea {

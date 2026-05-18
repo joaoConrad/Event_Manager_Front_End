@@ -172,9 +172,20 @@
   border-color: #bfdbfe;
 }
 
+.info-item.highlight-item .info-value,
+.info-item.danger-item .info-value {
+  color: var(--text);
+}
+
 .info-item.danger-item {
   background: #fef2f2;
   border-color: #fecaca;
+}
+
+:host-context([data-theme='dark']) .info-item.highlight-item,
+:host-context([data-theme='dark']) .info-item.danger-item {
+  background: var(--surface-subtle) !important;
+  border-color: var(--border-soft) !important;
 }
 
 .info-label {
