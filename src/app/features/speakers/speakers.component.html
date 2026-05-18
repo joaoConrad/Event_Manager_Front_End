@@ -1,0 +1,23 @@
+<div class="container">
+
+  <h2 class="title">Palestrantes</h2>
+  <p class="subtitle">Cadastre os palestrantes do evento</p>
+
+  <form (ngSubmit)="save()" class="form">
+
+    <input [(ngModel)]="speaker.name" name="name" placeholder="Nome" required>
+
+    <textarea [(ngModel)]="speaker.miniBio" name="miniBio" placeholder="Biografia"></textarea>
+
+    <input [(ngModel)]="topicsInput" name="topics" placeholder="Tópicos">
+
+    <input
+      type="time"
+      [(ngModel)]="speaker.schedule"
+      name="schedule">
+
+    <button type="submit" class="btn-primary">Salvar</button>
+
+  </form>
+
+</div>

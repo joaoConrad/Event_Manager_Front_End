@@ -1,3 +1,4 @@
+import { Component } from '@angular/core';
 import { Routes } from '@angular/router';
 import { Home } from './features/home/pages/home/home';
 import { EventList } from './features/events/pages/event-list/event-list';
@@ -12,7 +13,7 @@ import { adminGuard } from './core/guards/admin-guard';
 import { authGuard } from './core/guards/auth-guard';
 import { Dashboard } from './features/admin/dashboard/dashboard';
 import { NewsComponent } from './features/events/pages/news/news';
-
+import { SpeakersComponent } from './features/speakers/speakers.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
 
@@ -36,6 +37,9 @@ export const routes: Routes = [
 
   // avisos — lista de notícias internas do sistema
   { path: 'news', component: NewsComponent },
+
+  // palestrantes — cadastro, edição e listagem de palestrantes do evento
+  { path: 'speakers', component: SpeakersComponent },
 
   // 404 — deve ser a última
   { path: '**', component: NotFound }

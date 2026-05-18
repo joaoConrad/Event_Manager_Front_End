@@ -114,14 +114,14 @@
 
 /* ── SECTIONS ── */
 .detail-section {
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: 26px;
-  padding: 1.6rem 2rem;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+
+  border: 1px solid var(--border-soft);
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.25);
 }
 
 .section-label {
@@ -358,16 +358,17 @@
 
 .full { width: 100%; }
 
-.btn-primary  { background: #2563eb; color: #fff; box-shadow: 0 10px 24px rgba(37,99,235,.22); }
-.btn-secondary { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.22); }
-.btn-secondary:hover { background: rgba(255,255,255,.2); }
-.btn-success  { background: #059669; color: #fff; box-shadow: 0 10px 24px rgba(5,150,105,.2); }
-.btn-success:hover { background: #047857; }
-.btn-warning  { background: #d97706; color: #fff; box-shadow: 0 10px 24px rgba(217,119,6,.2); }
-.btn-warning:hover { background: #b45309; }
-.btn-danger   { background: #dc2626; color: #fff; box-shadow: 0 10px 24px rgba(220,38,38,.2); }
-.btn-danger:hover { background: #b91c1c; }
-.btn-disabled { background: rgba(255,255,255,.1); color: rgba(255,255,255,.45); cursor: not-allowed; box-shadow: none; }
+.btn-primary  { background: var(--btn-primary-bg); color: #fff; box-shadow: 0 10px 24px rgba(37,99,235,.22); }
+.btn-primary:hover { background: var(--btn-primary-hover); }
+.btn-secondary { background: var(--btn-secondary-bg); color: var(--text); border: 1px solid var(--btn-secondary-border); }
+.btn-secondary:hover { background: var(--btn-secondary-hover); }
+.btn-success  { background: var(--btn-success-bg); color: #fff; box-shadow: 0 10px 24px rgba(5,150,105,.2); }
+.btn-success:hover { background: var(--btn-success-hover); }
+.btn-warning  { background: var(--btn-warning-bg); color: #fff; box-shadow: 0 10px 24px rgba(217,119,6,.2); }
+.btn-warning:hover { background: var(--btn-warning-hover); }
+.btn-danger   { background: var(--btn-danger-bg); color: #fff; box-shadow: 0 10px 24px rgba(220,38,38,.2); }
+.btn-danger:hover { background: var(--btn-danger-hover); }
+.btn-disabled { background: var(--border); color: var(--text-muted-2); cursor: not-allowed; box-shadow: none; }
 .btn-disabled:hover { transform: none; }
 
 /* ── MODAL ── */
@@ -494,4 +495,47 @@
   flex: 1;
   max-width: 200px;
   padding: 6px;
+}
+
+.speaker-card {
+  display: flex;
+  justify-content: space-between; /* joga pro lado direito */
+  align-items: center;
+  background: var(--card);
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.speaker-card button {
+  margin-left: auto; /* garante que vá pra direita */
+}
+
+.speaker-card div {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-danger {
+  background: var(--btn-danger-bg);
+  color: var(--text);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: var(--btn-danger-hover);
+}
+
+.actions {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.actions button {
+  display: inline-flex !important;
+  width: auto !important;
 }

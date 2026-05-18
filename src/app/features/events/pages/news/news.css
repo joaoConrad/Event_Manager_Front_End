@@ -21,7 +21,7 @@ h2 {
   max-width: 500px;
   margin-bottom: 30px;
   padding: 20px;
-  background: #1e293b;
+  background: var(--card);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -34,15 +34,15 @@ input, textarea {
   margin-bottom: 12px;
   border-radius: 8px;
   border: 1px solid #444;
-  background: #121a2f;
-  color: white;
+  background: var(--input);
+  color: var(--text);
   font-size: 14px;
 }
 
 /* BOTÃO PUBLICAR */
 .form button {
-  background: #4f8cff;
-  color: white;
+  background: var(--btn-primary-bg);
+  color: var(--text);
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
@@ -53,20 +53,21 @@ input, textarea {
 }
 
 .form button:hover {
-  background: #3a6edc;
+  background: var(--btn-primary-hover);
   transform: translateY(-2px);
 }
 
 /* LISTA */
 .news-card {
-  background: #1e293b;
+  background: var(--card);
   padding: 18px;
+  border-radius: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+
   margin-bottom: 15px;
-  border-radius: 12px;
-  border-left: 5px solid #4f8cff;
-  max-width: 600px;
-  transition: 0.2s;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .news-card:hover {
@@ -86,14 +87,14 @@ input, textarea {
 
 /* DATA */
 .news-card small {
-  color: #aaa;
+  color: var(--muted);
 }
 
 /* BOTÃO EXCLUIR */
 .news-card button {
   margin-top: 10px;
-  background: #dc2626;
-  color: white;
+  background: var(--btn-danger-bg);
+  color: var(--text);
   border: none;
   padding: 6px 12px;
   border-radius: 6px;
@@ -102,7 +103,7 @@ input, textarea {
 }
 
 .news-card button:hover {
-  background: #cc0000;
+  background: var(--btn-danger-hover);
   transform: translateY(-2px);
 }
 
@@ -124,7 +125,7 @@ button:active {
 
 /* LABEL AZUL PEQUENA */
 .page-label {
-  color: #4f8cff;
+  color: var(--primary);
   font-size: 12px;
   font-weight: bold;
   letter-spacing: 1px;
@@ -135,7 +136,13 @@ button:active {
 
 /* DESCRIÇÃO */
 .page-description {
-  color: #9aa4b2;
+  color: var(--muted);
   margin-bottom: 25px;
   max-width: 500px;
+}
+
+input,
+textarea {
+  background: var(--surface);
+  color: var(--text);
 }

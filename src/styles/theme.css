@@ -2,6 +2,7 @@
 
 :root {
   color-scheme: light;
+  --card: #ffffff;
 
   --brand-blue: #2563eb;
   --brand-purple: #7c3aed;
@@ -35,6 +36,15 @@
   --btn-secondary-hover: #eef2f7;
   --btn-secondary-border: #dbe3ee;
 
+  --btn-primary-bg: #2563eb;
+  --btn-primary-hover: #1d4ed8;
+  --btn-success-bg: #059669;
+  --btn-success-hover: #047857;
+  --btn-warning-bg: #d97706;
+  --btn-warning-hover: #b45309;
+  --btn-danger-bg: #dc2626;
+  --btn-danger-hover: #b91c1c;
+
   --carousel-btn-bg: #ffffff;
   --carousel-btn-border: #e5e7eb;
   --carousel-btn-text: #374151;
@@ -57,16 +67,17 @@
 
 [data-theme='dark'] {
   color-scheme: dark;
+  --card: #1e293b;
 
   --page-bg: #0f172a;
-  --page-bg-end: #1e293b;
+  --page-bg-end: var(--card);
 
   --text: #f1f5f9;
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
   --text-muted-2: #64748b;
 
-  --surface: #1e293b;
+  --surface: var(--card);
   --surface-subtle: #273549;
   --surface-muted: #334155;
   --surface-secondary: #0f172a;
@@ -86,6 +97,15 @@
   --btn-secondary-hover: #3f4f63;
   --btn-secondary-border: #475569;
 
+  --btn-primary-bg: #2563eb;
+  --btn-primary-hover: #1d4ed8;
+  --btn-success-bg: #059669;
+  --btn-success-hover: #047857;
+  --btn-warning-bg: #d97706;
+  --btn-warning-hover: #b45309;
+  --btn-danger-bg: #dc2626;
+  --btn-danger-hover: #b91c1c;
+
   --carousel-btn-bg: var(--surface);
   --carousel-btn-border: var(--border);
   --carousel-btn-text: var(--text-secondary);
@@ -93,13 +113,13 @@
   --skeleton-a: #334155;
   --skeleton-b: #475569;
 
-  --section-band-bg: #1e293b;
+  --section-band-bg: var(--card);
   --section-band-border: #334155;
 
   --meta-tile-bg: #273549;
   --meta-tile-border: #334155;
 
-  --footer-bg: #020617;
+  --footer-bg: var(--surface);
   --footer-text: #f1f5f9;
   --footer-muted: #94a3b8;
 

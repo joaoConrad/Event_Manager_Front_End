@@ -63,7 +63,7 @@ button {
   border-radius: 12px;
   border: none;
   background: #2563eb;
-  color: white;
+  color: var(--card);
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;

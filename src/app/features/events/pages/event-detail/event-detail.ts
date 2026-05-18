@@ -7,17 +7,29 @@ import { EventModel } from '../../../../models/event.model';
 import { ParticipantModel } from '../../../../models/participant.model';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 
 type FeedbackType = 'success' | 'error' | 'info';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [RouterLink, FormsModule, DatePipe],
+  imports: [RouterLink, FormsModule, DatePipe, CommonModule],
   templateUrl: './event-detail.html',
   styleUrl: './event-detail.css'
 })
 export class EventDetail implements OnInit {
+
+  selectedSpeaker: any = null;
+
+  openSpeaker(s: any) {
+    this.selectedSpeaker = s;
+  }
+
+  closeSpeaker() {
+    this.selectedSpeaker = null;
+  }
+
   event: EventModel | null = null;
   participants: ParticipantModel[] = [];
   searchParticipant = '';
@@ -52,37 +64,35 @@ export class EventDetail implements OnInit {
       return;
     }
     this.loadEvent(Number(idParam));
+    this.loadSpeakers();
   }
 
   loadEvent(id: number): void {
-    this.loading = true;
-    this.eventService.getById(id).subscribe({
-      next: (res: any) => {
-        const raw = res?.data ?? res;
+  this.loading = true;
 
-        // ── fix: normaliza date e time que podem vir como ISO do banco ──
-        this.event = {
-          ...raw,
-          date: raw.date?.split('T')[0] ?? raw.date,
-          time: raw.startTime?.slice(0, 5) ?? raw.startTime,
-          isCheckedIn: raw.isCheckedIn ?? false
-        };
+  this.eventService.getById(id).subscribe({
+    next: (res: any) => {
+      const raw = res?.data ?? res;
 
-        this.loading = false;
+      this.event = {
+        ...raw,
+        date: raw.date?.split('T')[0] ?? raw.date,
+        time: raw.startTime?.slice(0, 5) ?? raw.startTime,
+        isCheckedIn: raw.isCheckedIn ?? false
+      };
 
-        if (this.authService.isAdmin() && this.event?.id) {
-          this.loadParticipants(this.event.id);
-        }
+      this.loadSpeakers();
 
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.notFound = true;
-        this.loading = false;
-        this.cdr.detectChanges();
+      this.loading = false;
+
+      if (this.authService.isAdmin() && this.event?.id) {
+        this.loadParticipants(this.event.id);
       }
-    });
-  }
+
+      this.cdr.detectChanges();
+    }
+  });
+}
 
   loadParticipants(eventId: number): void {
     this.loadingParticipants = true;
@@ -229,25 +239,53 @@ export class EventDetail implements OnInit {
   if (this.filteredParticipants.length === 0) {
     console.log("Nenhum participante encontrado");
   }
+  }
+
+  sortParticipants(type: string) {
+    if (type === 'name') {
+      this.filteredParticipants.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+    }
+
+    if (type === 'date') {
+      this.filteredParticipants.sort((a, b) =>
+        new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
+      );
+    }
+
+    if (type === 'status') {
+      this.filteredParticipants.sort((a, b) =>
+        Number(b.isCheckedIn) - Number(a.isCheckedIn)
+      );
+    }
+  }
+
+  speakers: any[] = [];
+
+  loadSpeakers() {
+  const all = JSON.parse(localStorage.getItem('speakers') || '[]');
+
+  console.log('Todos speakers:', all);
+  console.log('Evento atual:', this.event?.id);
+
+  this.speakers = all.filter((s: any) => s.eventId == this.event?.id);
+
+  console.log('Filtrados:', this.speakers);
 }
 
-sortParticipants(type: string) {
-  if (type === 'name') {
-    this.filteredParticipants.sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-  }
+deleteSpeaker(id: number) {
+  const confirmDelete = confirm('Deseja excluir este palestrante?');
 
-  if (type === 'date') {
-    this.filteredParticipants.sort((a, b) =>
-      new Date(a.createdAt || '').getTime() - new Date(b.createdAt || '').getTime()
-    );
-  }
+  if (!confirmDelete) return;
 
-  if (type === 'status') {
-    this.filteredParticipants.sort((a, b) =>
-      Number(b.isCheckedIn) - Number(a.isCheckedIn)
-    );
-  }
+  const all = JSON.parse(localStorage.getItem('speakers') || '[]');
+
+  const updated = all.filter((s: any) => s.id !== id);
+
+  localStorage.setItem('speakers', JSON.stringify(updated));
+
+  this.loadSpeakers();
 }
+
 }

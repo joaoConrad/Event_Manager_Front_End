@@ -61,6 +61,36 @@
           <p class="detail-description">{{ event.description }}</p>
         </div>
 
+        <!-- PALESTRANTES -->
+        <div class="detail-section">
+          <span class="section-label">Palestrantes</span>
+
+          @if (speakers.length === 0) {
+            <p class="muted">Nenhum palestrante cadastrado para este evento.</p>
+          } @else {
+            <div class="speakers-list">
+              @for (s of speakers; track s.id) {
+                <div class="speaker-card">
+                  <div>
+                    <strong>{{ s.name }}</strong>
+                    <p class="muted">{{ s.miniBio }}</p>
+                  </div>
+
+                  <div class="actions">
+                    <button class="btn btn-secondary" (click)="openSpeaker(s)">
+                      Ver detalhes
+                    </button>
+
+                    <button class="btn btn-danger" (click)="deleteSpeaker(s.id)">
+                      Excluir
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
         <!-- INFORMAÇÕES -->
         <div class="detail-section">
           <span class="section-label">Informações</span>
@@ -206,6 +236,13 @@
             <a [routerLink]="['/events/edit', event.id]" class="btn btn-secondary full">
               Editar evento
             </a>
+            <a
+              [routerLink]="['/speakers']"
+              [queryParams]="{ eventId: event.id }"
+              class="btn btn-secondary full"
+              style="margin-top: 0.6rem">
+               Adicionar palestrante
+            </a>
             <a [routerLink]="['/events', event.id, 'checkin']"
               class="btn btn-secondary full"
               style="margin-top: 0.6rem">
@@ -276,5 +313,19 @@
       </div>
     </div>
   }
+
+  @if (selectedSpeaker) {
+  <div class="modal-backdrop" (click)="closeSpeaker()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <h3>{{ selectedSpeaker.name }}</h3>
+      <p>{{ selectedSpeaker.miniBio }}</p>
+
+      <p><b>Temas:</b> {{ selectedSpeaker.topics.join(', ') }}</p>
+      <p><b>Agenda:</b> {{ selectedSpeaker.schedule }}</p>
+
+      <button class="btn btn-secondary" (click)="closeSpeaker()">Fechar</button>
+    </div>
+  </div>
+}
 
 </section>
