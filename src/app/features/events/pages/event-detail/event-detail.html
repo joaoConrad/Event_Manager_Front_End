@@ -81,7 +81,7 @@
                       Ver detalhes
                     </button>
 
-                    <button class="btn btn-danger" (click)="deleteSpeaker(s.id)">
+                    <button *ngIf="authService.isAdmin()" class="btn btn-danger" (click)="deleteSpeaker(s.id)">
                       Excluir
                     </button>
                   </div>

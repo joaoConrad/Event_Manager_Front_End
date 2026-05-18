@@ -275,6 +275,8 @@ export class EventDetail implements OnInit {
 }
 
 deleteSpeaker(id: number) {
+  if (!this.authService.isAdmin()) return;
+
   const confirmDelete = confirm('Deseja excluir este palestrante?');
 
   if (!confirmDelete) return;
