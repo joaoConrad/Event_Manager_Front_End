@@ -14,6 +14,7 @@ export interface MySubscription {
   subscriptionToken: string;
   isCheckedIn: boolean;
   checkedInAt: string | null;
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
 }
 
 export interface CheckinResponse {
@@ -53,6 +54,31 @@ export class ParticipantService {
       `${this.apiUrl}/${eventId}/participants/me`,
       { headers: this.authService.getAuthHeaders() }
     );
+  }
+
+  updateApprovalStatus(
+    eventId: number,
+    participantId: number,
+    approvalStatus: 'approved' | 'rejected',
+    approvalReason = ''
+  ): Observable<{ message: string; data?: ParticipantModel }> {
+    return this.http.patch<{ message: string; data?: ParticipantModel }>(
+      `${this.apiUrl}/${eventId}/participants/${participantId}/approval`,
+      { approvalStatus, approvalReason },
+      { headers: this.authService.getAuthHeaders() }
+    );
+  }
+
+  approve(eventId: number, participantId: number): Observable<{ message: string; data?: ParticipantModel }> {
+    return this.updateApprovalStatus(eventId, participantId, 'approved');
+  }
+
+  reject(
+    eventId: number,
+    participantId: number,
+    approvalReason = ''
+  ): Observable<{ message: string; data?: ParticipantModel }> {
+    return this.updateApprovalStatus(eventId, participantId, 'rejected', approvalReason);
   }
 
   // Busca a inscrição do usuário logado com o subscriptionToken para o QR code

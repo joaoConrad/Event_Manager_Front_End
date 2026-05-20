@@ -72,7 +72,7 @@
     <div class="empty-state"><p>Carregando eventos...</p></div>
   } @else {
 
-    @if (getAvailableEvents().length === 0) {
+    @if (getAvailableEvents().length === 0 && getPastEvents().length === 0 && getSoldOutEvents().length === 0) {
       <div class="empty-state"><p>Nenhum evento encontrado com esse filtro.</p></div>
     }
 
@@ -107,6 +107,8 @@
                   <h2>{{ event.title }}</h2>
                   @if (isPastEvent(event)) {
                     <span class="status-badge closed">Encerrado</span>
+                  } @else if (isPendingApproval(event)) {
+                    <span class="status-badge pending">Aguardando aprovação</span>
                   } @else if (isJoined(event.id)) {
                     <span class="status-badge joined">Inscrito</span>
                   } @else if (isSoldOut(event)) {
@@ -131,6 +133,8 @@
                     <span class="meta-label">Disponibilidade</span>
                     @if (isPastEvent(event)) {
                       <span class="meta-value danger">Encerrado</span>
+                    } @else if (isPendingApproval(event)) {
+                      <span class="meta-value warning">Aguardando aprovação</span>
                     } @else if (isJoined(event.id)) {
                       <span class="meta-value highlight">Você está inscrito</span>
                     } @else if (isSoldOut(event)) {
@@ -153,6 +157,8 @@
                 } @else if (authService.isLoggedIn()) {
                   @if (isPastEvent(event)) {
                     <button class="btn btn-disabled btn-sm" disabled>Encerrado</button>
+                  } @else if (isPendingApproval(event)) {
+                    <button class="btn btn-warning btn-sm" (click)="cancelSubscription(event.id)">Cancelar solicitação</button>
                   } @else if (isJoined(event.id)) {
                     <!-- Oculta cancelar se o usuário já fez check-in neste evento -->
                     @if (!event.isCheckedIn) {
@@ -213,12 +219,14 @@
             <span class="eyebrow">Encerrados</span>
             <span class="compact-count">{{ getPastEvents().length }} evento(s) já realizados</span>
           </div>
-          <button class="btn btn-secondary btn-sm" (click)="togglePastEvents()">
-            {{ showPastEvents ? 'Ocultar' : 'Ver encerrados' }}
-          </button>
+          @if (getAvailableEvents().length > 0) {
+            <button class="btn btn-secondary btn-sm" (click)="togglePastEvents()">
+              {{ showPastEvents ? 'Ocultar' : 'Ver encerrados' }}
+            </button>
+          }
         </div>
 
-        @if (showPastEvents) {
+        @if (shouldShowPastEvents()) {
           <div class="compact-list">
             @for (event of getPastEvents(); track event.id) {
               <div class="compact-card closed-card">
@@ -242,23 +250,25 @@
   }
 
   <!-- PAGINAÇÃO -->
-  @if (pagination && pagination.totalPages > 1) {
+  @if (pagination && pagination.totalPages >= 1) {
     <div class="pagination-bar">
       <span class="pagination-info">
         Página {{ currentPage }} de {{ pagination.totalPages }}
         <span class="pagination-total">({{ pagination.totalItems }} eventos)</span>
       </span>
-      <div class="pagination-controls">
-        <button class="page-btn page-btn--nav" [disabled]="!pagination.hasPreviousPage" (click)="prevPage()">←</button>
-        @for (page of getPageNumbers(); track page) {
-          @if (page === -1) {
-            <span class="page-dots">…</span>
-          } @else {
-            <button class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
+      @if (pagination.totalPages > 1) {
+        <div class="pagination-controls">
+          <button class="page-btn page-btn--nav" [disabled]="!pagination.hasPreviousPage" (click)="prevPage()">←</button>
+          @for (page of getPageNumbers(); track page) {
+            @if (page === -1) {
+              <span class="page-dots">…</span>
+            } @else {
+              <button class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
+            }
           }
-        }
-        <button class="page-btn page-btn--nav" [disabled]="!pagination.hasNextPage" (click)="nextPage()">→</button>
-      </div>
+          <button class="page-btn page-btn--nav" [disabled]="!pagination.hasNextPage" (click)="nextPage()">→</button>
+        </div>
+      }
     </div>
   }
 

@@ -145,6 +145,9 @@ export class EventList implements OnInit {
       isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
       isUserRegistered: event.isUserRegistered ?? false,
       isCheckedIn: event.isCheckedIn ?? false,
+      approvalMode: event.approvalMode ?? 'automatic',
+      approvalRuleDescription: event.approvalRuleDescription ?? '',
+      userRegistrationApprovalStatus: event.userRegistrationApprovalStatus,
     }));
   }
 
@@ -221,15 +224,18 @@ export class EventList implements OnInit {
   }
 
   getAvailableEvents(): EventWithRegistered[] {
-    const base = this.events.filter((e) => {
-      if (this.isPastEvent(e)) return false;
-      if (this.authService.isAdmin()) return true;
-      return !this.isSoldOut(e) || this.isJoined(e.id);
-    });
-    return this.sortEvents(this.applyFilters(base));
+    return this.getVisibleEvents();
+  }
+
+  getVisibleEvents(): EventWithRegistered[] {
+    return this.sortEvents(this.applyFilters(this.events));
   }
 
   getSoldOutEvents(): EventWithRegistered[] {
+    return [];
+  }
+
+  getHiddenSoldOutEvents(): EventWithRegistered[] {
     if (this.authService.isAdmin()) return [];
     const base = this.events.filter(
       (e) => !this.isPastEvent(e) && this.isSoldOut(e) && !this.isJoined(e.id),
@@ -238,6 +244,10 @@ export class EventList implements OnInit {
   }
 
   getPastEvents(): EventWithRegistered[] {
+    return [];
+  }
+
+  getHiddenPastEvents(): EventWithRegistered[] {
     return this.sortEvents(this.applyFilters(this.events.filter((e) => this.isPastEvent(e))));
   }
 
@@ -282,6 +292,10 @@ export class EventList implements OnInit {
 
   togglePastEvents(): void { this.showPastEvents = !this.showPastEvents; }
 
+  shouldShowPastEvents(): boolean {
+    return this.showPastEvents;
+  }
+
   // ── Helpers de data/estado ─────────────────────────────
 
   getDateTime(event: EventWithRegistered): number {
@@ -314,6 +328,10 @@ export class EventList implements OnInit {
     return event?.isUserRegistered === true || this.manualJoinedEventIds.has(eventId);
   }
 
+  isPendingApproval(event: EventWithRegistered): boolean {
+    return this.isJoined(event.id) && event.userRegistrationApprovalStatus === 'pending';
+  }
+
   // ── Ações ──────────────────────────────────────────────
 
   joinEvent(id?: number): void {
@@ -326,7 +344,12 @@ export class EventList implements OnInit {
     this.participantService.subscribe(id).subscribe({
       next: () => {
         this.manualJoinedEventIds.add(id);
-        this.showFeedback('Inscrição realizada com sucesso.', 'success');
+        this.showFeedback(
+          event?.approvalMode === 'manual'
+            ? 'Inscrição enviada para aprovação.'
+            : 'Inscrição realizada com sucesso.',
+          'success'
+        );
         this.reloadEvents();
       },
       error: (err) => this.showFeedback(err?.error?.message || 'Não foi possível concluir a inscrição.', 'error'),

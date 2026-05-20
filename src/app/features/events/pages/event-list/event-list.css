@@ -364,6 +364,7 @@
 
 .status-badge.open     { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
 .status-badge.joined   { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.status-badge.pending  { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
 .status-badge.sold-out { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 .status-badge.closed   { background: var(--page-bg); color: var(--text-secondary); border: 1px solid #d1d5db; }
 
@@ -412,6 +413,7 @@
 }
 
 .meta-value.highlight { color: #2563eb; }
+.meta-value.warning   { color: #b45309; }
 .meta-value.danger    { color: #b91c1c; }
 
 .event-actions {

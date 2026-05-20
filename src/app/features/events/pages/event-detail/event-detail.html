@@ -37,6 +37,8 @@
             <span class="eyebrow">Evento</span>
             @if (isPastEvent()) {
               <span class="status-badge closed">Encerrado</span>
+            } @else if (isUserPendingApproval()) {
+              <span class="status-badge pending">Aguardando aprovação</span>
             } @else if (isJoined()) {
               <span class="status-badge joined">Você está inscrito</span>
             } @else if (isSoldOut()) {
@@ -138,6 +140,26 @@
           </div>
         </div>
 
+        <div class="detail-section">
+          <span class="section-label">Aprovação de inscrições</span>
+          <div class="approval-summary">
+            <div>
+              <strong>{{ isManualApproval() ? 'Manual' : 'Automática' }}</strong>
+              <p class="muted">
+                {{ isManualApproval()
+                  ? 'Novas inscrições ficam pendentes até avaliação da organização.'
+                  : 'Novas inscrições são confirmadas automaticamente conforme as regras do backend.' }}
+              </p>
+            </div>
+            @if (authService.isAdmin() && isManualApproval()) {
+              <span class="status-badge pending">{{ getPendingParticipantsCount() }} pendente(s)</span>
+            }
+          </div>
+          @if (event.approvalRuleDescription) {
+            <p class="approval-rule">{{ event.approvalRuleDescription }}</p>
+          }
+        </div>
+
         <!-- PARTICIPANTES (admin) -->
         @if (authService.isAdmin()) {
           <div class="detail-section">
@@ -176,8 +198,10 @@
                       <th>Nome</th>
                       <th>Email</th>
                       <th>Telefone</th>
+                      <th>Aprovação</th>
                       <th>Data inscrição</th>
                       <th>Presença</th>
+                      <th>Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -187,8 +211,37 @@
                         <td>{{ p.name }}</td>
                         <td>{{ p.email }}</td>
                         <td>{{ p.phone ?? '—' }}</td>
+                        <td>
+                          <span class="approval-status" [class]="getParticipantApprovalStatus(p)">
+                            @if (getParticipantApprovalStatus(p) === 'pending') {
+                              Pendente
+                            } @else if (getParticipantApprovalStatus(p) === 'rejected') {
+                              Recusada
+                            } @else {
+                              Aprovada
+                            }
+                          </span>
+                        </td>
                         <td>{{ p.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>  <!-- 👈 NOVO -->
                         <td>{{ p.isCheckedIn ? 'Presente' : 'Ausente' }}</td>
+                        <td>
+                          @if (isManualApproval() && getParticipantApprovalStatus(p) === 'pending') {
+                            <div class="approval-actions">
+                              <button class="btn btn-success btn-compact"
+                                [disabled]="approvalLoadingIds.has(p.id!)"
+                                (click)="approveParticipant(p)">
+                                Aprovar
+                              </button>
+                              <button class="btn btn-danger btn-compact"
+                                [disabled]="approvalLoadingIds.has(p.id!)"
+                                (click)="rejectParticipant(p)">
+                                Recusar
+                              </button>
+                            </div>
+                          } @else {
+                            <span class="muted">—</span>
+                          }
+                        </td>
                       </tr>
                     }
                   </tbody>
@@ -258,6 +311,12 @@
             @if (isPastEvent()) {
               <button class="btn btn-disabled full" disabled>Evento encerrado</button>
             } @else if (isJoined()) {
+              @if (isUserPendingApproval()) {
+                <button class="btn btn-disabled full" disabled>Aguardando aprovação</button>
+                <button class="btn btn-warning full" style="margin-top: 0.6rem" [disabled]="actionLoading" (click)="cancelSubscription()">
+                  {{ actionLoading ? 'Aguarde...' : 'Cancelar solicitação' }}
+                </button>
+              } @else {
               <!-- Oculta cancelar se o usuário já fez check-in neste evento -->
               @if (!event.isCheckedIn) {
                 <button class="btn btn-warning full" [disabled]="actionLoading" (click)="cancelSubscription()">
@@ -272,6 +331,7 @@
                 style="margin-top: 0.6rem">
                 🎟️ Ver meu QR code
               </a>
+              }
             } @else if (isSoldOut()) {
               <button class="btn btn-disabled full" disabled>Evento esgotado</button>
             } @else {

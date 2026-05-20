@@ -36,7 +36,9 @@ export class EventCreate implements OnInit {
     startTime: '',
     endTime: '',
     location: '',
-    maxParticipants: 1
+    maxParticipants: 1,
+    approvalMode: 'automatic',
+    approvalRuleDescription: ''
   };
 
   isEditMode = false;
@@ -158,6 +160,8 @@ export class EventCreate implements OnInit {
           date:      ev.date?.split('T')[0] ?? ev.date,
           startTime: ev.startTime?.slice(0, 5) ?? ev.startTime ?? '',
           endTime:   ev.endTime?.slice(0, 5)   ?? ev.endTime   ?? '',
+          approvalMode: ev.approvalMode ?? 'automatic',
+          approvalRuleDescription: ev.approvalRuleDescription ?? '',
         };
         if (ev.imageUrl) this.imagePreview = ev.imageUrl;
         this.loadingEvent = false;
@@ -197,6 +201,8 @@ export class EventCreate implements OnInit {
       fd.append('endTime',         this.event.endTime);
       fd.append('location',        this.event.location);
       fd.append('maxParticipants', String(this.event.maxParticipants));
+      fd.append('approvalMode',    this.event.approvalMode ?? 'automatic');
+      fd.append('approvalRuleDescription', this.event.approvalRuleDescription ?? '');
       fd.append('image',           this.imageFile, this.imageFile.name);
 
       return fd;

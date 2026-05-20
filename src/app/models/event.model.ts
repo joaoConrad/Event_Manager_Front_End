@@ -1,3 +1,7 @@
+import type { RegistrationApprovalStatus } from './participant.model';
+
+export type RegistrationApprovalMode = 'automatic' | 'manual';
+
 export interface EventModel {
   id?: number;
   title: string;
@@ -8,6 +12,11 @@ export interface EventModel {
   location: string;
   maxParticipants: number;
   imageUrl?: string;
+
+  // aprovacao de inscricoes
+  approvalMode?: RegistrationApprovalMode;
+  approvalRuleDescription?: string;
+  userRegistrationApprovalStatus?: RegistrationApprovalStatus;
 
   // calculados pelo back
   registeredParticipants?: number;

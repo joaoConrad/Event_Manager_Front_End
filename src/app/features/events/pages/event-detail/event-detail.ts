@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event';
 import { ParticipantService } from '../../../../core/services/participant';
 import { AuthService } from '../../../../core/services/auth';
+import { SpeakerService } from '../../../../core/services/speaker.service';
 import { EventModel } from '../../../../models/event.model';
 import { ParticipantModel } from '../../../../models/participant.model';
 import { FormsModule } from '@angular/forms';
@@ -38,6 +39,7 @@ export class EventDetail implements OnInit {
   loading = true;
   loadingParticipants = false;
   actionLoading = false;
+  approvalLoadingIds = new Set<number>();
   notFound = false;
 
   feedbackMessage = '';
@@ -52,6 +54,7 @@ export class EventDetail implements OnInit {
     private readonly router: Router,
     private readonly eventService: EventService,
     private readonly participantService: ParticipantService,
+    private readonly speakerService: SpeakerService,
     public readonly authService: AuthService,
     private readonly cdr: ChangeDetectorRef
   ) {}
@@ -78,7 +81,10 @@ export class EventDetail implements OnInit {
         ...raw,
         date: raw.date?.split('T')[0] ?? raw.date,
         time: raw.startTime?.slice(0, 5) ?? raw.startTime,
-        isCheckedIn: raw.isCheckedIn ?? false
+        isCheckedIn: raw.isCheckedIn ?? false,
+        approvalMode: raw.approvalMode ?? 'automatic',
+        approvalRuleDescription: raw.approvalRuleDescription ?? '',
+        userRegistrationApprovalStatus: raw.userRegistrationApprovalStatus
       };
 
       this.loadSpeakers();
@@ -143,6 +149,27 @@ export class EventDetail implements OnInit {
     return this.event?.isUserRegistered === true;
   }
 
+  isManualApproval(): boolean {
+    return this.event?.approvalMode === 'manual';
+  }
+
+  getUserApprovalStatus(): string {
+    if (!this.isJoined()) return '';
+    return this.event?.userRegistrationApprovalStatus ?? 'approved';
+  }
+
+  isUserPendingApproval(): boolean {
+    return this.getUserApprovalStatus() === 'pending';
+  }
+
+  getParticipantApprovalStatus(participant: ParticipantModel): string {
+    return participant.approvalStatus ?? 'approved';
+  }
+
+  getPendingParticipantsCount(): number {
+    return this.participants.filter((p) => this.getParticipantApprovalStatus(p) === 'pending').length;
+  }
+
   // ── ações ──────────────────────────────────────────────
 
   joinEvent(): void {
@@ -153,12 +180,19 @@ export class EventDetail implements OnInit {
     this.participantService.subscribe(this.event.id).subscribe({
       next: () => {
         this.actionLoading = false;
-        this.showFeedback('Inscrição realizada com sucesso!', 'success');
+        const isManual = this.event?.approvalMode === 'manual';
+        this.showFeedback(
+          isManual ? 'Inscrição enviada para aprovação.' : 'Inscrição realizada com sucesso!',
+          'success'
+        );
         if (this.event) {
           this.event = {
             ...this.event,
             isUserRegistered: true,
-            registeredParticipants: (this.event.registeredParticipants ?? 0) + 1
+            userRegistrationApprovalStatus: isManual ? 'pending' : 'approved',
+            registeredParticipants: isManual
+              ? (this.event.registeredParticipants ?? 0)
+              : (this.event.registeredParticipants ?? 0) + 1
           };
         }
         this.cdr.detectChanges();
@@ -183,6 +217,7 @@ export class EventDetail implements OnInit {
           this.event = {
             ...this.event,
             isUserRegistered: false,
+            userRegistrationApprovalStatus: undefined,
             registeredParticipants: Math.max((this.event.registeredParticipants ?? 1) - 1, 0)
           };
         }
@@ -256,22 +291,66 @@ export class EventDetail implements OnInit {
 
     if (type === 'status') {
       this.filteredParticipants.sort((a, b) =>
-        Number(b.isCheckedIn) - Number(a.isCheckedIn)
+        this.getParticipantApprovalStatus(a).localeCompare(this.getParticipantApprovalStatus(b))
       );
     }
+  }
+
+  approveParticipant(participant: ParticipantModel): void {
+    if (!this.event?.id || !participant.id) return;
+
+    this.approvalLoadingIds.add(participant.id);
+    this.participantService.approve(this.event.id, participant.id).subscribe({
+      next: () => {
+        participant.approvalStatus = 'approved';
+        participant.approvedAt = new Date().toISOString();
+        this.approvalLoadingIds.delete(participant.id!);
+        this.showFeedback('Inscrição aprovada.', 'success');
+        this.loadParticipants(this.event!.id!);
+      },
+      error: (err) => {
+        this.approvalLoadingIds.delete(participant.id!);
+        this.showFeedback(err?.error?.message || 'Não foi possível aprovar a inscrição.', 'error');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  rejectParticipant(participant: ParticipantModel): void {
+    if (!this.event?.id || !participant.id) return;
+
+    this.approvalLoadingIds.add(participant.id);
+    this.participantService.reject(this.event.id, participant.id).subscribe({
+      next: () => {
+        participant.approvalStatus = 'rejected';
+        participant.rejectedAt = new Date().toISOString();
+        this.approvalLoadingIds.delete(participant.id!);
+        this.showFeedback('Inscrição recusada.', 'success');
+        this.loadParticipants(this.event!.id!);
+      },
+      error: (err) => {
+        this.approvalLoadingIds.delete(participant.id!);
+        this.showFeedback(err?.error?.message || 'Não foi possível recusar a inscrição.', 'error');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   speakers: any[] = [];
 
   loadSpeakers() {
-  const all = JSON.parse(localStorage.getItem('speakers') || '[]');
+    if (!this.event?.id) return;
 
-  console.log('Todos speakers:', all);
-  console.log('Evento atual:', this.event?.id);
-
-  this.speakers = all.filter((s: any) => s.eventId == this.event?.id);
-
-  console.log('Filtrados:', this.speakers);
+    this.speakerService.getByEvent(this.event.id).subscribe({
+      next: (speakers) => {
+        this.speakers = speakers;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.speakers = [];
+        this.cdr.detectChanges();
+      }
+    });
 }
 
 deleteSpeaker(id: number) {
@@ -281,13 +360,10 @@ deleteSpeaker(id: number) {
 
   if (!confirmDelete) return;
 
-  const all = JSON.parse(localStorage.getItem('speakers') || '[]');
-
-  const updated = all.filter((s: any) => s.id !== id);
-
-  localStorage.setItem('speakers', JSON.stringify(updated));
-
-  this.loadSpeakers();
+  this.speakerService.delete(id).subscribe({
+    next: () => this.loadSpeakers(),
+    error: (err) => this.showFeedback(err?.error?.message || err?.error?.error || 'Não foi possível excluir o palestrante.', 'error')
+  });
 }
 
 }

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://caminho.com/api'
+  apiUrl: 'http://localhost:4000/api'
 };
