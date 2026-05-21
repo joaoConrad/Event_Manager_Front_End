@@ -30,6 +30,10 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
 
   get isCheckedIn(): boolean { return this.subscription?.isCheckedIn === true; }
   get subscriptionToken(): string | null { return this.subscription?.subscriptionToken ?? null; }
+  get approvalStatus(): string { return this.subscription?.approvalStatus ?? 'approved'; }
+  get isPendingApproval(): boolean { return this.approvalStatus === 'pending'; }
+  get isRejectedApproval(): boolean { return this.approvalStatus === 'rejected'; }
+  get canShowQr(): boolean { return this.approvalStatus === 'approved'; }
 
   // ── Admin ──────────────────────────────────────────────
   checkinState: CheckinState = 'idle';
@@ -75,7 +79,11 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
       next: (res) => {
         this.subscription = res.data;
         this.loading = false;
-        this.generateQr();
+        if (this.canShowQr) {
+          this.generateQr();
+        } else {
+          this.qrDataUrl = null;
+        }
         this.cdr.detectChanges();
 
         // Inicia polling apenas se o check-in ainda não foi feito.
@@ -111,6 +119,10 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
           this.subscription = res.data;
 
           // Assim que o check-in for confirmado: para o polling e atualiza a tela
+          if (this.canShowQr && !this.qrDataUrl) {
+            this.generateQr();
+          }
+
           if (!wasCheckedIn && res.data.isCheckedIn) {
             this.stopPolling();
             this.cdr.detectChanges();
@@ -133,7 +145,7 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
   // ── Gera QR code ───────────────────────────────────────
 
   generateQr(): void {
-    if (!this.subscriptionToken) return;
+    if (!this.subscriptionToken || !this.canShowQr) return;
 
     import('qrcode').then((QRCode) => {
       QRCode.toDataURL(this.subscriptionToken!, {

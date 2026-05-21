@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -19,10 +20,13 @@ export class Register {
 
   constructor(
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly cdr: ChangeDetectorRef
   ) {}
 
   submit(): void {
+    if (this.loading) return;
+
     this.errorMessage = '';
 
     if (!this.name.trim() || !this.email.trim() || !this.password) {
@@ -53,14 +57,18 @@ export class Register {
 
     this.loading = true;
 
-    this.authService.register(this.name.trim(), this.email.trim(), this.password, this.phone || undefined).subscribe({
-      next: () => {
+    this.authService.register(this.name.trim(), this.email.trim(), this.password, this.phone || undefined).pipe(
+      finalize(() => {
         this.loading = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: () => {
         this.router.navigate(['/home']);
       },
       error: (err) => {
-        this.loading = false;
         this.errorMessage = err?.error?.message || 'Não foi possível realizar o cadastro.';
+        this.cdr.detectChanges();
       }
     });
   }

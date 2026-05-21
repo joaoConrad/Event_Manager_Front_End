@@ -59,7 +59,7 @@ export class ParticipantService {
   updateApprovalStatus(
     eventId: number,
     participantId: number,
-    approvalStatus: 'approved' | 'rejected',
+    approvalStatus: 'pending' | 'approved' | 'rejected',
     approvalReason = ''
   ): Observable<{ message: string; data?: ParticipantModel }> {
     return this.http.patch<{ message: string; data?: ParticipantModel }>(

@@ -178,9 +178,10 @@ export class EventDetail implements OnInit {
 
     this.actionLoading = true;
     this.participantService.subscribe(this.event.id).subscribe({
-      next: () => {
+      next: (response) => {
         this.actionLoading = false;
-        const isManual = this.event?.approvalMode === 'manual';
+        const approvalStatus = response?.data?.approvalStatus;
+        const isManual = approvalStatus === 'pending' || this.event?.approvalMode === 'manual';
         this.showFeedback(
           isManual ? 'Inscrição enviada para aprovação.' : 'Inscrição realizada com sucesso!',
           'success'
@@ -189,10 +190,8 @@ export class EventDetail implements OnInit {
           this.event = {
             ...this.event,
             isUserRegistered: true,
-            userRegistrationApprovalStatus: isManual ? 'pending' : 'approved',
-            registeredParticipants: isManual
-              ? (this.event.registeredParticipants ?? 0)
-              : (this.event.registeredParticipants ?? 0) + 1
+            userRegistrationApprovalStatus: approvalStatus ?? (isManual ? 'pending' : 'approved'),
+            registeredParticipants: (this.event.registeredParticipants ?? 0) + 1
           };
         }
         this.cdr.detectChanges();
@@ -301,9 +300,8 @@ export class EventDetail implements OnInit {
 
     this.approvalLoadingIds.add(participant.id);
     this.participantService.approve(this.event.id, participant.id).subscribe({
-      next: () => {
-        participant.approvalStatus = 'approved';
-        participant.approvedAt = new Date().toISOString();
+      next: (response) => {
+        Object.assign(participant, response.data ?? { approvalStatus: 'approved' });
         this.approvalLoadingIds.delete(participant.id!);
         this.showFeedback('Inscrição aprovada.', 'success');
         this.loadParticipants(this.event!.id!);
@@ -321,9 +319,8 @@ export class EventDetail implements OnInit {
 
     this.approvalLoadingIds.add(participant.id);
     this.participantService.reject(this.event.id, participant.id).subscribe({
-      next: () => {
-        participant.approvalStatus = 'rejected';
-        participant.rejectedAt = new Date().toISOString();
+      next: (response) => {
+        Object.assign(participant, response.data ?? { approvalStatus: 'rejected' });
         this.approvalLoadingIds.delete(participant.id!);
         this.showFeedback('Inscrição recusada.', 'success');
         this.loadParticipants(this.event!.id!);

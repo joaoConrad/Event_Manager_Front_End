@@ -224,6 +224,8 @@ export class EventCreate implements OnInit {
   // ── Submit ────────────────────────────────────────────────
 
   submit(): void {
+    if (this.loading || this.loadingEvent) return;
+
     this.submitted = true;
     this.errorMessage = '';
     this.successMessage = '';

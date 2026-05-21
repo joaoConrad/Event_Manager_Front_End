@@ -81,6 +81,22 @@
           <p>Inscreva-se no evento para obter seu QR code.</p>
           <a [routerLink]="['/events', eventId]" class="btn btn-primary btn-sm">Ver evento</a>
         </div>
+      } @else if (isPendingApproval) {
+        <div class="checkin-result warning">
+          <span class="result-icon">⏳</span>
+          <h2>Inscrição em análise</h2>
+          <p>Sua inscrição ainda precisa ser aprovada pela organização antes de liberar o QR code.</p>
+          <a [routerLink]="['/events', eventId]" class="btn btn-secondary btn-sm">Voltar ao evento</a>
+        </div>
+
+      } @else if (isRejectedApproval) {
+        <div class="checkin-result error">
+          <span class="result-icon">✕</span>
+          <h2>Inscrição recusada</h2>
+          <p>Sua inscrição foi recusada pela organização e o QR code não está disponível.</p>
+          <a [routerLink]="['/events', eventId]" class="btn btn-secondary btn-sm">Voltar ao evento</a>
+        </div>
+
       } @else {
 
         <div class="qr-display">
