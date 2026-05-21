@@ -1,0 +1,122 @@
+<section class="participant-area">
+
+  <!-- HEADER -->
+  <div class="area-header">
+    <div class="area-header-inner">
+      <div class="area-header-text">
+        <span class="eyebrow">Área do Participante</span>
+        <h1>Meus materiais</h1>
+        <p>Acesse os conteúdos disponibilizados nos eventos em que você participou.</p>
+      </div>
+      <div class="area-avatar" aria-hidden="true">{{ getInitials() }}</div>
+    </div>
+  </div>
+
+  <!-- BUSCA -->
+  <div class="area-controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Buscar materiais..."
+        [(ngModel)]="searchQuery"
+      />
+    </div>
+    @if (!loading) {
+      <span class="total-count">
+        {{ filteredMaterials.length }} material{{ filteredMaterials.length !== 1 ? 'is' : '' }}
+      </span>
+    }
+  </div>
+
+  <!-- CONTEÚDO -->
+  <div class="area-body">
+
+    @if (loading) {
+      <div class="skeletons">
+        @for (i of [1, 2]; track i) {
+          <div class="skeleton-group">
+            <div class="skeleton-event-title"></div>
+            <div class="materials-grid">
+              @for (j of [1, 2, 3]; track j) {
+                <div class="material-card skeleton-card">
+                  <div class="skeleton-line short"></div>
+                  <div class="skeleton-line long"></div>
+                  <div class="skeleton-line medium"></div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (groupedByEvent.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon">📭</span>
+        @if (searchQuery) {
+          <p>Nenhum material encontrado para <strong>"{{ searchQuery }}"</strong>.</p>
+          <button class="btn-clear" (click)="searchQuery = ''">Limpar busca</button>
+        } @else {
+          <p>Nenhum material disponível ainda.<br>
+             Os organizadores liberarão os conteúdos em breve.</p>
+        }
+      </div>
+    } @else {
+      @for (group of groupedByEvent; track group.eventId) {
+        <div class="event-group">
+
+          <div class="group-header">
+            <div class="group-info">
+              <h2 class="group-title">{{ group.eventTitle }}</h2>
+              <span class="group-date">📅 {{ formatDate(group.eventDate) }}</span>
+            </div>
+            <span class="group-count">
+              {{ group.materials.length }} material{{ group.materials.length !== 1 ? 'is' : '' }}
+            </span>
+          </div>
+
+          <div class="materials-grid">
+            @for (material of group.materials; track material.id) {
+              <div class="material-card">
+
+                <div class="material-card-top">
+                  <div class="material-type-badge" [attr.data-type]="material.type">
+                    <span class="type-icon">{{ getTypeIcon(material.type) }}</span>
+                    <span class="type-label">{{ getTypeLabel(material.type) }}</span>
+                  </div>
+                  @if (material.sizeLabel) {
+                    <span class="material-size">{{ material.sizeLabel }}</span>
+                  }
+                </div>
+
+                <h3 class="material-title">{{ material.title }}</h3>
+
+                @if (material.description) {
+                  <p class="material-desc">{{ material.description }}</p>
+                }
+
+                <div class="material-footer">
+                  <span class="material-release">
+                    🕐 Disponível desde {{ formatRelease(material.releasedAt) }}
+                  </span>
+                  <button
+                    class="btn-download"
+                    (click)="handleDownload(material)"
+                    [attr.aria-label]="'Acessar ' + material.title"
+                  >
+                    {{ material.type === 'link' ? 'Acessar' : 'Baixar' }}
+                    <span class="btn-arrow">↗</span>
+                  </button>
+                </div>
+
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+    }
+
+  </div>
+
+</section>

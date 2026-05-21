@@ -11,9 +11,12 @@ import { QrCheckin } from './features/events/pages/qr-checkin/qr-checkin';
 import { NotFound } from './features/shared/not-found/not-found';
 import { adminGuard } from './core/guards/admin-guard';
 import { authGuard } from './core/guards/auth-guard';
+import { participantGuard } from './core/guards/participant-guard';
 import { Dashboard } from './features/admin/dashboard/dashboard';
 import { NewsComponent } from './features/events/pages/news/news';
 import { SpeakersComponent } from './features/speakers/speakers.component';
+import { ParticipantArea } from './features/participants/pages/area/area';
+
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
 
@@ -31,6 +34,9 @@ export const routes: Routes = [
 
   // perfil — só usuário logado
   { path: 'profile', component: Profile, canActivate: [authGuard] },
+
+  // área do participante — só usuário logado
+  { path: 'minha-area', component: ParticipantArea, canActivate: [participantGuard] },
 
   // dashboard — só admin
   { path: 'admin/dashboard', component: Dashboard, canActivate: [adminGuard] },
