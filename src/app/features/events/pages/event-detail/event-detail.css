@@ -423,6 +423,110 @@
   font-weight: 700;
 }
 
+.notice-form {
+  max-width: 500px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--surface-subtle);
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+}
+
+.notice-form input,
+.notice-form textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-input);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.notice-form button {
+  background: var(--btn-primary-bg);
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  width: auto;
+  min-width: 140px;
+  transition: all 0.2s ease;
+}
+
+.notice-form button:hover {
+  background: var(--btn-primary-hover);
+}
+
+.notices-list .notice-card {
+  background: var(--surface);
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+  margin-bottom: 12px;
+}
+
+.notices-list .notice-card:hover {
+  background: var(--surface-subtle);
+}
+
+.notices-list .notice-card h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.notices-list .notice-card p {
+  margin: 6px 0 10px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.notices-list .notice-card small {
+  color: var(--muted);
+}
+
+.notice-card .btn-compact {
+  margin-top: 0;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.notice-card .btn-compact:not(.btn-danger) {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border-soft);
+}
+
+.notice-card .btn-compact.btn-danger {
+  background: var(--btn-danger-bg);
+  color: #fff;
+  border: 1px solid transparent;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.18);
+}
+
+.notice-card .btn-compact:hover {
+  transform: translateY(-1px);
+}
+
+.notice-card .btn-compact.btn-danger:hover {
+  background: var(--btn-danger-hover);
+}
+
+.notice-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
 .approval-status.pending {
   background: #fffbeb;
   color: #b45309;

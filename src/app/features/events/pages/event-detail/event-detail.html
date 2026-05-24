@@ -160,6 +160,57 @@
           }
         </div>
 
+        <!-- AVISOS -->
+<div class="detail-section">
+  <span class="section-label">Avisos</span>
+  <h2 class="notice-title">
+    Avisos do Evento
+  </h2>
+  <p class="muted">
+    Acompanhe comunicados importantes, atualizações e informações internas do evento.
+  </p>
+  @if (authService.isAdmin()) {
+    <div class="notice-form">
+      <input
+        [(ngModel)]="newTitle"
+        placeholder="Título"
+      >
+      <textarea
+        [(ngModel)]="newContent"
+        placeholder="Conteúdo"
+      ></textarea>
+      <button
+        class="btn btn-primary"
+        (click)="addNews()">
+        Publicar
+      </button>
+    </div>
+  }
+  <div class="notices-list">
+    @if (newsList.length === 0) {
+      <p class="muted">Nenhum aviso publicado para este evento.</p>
+    }
+    @for (news of newsList; track news.id) {
+      <div class="notice-card">
+        <h3>{{ news.title }}</h3>
+        <p>{{ news.content }}</p>
+        <div class="notice-footer">
+          <small>
+            {{ news.createdAt | date:'dd/MM/yyyy HH:mm' }}
+          </small>
+          @if (authService.isAdmin()) {
+            <button
+              class="btn btn-danger btn-compact"
+              (click)="removeNews(news.id!)">
+              Excluir
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
         <!-- PARTICIPANTES (admin) -->
         @if (authService.isAdmin()) {
           <div class="detail-section">
@@ -389,3 +440,5 @@
 }
 
 </section>
+
+

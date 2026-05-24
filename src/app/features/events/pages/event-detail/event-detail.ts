@@ -9,6 +9,8 @@ import { ParticipantModel } from '../../../../models/participant.model';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
+import { NewsService } from '../../../../core/services/news.services';
+import { News } from '../../../../models/news.model';
 
 type FeedbackType = 'success' | 'error' | 'info';
 
@@ -35,6 +37,9 @@ export class EventDetail implements OnInit {
   participants: ParticipantModel[] = [];
   searchParticipant = '';
   filteredParticipants: any[] = [];
+  newsList: News[] = [];
+  newTitle = '';
+  newContent = '';
 
   loading = true;
   loadingParticipants = false;
@@ -56,7 +61,8 @@ export class EventDetail implements OnInit {
     private readonly participantService: ParticipantService,
     private readonly speakerService: SpeakerService,
     public readonly authService: AuthService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private newsService: NewsService
   ) {}
 
   ngOnInit(): void {
@@ -88,6 +94,7 @@ export class EventDetail implements OnInit {
       };
 
       this.loadSpeakers();
+      this.loadNews();
 
       this.loading = false;
 
@@ -119,9 +126,82 @@ export class EventDetail implements OnInit {
     });
   }
 
+  loadNews(): void {
+    if (!this.event?.id) {
+      this.newsList = [];
+      return;
+    }
+
+    const eventId = this.event.id;
+    this.newsService.getNews(eventId).subscribe({
+      next: (data) => {
+        this.newsList = data.filter((item) => {
+          const newsEventId = this.getNewsEventId(item);
+          return !newsEventId || newsEventId === eventId;
+        });
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao carregar avisos:', err);
+        this.newsList = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  addNews(): void {
+    if (!this.newTitle.trim() || !this.newContent.trim() || !this.event?.id) return;
+
+    const eventId = this.event.id;
+    const newItem: Partial<News> = {
+      title: this.newTitle.trim(),
+      content: this.newContent.trim(),
+      eventId
+    };
+
+    this.newsService.createNews(newItem, eventId).subscribe({
+      next: (res) => {
+        this.newTitle = '';
+        this.newContent = '';
+
+        if (res) {
+          const createdNews = {
+            ...newItem,
+            id: res.id,
+            createdAt: res.createdAt ? new Date(res.createdAt) : new Date(),
+            author: res.author
+          } as News;
+          this.newsList = [...this.newsList, createdNews];
+        }
+
+        this.loadNews();
+      },
+      error: (err) => {
+        console.error('Erro ao publicar aviso:', err);
+      }
+    });
+  }
+
+  removeNews(id: number): void {
+    this.newsService.deleteNews(id).subscribe({
+      next: () => {
+        this.newsList = this.newsList.filter((n) => n.id !== id);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao excluir aviso:', err);
+      }
+    });
+  }
+
   // ── helpers ────────────────────────────────────────────
 
   // date e time já normalizados no loadEvent, mas protege por garantia
+  private getNewsEventId(news: News): number | null {
+    const item = news as News & { event?: { id?: number | string }; event_id?: number | string };
+    const rawEventId = item.eventId ?? item.event_id ?? item.event?.id;
+    const eventId = Number(rawEventId);
+    return Number.isNaN(eventId) ? null : eventId;
+  }
   getEventDateTime(): number {
     if (!this.event) return 0;
     const date = this.event.date?.split('T')[0] ?? this.event.date;
@@ -364,3 +444,5 @@ deleteSpeaker(id: number) {
 }
 
 }
+
+

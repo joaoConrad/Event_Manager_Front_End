@@ -13,7 +13,6 @@ import { adminGuard } from './core/guards/admin-guard';
 import { authGuard } from './core/guards/auth-guard';
 import { participantGuard } from './core/guards/participant-guard';
 import { Dashboard } from './features/admin/dashboard/dashboard';
-import { NewsComponent } from './features/events/pages/news/news';
 import { SpeakersComponent } from './features/speakers/speakers.component';
 import { ParticipantArea } from './features/participants/pages/area/area';
 
@@ -40,9 +39,6 @@ export const routes: Routes = [
 
   // dashboard — só admin
   { path: 'admin/dashboard', component: Dashboard, canActivate: [adminGuard] },
-
-  // avisos — lista de notícias internas do sistema
-  { path: 'news', component: NewsComponent },
 
   // palestrantes — cadastro, edição e listagem de palestrantes do evento
   { path: 'speakers', component: SpeakersComponent },

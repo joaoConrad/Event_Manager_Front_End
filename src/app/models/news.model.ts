@@ -4,4 +4,5 @@ export interface News {
   content: string;
   createdAt: Date;
   author?: string;
+  eventId?: number;
 }
