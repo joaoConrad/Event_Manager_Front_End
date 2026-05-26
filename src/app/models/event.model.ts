@@ -6,9 +6,10 @@ export interface EventModel {
   id?: number;
   title: string;
   description: string;
-  date: string;
-  startTime: string;   // substitui 'time' — hora de início
-  endTime: string;     // novo — hora de término
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
   location: string;
   maxParticipants: number;
   imageUrl?: string;
@@ -32,6 +33,7 @@ export interface EventModel {
   // soft delete
   deletedAt?: string | null;
 
-  // legacy — mantido pra não quebrar código que ainda usa .time
+  // legacy/compatibilidade com respostas antigas do back
+  date?: string;
   time?: string;
 }

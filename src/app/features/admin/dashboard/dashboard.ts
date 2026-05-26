@@ -24,6 +24,8 @@ interface DashboardStats {
 interface EventWithCount {
   id?: number;
   title: string;
+  startDate: string;
+  endDate: string;
   date: string;
   maxParticipants: number;
   totalParticipants: number;
@@ -142,15 +144,19 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
         const now = Date.now();
 
         this.events = data.map((e: any) => {
+          const startDate = this.normalizeDate(e.startDate ?? e.date);
+          const endDate = this.normalizeDate(e.endDate ?? e.date ?? e.startDate);
           const timeStr = e.startTime ?? e.time ?? '00:00';
-          const isPast = new Date(`${e.date}T${timeStr}`).getTime() < now;
+          const isPast = new Date(`${startDate}T${timeStr}`).getTime() < now;
           const total = e.totalParticipants ?? e.registeredParticipants ?? 0;
           const max = e.maxParticipants ?? 1;
 
           return {
             id: e.id,
             title: e.title ?? 'Evento sem nome',
-            date: e.date,
+            startDate,
+            endDate,
+            date: startDate === endDate ? startDate : `${startDate} - ${endDate}`,
             maxParticipants: max,
             totalParticipants: total,
             occupancyPercent: Math.min(Math.round((total / max) * 100), 100),
@@ -219,5 +225,9 @@ export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
     if (event.isPast)    return 'badge-closed';
     if (event.isSoldOut) return 'badge-sold-out';
     return 'badge-active';
+  }
+
+  private normalizeDate(date?: string): string {
+    return date?.split('T')[0] ?? '';
   }
 }

@@ -5,14 +5,16 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { EventService } from './event';
 import { AuthService } from './auth';
 import { EventModel } from '../../models/event.model';
+import { environment } from '../../../environments/environment';
 
 describe('EventService', () => {
   let service: EventService;
   let httpMock: HttpTestingController;
 
-  const apiUrl = 'http://localhost:3000/api/events';
+  const apiUrl = `${environment.apiUrl}/events`;
 
   const authServiceMock = {
+    getToken: () => 'fake-token',
     getAuthHeaders: () => ({
       Authorization: 'Bearer fake-token'
     })
@@ -43,8 +45,11 @@ describe('EventService', () => {
         id: 1,
         title: 'Evento Teste',
         description: 'Descrição do evento',
+        startDate: '2026-05-10',
+        endDate: '2026-05-10',
         date: '2026-05-10',
-        time: '19:00',
+        startTime: '19:00',
+        endTime: '21:00',
         location: 'URI',
         maxParticipants: 10,
         registeredParticipants: 2,
@@ -65,7 +70,15 @@ describe('EventService', () => {
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('Authorization')).toBe('Bearer fake-token');
 
-    req.flush(mockEvents);
+    req.flush({
+      page: 1,
+      limit: 50,
+      totalItems: 1,
+      totalPages: 1,
+      hasPreviousPage: false,
+      hasNextPage: false,
+      data: mockEvents
+    });
   });
 
   it('deve cachear eventos usando shareReplay', () => {
@@ -75,15 +88,26 @@ describe('EventService', () => {
     const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('GET');
 
-    req.flush([]);
+    req.flush({
+      page: 1,
+      limit: 50,
+      totalItems: 0,
+      totalPages: 0,
+      hasPreviousPage: false,
+      hasNextPage: false,
+      data: []
+    });
   });
 
   it('deve criar evento e limpar cache', () => {
     const newEvent: EventModel = {
       title: 'Novo Evento',
       description: 'Teste',
+      startDate: '2026-05-12',
+      endDate: '2026-05-12',
       date: '2026-05-12',
-      time: '20:00',
+      startTime: '20:00',
+      endTime: '22:00',
       location: 'Auditório',
       maxParticipants: 30
     };

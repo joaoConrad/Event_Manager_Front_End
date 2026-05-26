@@ -44,8 +44,12 @@ export class Profile implements OnInit {
           .filter((e) => e.isUserRegistered === true)
           .map((e) => ({
             ...e,
-            date: e.date?.split('T')[0] ?? e.date,
-            time: e.time?.slice(0, 5) ?? e.time
+            startDate: this.normalizeDate(e.startDate ?? e.date),
+            endDate: this.normalizeDate(e.endDate ?? e.date ?? e.startDate),
+            date: this.normalizeDate(e.startDate ?? e.date),
+            time: e.startTime?.slice(0, 5) ?? e.time?.slice(0, 5) ?? e.time,
+            startTime: e.startTime?.slice(0, 5) ?? e.startTime,
+            endTime: e.endTime?.slice(0, 5) ?? e.endTime
           }))
           .sort((a, b) => this.getDateTime(a) - this.getDateTime(b));
 
@@ -60,9 +64,19 @@ export class Profile implements OnInit {
   }
 
   getDateTime(event: EventModel): number {
-    const date = event.date?.split('T')[0] ?? event.date;
-    const time = event.time?.slice(0, 5) ?? event.time;
+    const date = this.normalizeDate(event.startDate ?? event.date);
+    const time = event.startTime?.slice(0, 5) ?? event.time?.slice(0, 5) ?? event.time;
     return new Date(`${date}T${time}`).getTime();
+  }
+
+  getDateRange(event: EventModel): string {
+    const startDate = this.normalizeDate(event.startDate ?? event.date);
+    const endDate = this.normalizeDate(event.endDate ?? event.date ?? event.startDate);
+    return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+  }
+
+  private normalizeDate(date?: string): string {
+    return date?.split('T')[0] ?? '';
   }
 
   isPastEvent(event: EventModel): boolean {

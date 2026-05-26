@@ -77,8 +77,8 @@
                       <span class="pec-badge open">Inscrito</span>
                     </div>
                     <div class="pec-meta">
-                      <span>📅 {{ event.date }}</span>
-                      <span>🕐 {{ event.time }}</span>
+                      <span>📅 {{ getDateRange(event) }}</span>
+                      <span>🕐 {{ event.startTime }} – {{ event.endTime }}</span>
                       <span>📍 {{ event.location }}</span>
                     </div>
                     <div class="pec-spots">
@@ -108,7 +108,7 @@
                       <span class="pec-badge closed">Encerrado</span>
                     </div>
                     <div class="pec-meta">
-                      <span>📅 {{ event.date }}</span>
+                      <span>📅 {{ getDateRange(event) }}</span>
                       <span>📍 {{ event.location }}</span>
                     </div>
                   </div>

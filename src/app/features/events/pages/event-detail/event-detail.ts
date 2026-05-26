@@ -85,8 +85,12 @@ export class EventDetail implements OnInit {
 
       this.event = {
         ...raw,
-        date: raw.date?.split('T')[0] ?? raw.date,
+        startDate: this.normalizeDate(raw.startDate ?? raw.date),
+        endDate: this.normalizeDate(raw.endDate ?? raw.date ?? raw.startDate),
+        date: this.normalizeDate(raw.startDate ?? raw.date),
         time: raw.startTime?.slice(0, 5) ?? raw.startTime,
+        startTime: raw.startTime?.slice(0, 5) ?? raw.startTime,
+        endTime: raw.endTime?.slice(0, 5) ?? raw.endTime,
         isCheckedIn: raw.isCheckedIn ?? false,
         approvalMode: raw.approvalMode ?? 'automatic',
         approvalRuleDescription: raw.approvalRuleDescription ?? '',
@@ -204,9 +208,20 @@ export class EventDetail implements OnInit {
   }
   getEventDateTime(): number {
     if (!this.event) return 0;
-    const date = this.event.date?.split('T')[0] ?? this.event.date;
+    const date = this.normalizeDate(this.event.startDate ?? this.event.date);
     const time = this.event.startTime?.slice(0, 5) ?? this.event.startTime;
     return new Date(`${date}T${time}`).getTime();
+  }
+
+  getEventDateRange(): string {
+    if (!this.event) return '';
+    const startDate = this.normalizeDate(this.event.startDate ?? this.event.date);
+    const endDate = this.normalizeDate(this.event.endDate ?? this.event.date ?? this.event.startDate);
+    return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+  }
+
+  private normalizeDate(date?: string): string {
+    return date?.split('T')[0] ?? '';
   }
 
   isPastEvent(): boolean {

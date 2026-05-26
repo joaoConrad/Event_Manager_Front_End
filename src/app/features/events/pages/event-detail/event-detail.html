@@ -101,7 +101,7 @@
 
             <div class="info-item">
               <span class="info-label">📅 Data</span>
-              <span class="info-value">{{ event.date }}</span>
+              <span class="info-value">{{ getEventDateRange() }}</span>
             </div>
 
             <div class="info-item">
@@ -313,7 +313,7 @@
 
           <div class="sidebar-date-block">
             <span class="sidebar-date-label">Data do evento</span>
-            <strong class="sidebar-date">{{ event.date }}</strong>
+            <strong class="sidebar-date">{{ getEventDateRange() }}</strong>
             <span class="sidebar-time">{{ event.startTime }} – {{ event.endTime }}</span>
           </div>
 

@@ -14,7 +14,8 @@ const LIMITS = {
 type FieldError = {
   title?: string;
   description?: string;
-  date?: string;
+  startDate?: string;
+  endDate?: string;
   startTime?: string;
   endTime?: string;
   location?: string;
@@ -32,7 +33,8 @@ export class EventCreate implements OnInit {
   event: EventModel = {
     title: '',
     description: '',
-    date: '',
+    startDate: '',
+    endDate: '',
     startTime: '',
     endTime: '',
     location: '',
@@ -113,9 +115,14 @@ export class EventCreate implements OnInit {
 
   // ── Validação ────────────────────────────────────────────
 
+  private getDateTime(date: string, time: string): number {
+    if (!date || !time) return 0;
+    return new Date(`${date}T${time}`).getTime();
+  }
+
   private isPast(date: string, time: string): boolean {
-    if (!date || !time) return false;
-    return new Date(`${date}T${time}`).getTime() < Date.now();
+    const dateTime = this.getDateTime(date, time);
+    return !!dateTime && dateTime < Date.now();
   }
 
   private validate(): boolean {
@@ -128,13 +135,18 @@ export class EventCreate implements OnInit {
     if (!e.description?.trim())                         errors.description = 'A descrição é obrigatória.';
     else if (e.description.length > LIMITS.description) errors.description = `Máximo de ${LIMITS.description} caracteres.`;
 
-    if (!e.date)                                        errors.date = 'A data é obrigatória.';
+    if (!e.startDate)                                   errors.startDate = 'A data de início é obrigatória.';
+    if (!e.endDate)                                     errors.endDate = 'A data de término é obrigatória.';
 
     if (!e.startTime)                                   errors.startTime = 'O horário de início é obrigatório.';
-    else if (e.date && this.isPast(e.date, e.startTime)) errors.startTime = 'O horário de início não pode ser no passado.';
+    else if (e.startDate && this.isPast(e.startDate, e.startTime)) errors.startTime = 'O início não pode ser no passado.';
 
     if (!e.endTime)                                     errors.endTime = 'O horário de término é obrigatório.';
-    else if (e.startTime && e.endTime && e.endTime <= e.startTime) errors.endTime = 'O término deve ser depois do início.';
+    else if (e.startDate && e.endDate && e.startTime && e.endTime) {
+      const start = this.getDateTime(e.startDate, e.startTime);
+      const end = this.getDateTime(e.endDate, e.endTime);
+      if (end <= start) errors.endTime = 'O término deve ser depois do início.';
+    }
 
     if (!e.location?.trim())                            errors.location = 'O local é obrigatório.';
     else if (e.location.length > LIMITS.location)       errors.location = `Máximo de ${LIMITS.location} caracteres.`;
@@ -157,9 +169,11 @@ export class EventCreate implements OnInit {
         const ev = response?.data ?? response;
         this.event = {
           ...ev,
-          date:      ev.date?.split('T')[0] ?? ev.date,
-          startTime: ev.startTime?.slice(0, 5) ?? ev.startTime ?? '',
-          endTime:   ev.endTime?.slice(0, 5)   ?? ev.endTime   ?? '',
+          startDate: ev.startDate?.split('T')[0] ?? ev.date?.split('T')[0] ?? ev.date ?? '',
+          endDate:   ev.endDate?.split('T')[0]   ?? ev.date?.split('T')[0] ?? ev.date ?? '',
+          date:      ev.startDate?.split('T')[0] ?? ev.date?.split('T')[0] ?? ev.date ?? '',
+          startTime: ev.startTime?.slice(0, 5)   ?? ev.startTime ?? '',
+          endTime:   ev.endTime?.slice(0, 5)     ?? ev.endTime   ?? '',
           approvalMode: ev.approvalMode ?? 'automatic',
           approvalRuleDescription: ev.approvalRuleDescription ?? '',
         };
@@ -196,7 +210,9 @@ export class EventCreate implements OnInit {
 
       fd.append('title',           this.event.title);
       fd.append('description',     this.event.description);
-      fd.append('date',            this.event.date);
+      fd.append('startDate',       this.event.startDate);
+      fd.append('endDate',         this.event.endDate);
+      fd.append('date',            this.event.startDate);
       fd.append('startTime',       this.event.startTime);
       fd.append('endTime',         this.event.endTime);
       fd.append('location',        this.event.location);
@@ -209,7 +225,7 @@ export class EventCreate implements OnInit {
     }
 
     // Sem imagem nova — envia JSON; no edit o back preserva a imagem atual
-    const payload: EventModel = { ...this.event };
+    const payload: EventModel = { ...this.event, date: this.event.startDate };
 
     // Remove imageUrl do payload quando o usuário removeu a imagem no form
     // para que o back limpe o campo. Caso o preview ainda exista (URL remota),

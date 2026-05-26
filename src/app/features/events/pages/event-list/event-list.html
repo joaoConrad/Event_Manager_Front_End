@@ -85,7 +85,7 @@
             <!-- ASIDE -->
             <div class="event-aside">
               <span class="aside-label">Evento</span>
-              <strong class="aside-date">{{ event.date }}</strong>
+              <strong class="aside-date">{{ getDateRange(event) }}</strong>
               <span class="aside-time">{{ event.startTime }} – {{ event.endTime }}</span>
               <div class="aside-divider"></div>
               <span class="aside-vacancies-label">Vagas</span>
@@ -202,7 +202,7 @@
               <div class="compact-card-info">
                 <span class="status-badge sold-out">Esgotado</span>
                 <span class="compact-title">{{ event.title }}</span>
-                <span class="compact-meta">{{ event.date }} · {{ event.location }}</span>
+                <span class="compact-meta">{{ getDateRange(event) }} · {{ event.location }}</span>
               </div>
               <a [routerLink]="['/events', event.id]" class="btn btn-secondary btn-sm">Ver detalhes</a>
             </div>
@@ -234,7 +234,7 @@
                   <span class="status-badge closed">Encerrado</span>
                   <span class="compact-title">{{ event.title }}</span>
                   <span class="compact-meta">
-                    {{ event.date }} · {{ event.startTime }} – {{ event.endTime }} · {{ event.location }}
+                    {{ getDateRange(event) }} · {{ event.startTime }} – {{ event.endTime }} · {{ event.location }}
                   </span>
                 </div>
                 <div class="compact-card-right">

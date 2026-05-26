@@ -138,8 +138,12 @@ export class EventList implements OnInit {
   private normalizeEvents(events: EventWithRegistered[]): EventWithRegistered[] {
     return events.map((event) => ({
       ...event,
-      date: event.date?.split('T')[0] ?? event.date,
+      startDate: this.normalizeDate(event.startDate ?? event.date),
+      endDate: this.normalizeDate(event.endDate ?? event.date ?? event.startDate),
+      date: this.normalizeDate(event.startDate ?? event.date),
       time: event.startTime?.slice(0, 5) ?? event.startTime,
+      startTime: event.startTime?.slice(0, 5) ?? event.startTime,
+      endTime: event.endTime?.slice(0, 5) ?? event.endTime,
       registeredParticipants: event.registeredParticipants ?? 0,
       availableSpots: event.availableSpots ?? this.calcSpots(event),
       isSoldOut: event.isSoldOut ?? this.calcSoldOut(event),
@@ -212,7 +216,7 @@ export class EventList implements OnInit {
 
   private applyFilters(events: EventWithRegistered[]): EventWithRegistered[] {
     return events.filter((event) => {
-      const matchData    = this.filtroData      ? event.date === this.filtroData : true;
+      const matchData    = this.filtroData      ? event.startDate === this.filtroData : true;
       const matchTitulo  = this.filtroCategoria ? event.title.toLowerCase().includes(this.filtroCategoria.toLowerCase()) : true;
       const matchStatus  = this.filtroStatus === 'inscrito'
         ? this.isJoined(event.id)
@@ -299,9 +303,19 @@ export class EventList implements OnInit {
   // ── Helpers de data/estado ─────────────────────────────
 
   getDateTime(event: EventWithRegistered): number {
-    const date = event.date?.split('T')[0] ?? event.date;
+    const date = this.normalizeDate(event.startDate ?? event.date);
     const time = event.startTime?.slice(0, 5) ?? event.startTime;
     return new Date(`${date}T${time}`).getTime();
+  }
+
+  getDateRange(event: EventWithRegistered): string {
+    const startDate = this.normalizeDate(event.startDate ?? event.date);
+    const endDate = this.normalizeDate(event.endDate ?? event.date ?? event.startDate);
+    return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+  }
+
+  private normalizeDate(date?: string): string {
+    return date?.split('T')[0] ?? '';
   }
 
   isPastEvent(event: EventWithRegistered): boolean {

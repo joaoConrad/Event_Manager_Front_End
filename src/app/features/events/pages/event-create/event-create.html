@@ -73,13 +73,13 @@
           }
         </div>
 
-        <!-- DATA -->
-        <div class="form-group full">
-          <label>Data <span class="required">*</span></label>
-          <input type="date" [(ngModel)]="event.date" name="date" [min]="minDate"
-            [class.field-invalid]="submitted && fieldErrors.date" [disabled]="loadingEvent" />
-          @if (submitted && fieldErrors.date) {
-            <span class="field-error-msg">{{ fieldErrors.date }}</span>
+        <!-- DATA INICIO -->
+        <div class="form-group">
+          <label>Data de inicio <span class="required">*</span></label>
+          <input type="date" [(ngModel)]="event.startDate" name="startDate" [min]="minDate"
+            [class.field-invalid]="submitted && fieldErrors.startDate" [disabled]="loadingEvent" />
+          @if (submitted && fieldErrors.startDate) {
+            <span class="field-error-msg">{{ fieldErrors.startDate }}</span>
           }
         </div>
 
@@ -90,6 +90,16 @@
             [class.field-invalid]="submitted && fieldErrors.startTime" [disabled]="loadingEvent" />
           @if (submitted && fieldErrors.startTime) {
             <span class="field-error-msg">{{ fieldErrors.startTime }}</span>
+          }
+        </div>
+
+        <!-- DATA FIM -->
+        <div class="form-group">
+          <label>Data de termino <span class="required">*</span></label>
+          <input type="date" [(ngModel)]="event.endDate" name="endDate" [min]="event.startDate || minDate"
+            [class.field-invalid]="submitted && fieldErrors.endDate" [disabled]="loadingEvent" />
+          @if (submitted && fieldErrors.endDate) {
+            <span class="field-error-msg">{{ fieldErrors.endDate }}</span>
           }
         </div>
 

@@ -33,7 +33,8 @@ describe('AuthService', () => {
 
   it('deve realizar login e salvar token e usuário', () => {
     service.login('admin@admin.com', 'adminpassword').subscribe((response) => {
-      expect(response.data?.token).toBe('fake-token');
+      expect(response.data?.accessToken).toBe('fake-token');
+      expect(response.data?.refreshToken).toBe('fake-refresh-token');
     });
 
     const req = httpMock.expectOne(`${apiUrl}/login`);
@@ -43,7 +44,8 @@ describe('AuthService', () => {
     req.flush({
       message: 'Login realizado com sucesso',
       data: {
-        token: 'fake-token',
+        accessToken: 'fake-token',
+        refreshToken: 'fake-refresh-token',
         user: {
           id: 1,
           name: 'Admin',
@@ -54,6 +56,7 @@ describe('AuthService', () => {
     });
 
     expect(localStorage.getItem('eventmanager_token')).toBe('fake-token');
+    expect(localStorage.getItem('eventmanager_refresh_token')).toBe('fake-refresh-token');
     expect(localStorage.getItem('eventmanager_user')).toContain('admin@admin.com');
   });
 
