@@ -39,6 +39,7 @@ export class EventService {
   private readonly authService = inject(AuthService);
 
   private readonly apiUrl      = `${environment.apiUrl}/events`;
+  private readonly apiBaseUrl  = environment.apiUrl.replace(/\/api$/, '');
 
   // Cache da última página buscada
   private eventsCache: EventModel[] = [];
@@ -60,7 +61,7 @@ export class EventService {
           hasNextPage:     res.hasNextPage,
           hasPreviousPage: res.hasPreviousPage
         };
-        return { events: res.data, meta };
+        return { events: res.data.map((event) => this.normalizeEventImage(event)), meta };
       }),
       tap(({ events, meta }) => {
         this.eventsCache = events;
@@ -82,7 +83,7 @@ export class EventService {
       headers: this.authService.getAuthHeaders(),
       params: { page: '1', limit: '50' }
     }).pipe(
-      map((res) => res.data),
+      map((res) => res.data.map((event) => this.normalizeEventImage(event))),
       tap((events) => {
         this.eventsCache = events;
         this.cacheValid  = true;
@@ -105,7 +106,9 @@ export class EventService {
   getById(id: number): Observable<EventModel> {
     return this.http.get<EventModel>(`${this.apiUrl}/${id}`, {
       headers: this.authService.getAuthHeaders()
-    });
+    }).pipe(
+      map((event) => this.normalizeEventImage(event))
+    );
   }
 
   /**
@@ -123,7 +126,7 @@ export class EventService {
 
     return this.http.post<EventResponse>(this.apiUrl, payload, { headers }).pipe(
       tap(() => this.clearCache()),
-      map((res) => res.data ?? (res as unknown as EventModel))
+      map((res) => this.normalizeEventImage(res.data ?? (res as unknown as EventModel)))
     );
   }
 
@@ -135,7 +138,7 @@ export class EventService {
 
     return this.http.put<EventResponse>(`${this.apiUrl}/${id}`, payload, { headers }).pipe(
       tap(() => this.clearCache()),
-      map((res) => res.data ?? (res as unknown as EventModel))
+      map((res) => this.normalizeEventImage(res.data ?? (res as unknown as EventModel)))
     );
   }
 
@@ -155,7 +158,7 @@ export class EventService {
       params: { page: '1', limit: '50' }
     }).pipe(
       map((res) => res.data.map(event => ({
-        ...event,
+        ...this.normalizeEventImage(event),
         totalParticipants: event.registeredParticipants ?? 0
       })))
     );
@@ -181,5 +184,23 @@ export class EventService {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
+  }
+
+  private normalizeEventImage(event: EventModel): EventModel {
+    if (event.imageUrl || !event.imagePath) {
+      return event;
+    }
+
+    const normalizedPath = event.imagePath.replace(/\\/g, '/');
+    const uploadsIndex = normalizedPath.lastIndexOf('uploads/');
+
+    if (uploadsIndex === -1) {
+      return event;
+    }
+
+    return {
+      ...event,
+      imageUrl: `${this.apiBaseUrl}/${normalizedPath.slice(uploadsIndex)}`
+    };
   }
 }

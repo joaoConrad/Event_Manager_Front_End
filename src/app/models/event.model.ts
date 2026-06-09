@@ -13,6 +13,7 @@ export interface EventModel {
   location: string;
   maxParticipants: number;
   imageUrl?: string;
+  imagePath?: string | null;
 
   // aprovacao de inscricoes
   approvalMode?: RegistrationApprovalMode;
