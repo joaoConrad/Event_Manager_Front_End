@@ -211,6 +211,68 @@
   </div>
 </div>
 
+        <!-- MATERIAIS (admin) -->
+        @if (authService.isAdmin()) {
+          <div class="detail-section">
+            <span class="section-label">Materiais do evento</span>
+            <p class="muted">
+              Envie arquivos para participantes aprovados acessarem na área do participante.
+            </p>
+
+            <div class="material-upload-form">
+              <input
+                type="text"
+                [(ngModel)]="materialTitle"
+                placeholder="Título do material"
+              />
+
+              <input
+                type="file"
+                (change)="onMaterialFileSelected($event)"
+                accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.webp,.txt,.zip"
+              />
+
+              <button
+                class="btn btn-primary"
+                [disabled]="!selectedMaterialFile || uploadingMaterial"
+                (click)="uploadMaterial()">
+                {{ uploadingMaterial ? 'Enviando...' : 'Enviar material' }}
+              </button>
+            </div>
+
+            @if (loadingMaterials) {
+              <p class="muted">Carregando materiais...</p>
+            } @else if (materials.length === 0) {
+              <p class="muted">Nenhum material cadastrado para este evento.</p>
+            } @else {
+              <div class="admin-materials-list">
+                @for (material of materials; track material.id) {
+                  <div class="admin-material-card">
+                    <div>
+                      <strong>{{ material.title }}</strong>
+                      <p class="muted">{{ material.description }}</p>
+                      <small>{{ material.sizeLabel }} • {{ material.releasedAt | date:'dd/MM/yyyy HH:mm' }}</small>
+                    </div>
+                    <div class="actions">
+                      <button
+                        class="btn btn-secondary btn-compact"
+                        (click)="downloadMaterial(material)">
+                        Baixar
+                      </button>
+                      <button
+                        class="btn btn-danger btn-compact"
+                        [disabled]="deletingMaterialIds.has(material.id)"
+                        (click)="removeMaterial(material)">
+                        {{ deletingMaterialIds.has(material.id) ? 'Excluindo...' : 'Excluir' }}
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
         <!-- PARTICIPANTES (admin) -->
         @if (authService.isAdmin()) {
           <div class="detail-section">

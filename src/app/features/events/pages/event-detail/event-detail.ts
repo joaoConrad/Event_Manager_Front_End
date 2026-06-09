@@ -4,8 +4,10 @@ import { EventService } from '../../../../core/services/event';
 import { ParticipantService } from '../../../../core/services/participant';
 import { AuthService } from '../../../../core/services/auth';
 import { SpeakerService } from '../../../../core/services/speaker.service';
+import { MaterialService } from '../../../../core/services/material.service';
 import { EventModel } from '../../../../models/event.model';
 import { ParticipantModel } from '../../../../models/participant.model';
+import { MaterialModel } from '../../../../models/material.model';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -38,8 +40,14 @@ export class EventDetail implements OnInit {
   searchParticipant = '';
   filteredParticipants: any[] = [];
   newsList: News[] = [];
+  materials: MaterialModel[] = [];
   newTitle = '';
   newContent = '';
+  materialTitle = '';
+  selectedMaterialFile: File | null = null;
+  uploadingMaterial = false;
+  loadingMaterials = false;
+  deletingMaterialIds = new Set<number>();
 
   loading = true;
   loadingParticipants = false;
@@ -60,6 +68,7 @@ export class EventDetail implements OnInit {
     private readonly eventService: EventService,
     private readonly participantService: ParticipantService,
     private readonly speakerService: SpeakerService,
+    private readonly materialService: MaterialService,
     public readonly authService: AuthService,
     private readonly cdr: ChangeDetectorRef,
     private newsService: NewsService
@@ -104,6 +113,7 @@ export class EventDetail implements OnInit {
 
       if (this.authService.isAdmin() && this.event?.id) {
         this.loadParticipants(this.event.id);
+        this.loadMaterials();
       }
 
       this.cdr.detectChanges();
@@ -193,6 +203,82 @@ export class EventDetail implements OnInit {
       },
       error: (err) => {
         console.error('Erro ao excluir aviso:', err);
+      }
+    });
+  }
+
+  loadMaterials(): void {
+    if (!this.event?.id || !this.authService.isAdmin()) {
+      this.materials = [];
+      return;
+    }
+
+    this.loadingMaterials = true;
+    this.materialService.getMaterialsByEvent(this.event.id, this.event).subscribe({
+      next: (materials) => {
+        this.materials = materials;
+        this.loadingMaterials = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.loadingMaterials = false;
+        this.showFeedback(err?.error?.message || 'Não foi possível carregar os materiais.', 'error');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onMaterialFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedMaterialFile = input.files?.[0] ?? null;
+  }
+
+  uploadMaterial(): void {
+    if (!this.event?.id || !this.selectedMaterialFile || this.uploadingMaterial) return;
+
+    this.uploadingMaterial = true;
+    this.materialService.uploadMaterial(this.event.id, this.materialTitle, this.selectedMaterialFile).subscribe({
+      next: () => {
+        this.materialTitle = '';
+        this.selectedMaterialFile = null;
+        this.uploadingMaterial = false;
+        this.showFeedback('Material enviado com sucesso.', 'success');
+        this.loadMaterials();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.uploadingMaterial = false;
+        this.showFeedback(err?.error?.message || 'Não foi possível enviar o material.', 'error');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  removeMaterial(material: MaterialModel): void {
+    if (!this.event?.id || this.deletingMaterialIds.has(material.id)) return;
+
+    this.deletingMaterialIds.add(material.id);
+    this.materialService.deleteMaterial(this.event.id, material.id).subscribe({
+      next: () => {
+        this.materials = this.materials.filter((item) => item.id !== material.id);
+        this.deletingMaterialIds.delete(material.id);
+        this.showFeedback('Material removido com sucesso.', 'success');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.deletingMaterialIds.delete(material.id);
+        this.showFeedback(err?.error?.message || 'Não foi possível remover o material.', 'error');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  downloadMaterial(material: MaterialModel): void {
+    this.materialService.downloadMaterial(material).subscribe({
+      next: (blob) => this.materialService.saveMaterialFile(material, blob),
+      error: (err) => {
+        this.showFeedback(err?.error?.message || 'Não foi possível baixar o material.', 'error');
+        this.cdr.detectChanges();
       }
     });
   }

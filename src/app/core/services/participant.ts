@@ -111,7 +111,7 @@ export class ParticipantService {
    */
   validateCheckin(eventId: number, subscriptionToken: string): Observable<CheckinResponse> {
     return this.http.get<CheckinResponse>(
-      `${this.apiUrl}/validate/${subscriptionToken}`,
+      `${this.apiUrl}/${eventId}/validate/${subscriptionToken}`,
       { headers: this.authService.getAuthHeaders() }
     );
   }

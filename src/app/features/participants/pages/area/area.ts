@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
 import { MaterialService } from '../../../../core/services/material.service';
 import { MaterialModel, MaterialType } from '../../../../models/material.model';
@@ -16,7 +16,7 @@ interface EventGroup {
 @Component({
   selector: 'app-participant-area',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './area.html',
   styleUrl: './area.css',
 })
@@ -118,7 +118,10 @@ export class ParticipantArea implements OnInit {
   }
 
   handleDownload(material: MaterialModel): void {
-    window.open(material.url, '_blank', 'noopener noreferrer');
+    this.materialService.downloadMaterial(material).subscribe({
+      next: (blob) => this.materialService.saveMaterialFile(material, blob),
+      error: () => {}
+    });
   }
 
   getInitials(): string {
