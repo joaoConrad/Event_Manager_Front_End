@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap, map } from 'rxjs';
+import { Observable, tap, map, shareReplay, finalize } from 'rxjs';
 import { EventModel } from '../../models/event.model';
 import { AuthService } from './auth';
 import { environment } from '../../../environments/environment';
@@ -45,6 +45,7 @@ export class EventService {
   private eventsCache: EventModel[] = [];
   private lastMeta: PaginationMeta | null = null;
   private cacheValid = false;
+  private allEventsRequest: Observable<EventModel[]> | null = null;
 
   // ── Paginação ──────────────────────────────────────────
 
@@ -79,7 +80,11 @@ export class EventService {
       });
     }
 
-    return this.http.get<PaginatedResponse>(this.apiUrl, {
+    if (!forceRefresh && this.allEventsRequest) {
+      return this.allEventsRequest;
+    }
+
+    this.allEventsRequest = this.http.get<PaginatedResponse>(this.apiUrl, {
       headers: this.authService.getAuthHeaders(),
       params: { page: '1', limit: '50' }
     }).pipe(
@@ -87,8 +92,14 @@ export class EventService {
       tap((events) => {
         this.eventsCache = events;
         this.cacheValid  = true;
-      })
+      }),
+      finalize(() => {
+        this.allEventsRequest = null;
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+
+    return this.allEventsRequest;
   }
 
   getMeta(): PaginationMeta | null {
@@ -99,6 +110,7 @@ export class EventService {
     this.eventsCache = [];
     this.lastMeta    = null;
     this.cacheValid  = false;
+    this.allEventsRequest = null;
   }
 
   // ── CRUD ───────────────────────────────────────────────
