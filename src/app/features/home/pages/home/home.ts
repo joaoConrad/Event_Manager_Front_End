@@ -81,6 +81,12 @@ export class Home implements OnInit, AfterViewInit {
     return new Date(`${date}T${time}`).getTime();
   }
 
+  getEventEndDateTime(event: EventModel): number {
+    const date = this.normalizeDate(event.endDate ?? event.startDate ?? event.date);
+    const time = event.endTime?.slice(0, 5) ?? event.endTime ?? event.startTime ?? '00:00';
+    return new Date(`${date}T${time}`).getTime();
+  }
+
   getDateRange(event: EventModel): string {
     const startDate = this.normalizeDate(event.startDate ?? event.date);
     const endDate = this.normalizeDate(event.endDate ?? event.date ?? event.startDate);
@@ -92,7 +98,7 @@ export class Home implements OnInit, AfterViewInit {
   }
 
   isPastEvent(event: EventModel): boolean {
-    return this.getEventDateTime(event) < Date.now();
+    return this.getEventEndDateTime(event) < Date.now();
   }
 
   getAvailableSpots(event: EventModel): number {

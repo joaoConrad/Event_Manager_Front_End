@@ -122,7 +122,12 @@ export class EventCreate implements OnInit {
 
   private isPast(date: string, time: string): boolean {
     const dateTime = this.getDateTime(date, time);
-    return !!dateTime && dateTime < Date.now();
+    if (!dateTime) return false;
+
+    const now = new Date();
+    now.setSeconds(0, 0);
+
+    return dateTime < now.getTime();
   }
 
   private validate(): boolean {

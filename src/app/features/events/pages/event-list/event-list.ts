@@ -308,6 +308,12 @@ export class EventList implements OnInit {
     return new Date(`${date}T${time}`).getTime();
   }
 
+  getEventEndDateTime(event: EventWithRegistered): number {
+    const date = this.normalizeDate(event.endDate ?? event.startDate ?? event.date);
+    const time = event.endTime?.slice(0, 5) ?? event.endTime ?? event.startTime ?? '00:00';
+    return new Date(`${date}T${time}`).getTime();
+  }
+
   getDateRange(event: EventWithRegistered): string {
     const startDate = this.normalizeDate(event.startDate ?? event.date);
     const endDate = this.normalizeDate(event.endDate ?? event.date ?? event.startDate);
@@ -319,7 +325,7 @@ export class EventList implements OnInit {
   }
 
   isPastEvent(event: EventWithRegistered): boolean {
-    return this.getDateTime(event) < Date.now();
+    return this.getEventEndDateTime(event) < Date.now();
   }
 
   calcSpots(event: EventWithRegistered): number {

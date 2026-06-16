@@ -299,6 +299,13 @@ export class EventDetail implements OnInit {
     return new Date(`${date}T${time}`).getTime();
   }
 
+  getEventEndDateTime(): number {
+    if (!this.event) return 0;
+    const date = this.normalizeDate(this.event.endDate ?? this.event.startDate ?? this.event.date);
+    const time = this.event.endTime?.slice(0, 5) ?? this.event.endTime ?? this.event.startTime ?? '00:00';
+    return new Date(`${date}T${time}`).getTime();
+  }
+
   getEventDateRange(): string {
     if (!this.event) return '';
     const startDate = this.normalizeDate(this.event.startDate ?? this.event.date);
@@ -311,7 +318,7 @@ export class EventDetail implements OnInit {
   }
 
   isPastEvent(): boolean {
-    return this.getEventDateTime() < Date.now();
+    return this.getEventEndDateTime() < Date.now();
   }
 
   getAvailableSpots(): number {
