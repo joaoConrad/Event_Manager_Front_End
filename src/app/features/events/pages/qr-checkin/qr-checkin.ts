@@ -1,6 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import * as QRCode from 'qrcode';
 import { AuthService } from '../../../../core/services/auth';
 import { ParticipantService, MySubscription } from '../../../../core/services/participant';
 
@@ -147,19 +148,19 @@ export class QrCheckin implements OnInit, AfterViewInit, OnDestroy {
   generateQr(): void {
     if (!this.subscriptionToken || !this.canShowQr) return;
 
-    import('qrcode').then((QRCode) => {
-      QRCode.toDataURL(this.subscriptionToken!, {
+    QRCode.toDataURL(this.subscriptionToken, {
         width: 280,
         margin: 2,
         color: { dark: '#0F2557', light: '#FFFFFF' }
-      }).then(url => {
+      })
+      .then(url => {
         this.qrDataUrl = url;
         this.cdr.detectChanges();
+      })
+      .catch(() => {
+        this.qrDataUrl = null;
+        this.cdr.detectChanges();
       });
-    }).catch(() => {
-      this.qrDataUrl = null;
-      this.cdr.detectChanges();
-    });
   }
 
   // ── Admin: check-in via token ──────────────────────────

@@ -69,7 +69,7 @@ export class EventCreate implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.minDate = this.getLocalDateString();
+    this.minDate = new Date().toISOString().split('T')[0];
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.isEditMode = true;
@@ -116,62 +116,18 @@ export class EventCreate implements OnInit {
   // ── Validação ────────────────────────────────────────────
 
   private getDateTime(date: string, time: string): number {
-    const parsed = this.parseDateTime(date, time);
-    if (!parsed) return 0;
-
-    return Date.UTC(
-      parsed.year,
-      parsed.month - 1,
-      parsed.day,
-      parsed.hour,
-      parsed.minute
-    );
+    if (!date || !time) return 0;
+    return new Date(`${date}T${time}`).getTime();
   }
 
   private isPast(date: string, time: string): boolean {
-    const selected = this.parseDateTime(date, time);
-    if (!selected) return false;
+    const dateTime = this.getDateTime(date, time);
+    if (!dateTime) return false;
 
     const now = new Date();
-    const current = Date.UTC(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      now.getHours(),
-      now.getMinutes()
-    );
+    now.setSeconds(0, 0);
 
-    return this.getDateTime(date, time) < current;
-  }
-
-  private parseDateTime(date: string, time: string): {
-    year: number;
-    month: number;
-    day: number;
-    hour: number;
-    minute: number;
-  } | null {
-    const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
-    const timeMatch = /^(\d{2}):(\d{2})/.exec(time);
-
-    if (!dateMatch || !timeMatch) return null;
-
-    return {
-      year: Number(dateMatch[1]),
-      month: Number(dateMatch[2]),
-      day: Number(dateMatch[3]),
-      hour: Number(timeMatch[1]),
-      minute: Number(timeMatch[2])
-    };
-  }
-
-  private getLocalDateString(): string {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
+    return dateTime < now.getTime();
   }
 
   private validate(): boolean {
