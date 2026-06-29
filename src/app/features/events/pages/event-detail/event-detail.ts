@@ -111,9 +111,12 @@ export class EventDetail implements OnInit {
 
       this.loading = false;
 
+      if (this.event?.id) {
+        this.loadMaterials();
+      }
+
       if (this.authService.isAdmin() && this.event?.id) {
         this.loadParticipants(this.event.id);
-        this.loadMaterials();
       }
 
       this.cdr.detectChanges();
@@ -208,7 +211,7 @@ export class EventDetail implements OnInit {
   }
 
   loadMaterials(): void {
-    if (!this.event?.id || !this.authService.isAdmin()) {
+    if (!this.event?.id) {
       this.materials = [];
       return;
     }

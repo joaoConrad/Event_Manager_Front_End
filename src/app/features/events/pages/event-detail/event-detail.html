@@ -212,19 +212,20 @@
 </div>
 
         <!-- MATERIAIS (admin) -->
-        @if (authService.isAdmin()) {
-          <div class="detail-section">
+        <div class="detail-section">
             <span class="section-label">Materiais do evento</span>
             <p class="muted">
               Envie arquivos para participantes aprovados acessarem na área do participante.
             </p>
 
+          @if (authService.isAdmin()) {
             <div class="material-upload-form">
               <input
                 type="text"
                 [(ngModel)]="materialTitle"
                 placeholder="Título do material"
               />
+
 
               <input
                 type="file"
@@ -239,6 +240,7 @@
                 {{ uploadingMaterial ? 'Enviando...' : 'Enviar material' }}
               </button>
             </div>
+          }
 
             @if (loadingMaterials) {
               <p class="muted">Carregando materiais...</p>
@@ -254,24 +256,31 @@
                       <small>{{ material.sizeLabel }} • {{ material.releasedAt | date:'dd/MM/yyyy HH:mm' }}</small>
                     </div>
                     <div class="actions">
+
                       <button
                         class="btn btn-secondary btn-compact"
                         (click)="downloadMaterial(material)">
                         Baixar
                       </button>
-                      <button
-                        class="btn btn-danger btn-compact"
-                        [disabled]="deletingMaterialIds.has(material.id)"
-                        (click)="removeMaterial(material)">
-                        {{ deletingMaterialIds.has(material.id) ? 'Excluindo...' : 'Excluir' }}
-                      </button>
+
+                      @if (authService.isAdmin()) {
+
+                        <button
+                          class="btn btn-danger btn-compact"
+                          [disabled]="deletingMaterialIds.has(material.id)"
+                          (click)="removeMaterial(material)">
+                          {{ deletingMaterialIds.has(material.id) ? 'Excluindo...' : 'Excluir' }}
+                        </button>
+
+                      }
+
                     </div>
                   </div>
                 }
               </div>
             }
           </div>
-        }
+
 
         <!-- PARTICIPANTES (admin) -->
         @if (authService.isAdmin()) {
