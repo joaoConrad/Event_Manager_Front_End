@@ -77,3 +77,33 @@ img, video {
   height: auto;
 }
 
+
+/* Utility helpers to make images fit their containers.
+   Use on an <img> element (or add the class to the component CSS):
+     - .img-cover  -> fills the container and crops (object-fit: cover)
+     - .img-contain -> fits inside without cropping (object-fit: contain)
+   Example: <img src="..." class="img-cover" />
+*/
+.img-cover {
+  width: 100%;
+  height: 100%; /* requires parent to have an explicit height */
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+.img-contain {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center center;
+  display: block;
+}
+
+/* Background helpers for elements that use background-image */
+.bg-cover {
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+

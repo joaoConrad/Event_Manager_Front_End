@@ -116,10 +116,10 @@ export class EventService {
   // ── CRUD ───────────────────────────────────────────────
 
   getById(id: number): Observable<EventModel> {
-    return this.http.get<EventModel>(`${this.apiUrl}/${id}`, {
+    return this.http.get<EventModel | EventResponse>(`${this.apiUrl}/${id}`, {
       headers: this.authService.getAuthHeaders()
     }).pipe(
-      map((event) => this.normalizeEventImage(event))
+      map((res) => this.normalizeEventImage(('data' in res ? res.data : res)))
     );
   }
 
@@ -199,20 +199,50 @@ export class EventService {
   }
 
   private normalizeEventImage(event: EventModel): EventModel {
-    if (event.imageUrl || !event.imagePath) {
-      return event;
+    if (event.imageUrl) {
+      return {
+        ...event,
+        imageUrl: this.normalizeAssetUrl(event.imageUrl)
+      };
     }
 
-    const normalizedPath = event.imagePath.replace(/\\/g, '/');
-    const uploadsIndex = normalizedPath.lastIndexOf('uploads/');
-
-    if (uploadsIndex === -1) {
+    if (!event.imagePath) {
       return event;
     }
 
     return {
       ...event,
-      imageUrl: `${this.apiBaseUrl}/${normalizedPath.slice(uploadsIndex)}`
+      imageUrl: this.normalizeAssetUrl(event.imagePath)
     };
+  }
+
+  private normalizeAssetUrl(value: string): string {
+    const normalizedPath = value.replace(/\\/g, '/');
+    const uploadsIndex = normalizedPath.lastIndexOf('uploads/');
+
+    if (/^https?:/i.test(value)) {
+      try {
+        const assetUrl = new URL(normalizedPath);
+        const apiUrl = new URL(this.apiBaseUrl);
+
+        if (assetUrl.origin === apiUrl.origin && uploadsIndex !== -1) {
+          return `${assetUrl.origin}/${normalizedPath.slice(uploadsIndex)}`;
+        }
+      } catch {
+        return value;
+      }
+
+      return value;
+    }
+
+    if (/^(data:|blob:)/i.test(value)) {
+      return value;
+    }
+
+    if (uploadsIndex === -1) {
+      return normalizedPath;
+    }
+
+    return `${this.apiBaseUrl}/${normalizedPath.slice(uploadsIndex)}`;
   }
 }

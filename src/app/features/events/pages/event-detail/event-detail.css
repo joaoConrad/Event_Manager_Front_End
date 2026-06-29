@@ -709,8 +709,8 @@
 
 /* ── IMAGEM DE CAPA NO DETALHE ── */
 .detail-cover-wrap {
-  margin: -2rem -2rem 1.5rem;
-  height: 260px;
+  margin: 1rem -2rem 1.5rem;
+  height: 300px;
   overflow: hidden;
   border-radius: 26px 26px 0 0;
 }
